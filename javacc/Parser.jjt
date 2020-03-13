@@ -1,6 +1,4 @@
 PARSER_BEGIN(Parser)
-import java.util.HashMap;
-import java.util.Map;
 public class Parser {
 
     public static void main(String[] args) throws ParseException {
@@ -40,41 +38,41 @@ TOKEN:
     | <IDENTIFIER: ["A"-"Z", "a"-"z"](["0"-"9", "A"-"Z", "a" - "z"])* >
 }
 
-void Program() : {}
+SimpleNode Program() : {}
 {
-    ImportDeclaration() ClassDeclaration() <EOF>
+    ImportDeclaration() ClassDeclaration() <EOF> { return jjtThis; }
 }
 
 
-void ImportDeclaration() : {}
+void ImportDeclaration() #void : {}
 {
     (<IMPORT> ImportStatement() ";")*
 }
 
-void ImportStatement() : {}
+void ImportStatement() #void : {}
 {
     <IDENTIFIER> ("." <IDENTIFIER>)* "(" Type() ")"
 }
 
 
-void ClassDeclaration() : {}
+void ClassDeclaration() #void : {}
 {
     <CLASS> <IDENTIFIER>  [<EXTENDS> <IDENTIFIER> ]  "{"VarDeclaration() (MethodDeclaration())* "}"
 }
 
-void VarDeclaration() : {}
+void VarDeclaration() #void : {}
 {
     Type() <IDENTIFIER> [ VarDeclaration() ]";"
 }
 
-void MethodDeclaration() : {}
+void MethodDeclaration() #void : {}
 {
     <PUBLIC>
     ((Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{"VarDeclaration() (Statement())* <RETURN> Stuff() ";" "}")
     | (<STATIC> <VOID> <MAIN> "(" <STRING> "[" "]" <IDENTIFIER> ")" "{" VarDeclaration() (Statement())* "}")) //TODO: check if newly added production is correct
 }
 
-void Statement() : {}
+void Statement() #void : {}
 {
     "{" (Statement())* "}"
     | <IF> "(" Expression() ")" Statement() <ELSE> Statement()
@@ -84,20 +82,20 @@ void Statement() : {}
     | Expression() ";"
 }
 
-void Stuff() : {}
+void Stuff() #void : {}
 {
      ("&&"|"<"|"+"|"-"|"*"|"/") Expression() Stuff()
     | "[" Expression() "]" Stuff()
     |"." ( <LENGTH> | (<IDENTIFIER> "(" [ Expression() ("," Expression() )* ] ")")) Stuff()
 }
 
-void Expression() : {}
-{
-    <INTEGER> Stuff()
-    | <TRUE> Stuff()
-    | <FALSE> Stuff()
-    | <NEW> ((<IDENTIFIER> "()") |( <INT> "[" Expression() "]") ) Stuff()
-    | "!" Expression() Stuff()
+void Expression() : { Token t; }{
+    t=<INTEGER>{ jjtThis.action = new NumericAction(Integer.parseInt(t.image)); } #Numeric Stuff()
+    | <TRUE> { jjtThis.action = new NumericAction(1); } #Numeric Stuff()
+    | <FALSE> { jjtThis.action = new NumericAction(0); } #Numeric Stuff()
+    | <NEW> (t= <IDENTIFIER>  { jjtThis.action = new NewAction(t.image); }#New  "()"
+    |<INT> "[" Expression() "]" { jjtThis.action = new ArrayAccessAction(); }#ArrayAccess ) Stuff()
+    | "!" { jjtThis.action = new NegationAction(); }#Negation Expression() Stuff()
     | "(" Expression() ")" Stuff()
 }
 
