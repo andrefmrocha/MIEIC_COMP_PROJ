@@ -1,12 +1,11 @@
 PARSER_BEGIN(Parser)
 import java.util.HashMap;
 import java.util.Map;
-public class Parser implements CalculatorTreeConstants {
+public class Parser {
 
     public static void main(String[] args) throws ParseException {
             Parser parser = new Parser(System.in);
-            parser.program();
-            root.dump("");
+            parser.Program();
     }
 }
 PARSER_END(Parser)
