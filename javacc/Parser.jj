@@ -1,0 +1,108 @@
+PARSER_BEGIN(Parser)
+import java.util.HashMap;
+import java.util.Map;
+public class Parser implements CalculatorTreeConstants {
+
+    public static void main(String[] args) throws ParseException {
+            Parser parser = new Parser(System.in);
+            parser.program();
+            root.dump("");
+    }
+}
+PARSER_END(Parser)
+
+SKIP :
+{
+    " " | "\t" | "\r" | "\n"
+}
+
+TOKEN:
+{
+    < INTEGER: (["0"-"9"])+ >
+    | < LF: ";" >
+    | <IMPORT: "import">
+    | <CLASS: "class">
+    | <EXTENDS: "extends">
+    | <PUBLIC: "public">
+    | <STATIC: "static">
+    | <VOID: "void">
+    | <MAIN: "main">
+    | <STRING: "String">
+    | <RETURN: "return">
+    | <IF: "if">
+    | <ELSE: "else">
+    | <WHILE: "while">
+    | <TRUE: "true">
+    | <FALSE: "false">
+    | <NEW: "new">
+    | <LENGTH: "length">
+    | <INT: "int">
+    | <BOOLEAN: "boolean">
+    | <IDENTIFIER: ["A"-"Z", "a"-"z"](["0"-"9", "A"-"Z", "a" - "z"])* >
+}
+
+void Program() : {}
+{
+    ImportDeclaration() ClassDeclaration() <EOF>
+}
+
+
+void ImportDeclaration() : {}
+{
+    (<IMPORT> ImportStatement() ";")*
+}
+
+void ImportStatement() : {}
+{
+    <IDENTIFIER> ("." <IDENTIFIER>)* "(" Type() ")"
+}
+
+
+void ClassDeclaration() : {}
+{
+    <CLASS> <IDENTIFIER>  [<EXTENDS> <IDENTIFIER> ]  "{" (VarDeclaration())* (MethodDeclaration())* "}"
+}
+
+void VarDeclaration() : {}
+{
+    Type() <IDENTIFIER> [ VarDeclaration() ]";"
+}
+
+void MethodDeclaration() : {}
+{
+    <PUBLIC>
+    ((Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{"VarDeclaration() (Statement())* <RETURN> Stuff() ";" "}")
+    | (<STATIC> <VOID> <MAIN> "(" <STRING> "[" "]" <IDENTIFIER> ")" "{" VarDeclaration() (Statement())* "}")) //TODO: check if newly added production is correct
+}
+
+void Statement() : {}
+{
+    "{" (Statement())* "}"
+    | <IF> "(" Expression() ")" Statement() <ELSE> Statement()
+    | <WHILE> "(" Expression() ")" Statement()
+    //| <IDENTIFIER> (("=" Expression() ) | ("[" Expression() "]" "=" Expression() ) ) ";"
+    | <IDENTIFIER> ["[" Expression() "]"] "=" Expression() ";" //TODO: verify if this production is acceptable
+    | Expression() ";"
+}
+
+void Stuff() : {}
+{
+     ("&&"|"<"|"+"|"-"|"*"|"/") Expression() Stuff()
+    | "[" Expression() "]" Stuff()
+    |"." ( <LENGTH> | (<IDENTIFIER> "(" [ Expression() ("," Expression() )* ] ")")) Stuff()
+}
+
+void Expression() : {}
+{
+    <INTEGER> Stuff()
+    | <TRUE> Stuff()
+    | <FALSE> Stuff()
+    | <NEW> ((<IDENTIFIER> "()") |( <INT> "[" Expression() "]") ) Stuff()
+    | "!" Expression() Stuff()
+    | "(" Expression() ")" Stuff()
+}
+
+void Type() : {} //TODO: Type no longer a Token
+{
+      <INT>["[]"] | <BOOLEAN> | <IDENTIFIER>
+}
