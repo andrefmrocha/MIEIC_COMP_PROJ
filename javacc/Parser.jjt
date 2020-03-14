@@ -80,12 +80,12 @@ void MethodDeclaration() #void : {}
 
 }
 
-void Statement() #void : {}
+void Statement() #void : {Token t;}
 {
     "{" (Statement())* "}"
-    | (<IF> "(" Expression() ")" Statement()  <ELSE> Statement()) {jjtThis.action = new IfThenElseAction();} #IfThenElse
-    | (<WHILE> "(" Expression() ")" Statement()) {jjtThis.action = new WhileAction();} #While
-    | <IDENTIFIER> (("=" Expression() {jjtThis.action = new AssignVar();} #AssignVar) | ("[" Expression() "]" "=" Expression()  {jjtThis.action = new AssignVarArray();} #AssignVarArray) ) ";"
+    | <IF> #If "(" Expression() ")" #Then Statement()  <ELSE> #Else Statement()
+    | <WHILE> #While"(" Expression() ")" #Do Statement()
+    | t=<IDENTIFIER> (("=" Expression() {jjtThis.varIdentifier = t.image;} #AssignVar) | ("[" Expression() #ArrayAccess "]" "=" Expression() {jjtThis.arrayIdentifier = t.image;} #AssignVarArray))  ";"
     | Expression() ";"
 }
 
