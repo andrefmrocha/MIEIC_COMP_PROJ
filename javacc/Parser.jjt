@@ -19,6 +19,18 @@ SKIP :
     " " | "\t" | "\r" | "\n"
 }
 
+SKIP :
+{
+  < "//" (~["\r", "\n"])* >
+| "/*" : ML_COMMENT_STATE
+}
+
+<ML_COMMENT_STATE> SKIP :
+{
+  "*/" : DEFAULT
+| < ~[] >
+}
+
 TOKEN:
 {
     < INTEGER: (["0"-"9"])+ >
@@ -75,8 +87,8 @@ void VarDeclaration() #void : {}
 void MethodDeclaration() #void : {}
 {
     <PUBLIC>
-    (Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{" ( LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> ComplementaryExpression() ";" "}"
-    | (<STATIC> <VOID> <MAIN> "(" <STRING> "[" "]" <IDENTIFIER> ")" "{" (LOOKAHEAD(2) VarDeclaration())* (Statement())* "}")) //TODO: check if newly added production is correct
+    (Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{" ( LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() ";" "}"
+    | (<STATIC> <VOID> <MAIN> "(" <STRING> "[]" <IDENTIFIER> ")" "{" (LOOKAHEAD(2) VarDeclaration())* (Statement())* "}")) //TODO: check if newly added production is correct
 
 }
 
@@ -91,8 +103,9 @@ void Statement() #void : {}
 void ComplementaryExpression() #void : { Token t; }
 {
      ("&&" #And(2) |"<" #LessThan(2) | "+"#Sum(2) | "-"#Minus(2) | "*"#Mul(2) | "/"#Div(2) ) Expression() ComplementaryExpression()
-    |"." ( <LENGTH>
+    |"." ( <LENGTH> #Length
     | t=<IDENTIFIER> "(" [ Expression() ("," Expression() )* ] ")" { jjtThis.methodIdentifier = t.image; }#MethodCall  ) ComplementaryExpression()
+    | {}
 }
 
 void Expression() #void : { Token t; }{
