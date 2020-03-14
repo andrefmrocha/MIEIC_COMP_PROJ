@@ -19,10 +19,21 @@ SKIP :
     " " | "\t" | "\r" | "\n"
 }
 
+SKIP :
+{
+  < "//" (~["\r", "\n"])* >
+| "/*" : ML_COMMENT_STATE
+}
+
+<ML_COMMENT_STATE> SKIP :
+{
+  "*/" : DEFAULT
+| < ~[] >
+}
+
 TOKEN:
 {
     < INTEGER: (["0"-"9"])+ >
-    | < LF: ";" >
     | <IMPORT: "import">
     | <CLASS: "class">
     | <EXTENDS: "extends">
@@ -43,6 +54,15 @@ TOKEN:
     | <INT: "int">
     | <BOOLEAN: "boolean">
     | <IDENTIFIER: ["A"-"Z", "a"-"z"](["0"-"9", "A"-"Z", "a" - "z", "_"])* >
+    | <LFTSQRBRCKT : "[">
+    | <RGHTSQRBRCKT : "]">
+    | <RGHTBRCKT : ")">
+    | <LFTBRCKT : "(">
+    | <LFTCRLBRCKT : "{">
+    | <RGHTCRLBRCKT : "}">
+    | <SEMICOLON : ";">
+    | <DOT : ".">
+    | <COMMA : ",">
 }
 
 SimpleNode Program() : {}
@@ -53,46 +73,47 @@ SimpleNode Program() : {}
 
 void ImportDeclaration() #void : {}
 {
-    (<IMPORT> ImportStatement() ";")*
+    (<IMPORT> ImportStatement() <SEMICOLON> )*
 }
 
 void ImportStatement() #void : {}
 {
-    <IDENTIFIER> ("." <IDENTIFIER>)* "(" Type() ")"
+    <IDENTIFIER> (<DOT> <IDENTIFIER>)* <LFTBRCKT> Type() <RGHTBRCKT>
 }
 
 
 void ClassDeclaration() #void : {}
 {
-    <CLASS> <IDENTIFIER>  [<EXTENDS> <IDENTIFIER> ]  "{"(VarDeclaration())* (MethodDeclaration())* "}"
+    <CLASS> <IDENTIFIER>  [<EXTENDS> <IDENTIFIER> ]  <LFTCRLBRCKT> (VarDeclaration())* (MethodDeclaration())* <RGHTCRLBRCKT>
 }
 
 void VarDeclaration() #void : {}
 {
-   Type() <IDENTIFIER> ";"
+   Type() <IDENTIFIER> <SEMICOLON>
 }
 
 void MethodDeclaration() #void : {}
 {
     <PUBLIC>
-    (Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{" ( LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> ComplementaryExpression() ";" "}"
-    | (<STATIC> <VOID> <MAIN> "(" <STRING> "[" "]" <IDENTIFIER> ")" "{" (LOOKAHEAD(2) VarDeclaration())* (Statement())* "}")) //TODO: check if newly added production is correct
+    (Type() <IDENTIFIER> <LFTBRCKT> [Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)*] <RGHTBRCKT> <LFTCRLBRCKT> ( LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() <SEMICOLON> <RGHTCRLBRCKT>
+    | (<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") <IDENTIFIER> <RGHTBRCKT> <LFTCRLBRCKT> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <RGHTCRLBRCKT> )) //TODO: check if newly added production is correct
 
 }
 
 void Statement() #void : {}
 {
-    "{" (Statement())* "}"
-    | <IF> "(" Expression() ")" Statement() <ELSE> Statement()
-    | <WHILE> "(" Expression() ")" Statement()
-    | Expression() ";"
+    <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
+    | <IF> <LFTBRCKT> Expression() <RGHTBRCKT> Statement() <ELSE> Statement()
+    | <WHILE> <LFTBRCKT> Expression() <RGHTBRCKT> Statement()
+    | Expression() <SEMICOLON>
 }
 
 void ComplementaryExpression() #void : { Token t; }
 {
      ("&&" #And(2) |"<" #LessThan(2) | "+"#Sum(2) | "-"#Minus(2) | "*"#Mul(2) | "/"#Div(2) ) Expression() ComplementaryExpression()
-    |"." ( <LENGTH>
-    | t=<IDENTIFIER> "(" [ Expression() ("," Expression() )* ] ")" { jjtThis.methodIdentifier = t.image; }#MethodCall  ) ComplementaryExpression()
+    |<DOT> ( <LENGTH> #Length
+    | t=<IDENTIFIER> <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> { jjtThis.methodIdentifier = t.image; }#MethodCall  ) ComplementaryExpression()
+    | {}
 }
 
 void Expression() #void : { Token t; }{
@@ -101,10 +122,10 @@ void Expression() #void : { Token t; }{
     | <FALSE> { jjtThis.number = 0; } #Numeric ComplementaryExpression()
     | <THIS> #This ComplementaryExpression()
     | <NEW> (t= <IDENTIFIER>  { jjtThis.classIdentifier = t.image; }#New  "()" |
-     <INT> "[" Expression() "]" #NewArray ) ComplementaryExpression()
+     <INT> <LFTSQRBRCKT> Expression() #NewArray <RGHTSQRBRCKT>  ) ComplementaryExpression()
     | "!" #Negation Expression() ComplementaryExpression()
-    | "(" Expression() ")" ComplementaryExpression()
-    | <IDENTIFIER> ("[" Expression() #ArrayAccess "]")* ["=" Expression()] ComplementaryExpression()
+    | <LFTBRCKT> Expression() <RGHTBRCKT> ComplementaryExpression()
+    | <IDENTIFIER> (<LFTSQRBRCKT> Expression() #ArrayAccess <RGHTSQRBRCKT> )* ["=" Expression()] ComplementaryExpression()
 }
 
 void Type() : {} //TODO: Type no longer a Token
