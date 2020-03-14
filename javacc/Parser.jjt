@@ -1,4 +1,10 @@
+options {
+    LOOKAHEAD =  1;
+    MULTI = true;
+}
+
 PARSER_BEGIN(Parser)
+
 public class Parser {
 
     public static void main(String[] args) throws ParseException {
@@ -35,7 +41,7 @@ TOKEN:
     | <LENGTH: "length">
     | <INT: "int">
     | <BOOLEAN: "boolean">
-    | <IDENTIFIER: ["A"-"Z", "a"-"z"](["0"-"9", "A"-"Z", "a" - "z"])* >
+    | <IDENTIFIER: ["A"-"Z", "a"-"z"](["0"-"9", "A"-"Z", "a" - "z", "_"])* >
 }
 
 SimpleNode Program() : {}
@@ -62,14 +68,15 @@ void ClassDeclaration() #void : {}
 
 void VarDeclaration() #void : {}
 {
-    Type() <IDENTIFIER> [ VarDeclaration() ]";"
+   Type() <IDENTIFIER> [ VarDeclaration() ] ";"
 }
 
 void MethodDeclaration() #void : {}
 {
     <PUBLIC>
-    ((Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{"VarDeclaration() (Statement())* <RETURN> Stuff() ";" "}")
+    (Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{" VarDeclaration() (Statement())* <RETURN> Stuff() ";" "}"
     | (<STATIC> <VOID> <MAIN> "(" <STRING> "[" "]" <IDENTIFIER> ")" "{" VarDeclaration() (Statement())* "}")) //TODO: check if newly added production is correct
+
 }
 
 void Statement() #void : {}
@@ -82,24 +89,29 @@ void Statement() #void : {}
     | Expression() ";"
 }
 
-void Stuff() #void : {}
+void Stuff() : { Token t; }
 {
      ("&&"|"<"|"+"|"-"|"*"|"/") Expression() Stuff()
-    | "[" Expression() "]" Stuff()
-    |"." ( <LENGTH> | (<IDENTIFIER> "(" [ Expression() ("," Expression() )* ] ")")) Stuff()
+    | "[" Expression() #ArrayAccess "]" Stuff()
+    |"." ( <LENGTH> | (t=<IDENTIFIER> "(" [ Expression() ("," Expression() )* ] ")") { jjtThis.methodIdentifier = t.image; }#MethodCall  ) Stuff()
 }
 
 void Expression() : { Token t; }{
-    t=<INTEGER>{ jjtThis.action = new NumericAction(Integer.parseInt(t.image)); } #Numeric Stuff()
-    | <TRUE> { jjtThis.action = new NumericAction(1); } #Numeric Stuff()
-    | <FALSE> { jjtThis.action = new NumericAction(0); } #Numeric Stuff()
-    | <NEW> (t= <IDENTIFIER>  { jjtThis.action = new NewAction(t.image); }#New  "()"
-    |<INT> "[" Expression() "]" { jjtThis.action = new ArrayAccessAction(); }#ArrayAccess ) Stuff()
-    | "!" { jjtThis.action = new NegationAction(); }#Negation Expression() Stuff()
+    t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric Stuff()
+    | <TRUE> { jjtThis.number = 1; } #Numeric Stuff()
+    | <FALSE> { jjtThis.number = 0; } #Numeric Stuff()
+    | <NEW> (t= <IDENTIFIER>  { jjtThis.classIdentifier = t.image; }#New  "()" |
+     <INT> "[" Expression() "]" #NewArray ) Stuff()
+    | "!" #Negation Expression() Stuff()
     | "(" Expression() ")" Stuff()
 }
 
 void Type() : {} //TODO: Type no longer a Token
 {
       <INT>["[]"] | <BOOLEAN> | <IDENTIFIER>
+}
+
+void NewType() : {} //TODO: Type no longer a Token
+{
+      <INT>["[]"] | <BOOLEAN>
 }

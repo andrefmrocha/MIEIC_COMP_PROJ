@@ -8,7 +8,6 @@ class SimpleNode implements Node {
   protected int id;
   protected Object value;
   protected Parser parser;
-  protected Action action;
 
   public SimpleNode(int i) {
     id = i;
@@ -23,6 +22,10 @@ class SimpleNode implements Node {
   }
 
   public void jjtClose() {
+  }
+
+  int process(){
+    return 0;
   }
 
   public void jjtSetParent(Node n) { parent = n; }
