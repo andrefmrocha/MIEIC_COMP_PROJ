@@ -77,10 +77,9 @@ void MethodDeclaration() : {}
 void Statement() : {}
 {
     "{" (Statement())* "}"
-    | <IF> "(" Expression() ")" Statement() <ELSE> Statement()
-    | <WHILE> "(" Expression() ")" Statement()
-    //| <IDENTIFIER> (("=" Expression() ) | ("[" Expression() "]" "=" Expression() ) ) ";"
-    | <IDENTIFIER> ["[" Expression() "]"] "=" Expression() ";" //TODO: verify if this production is acceptable
+    | (<IF> "(" Expression() ")" Statement()  <ELSE> Statement()) {jjtThis.action = new IfThenElseAction();} #IfThenElse
+    | (<WHILE> "(" Expression() ")" Statement()) {jjtThis.action = new WhileAction();} #While
+    | <IDENTIFIER> (("=" Expression() {jjtThis.action = new AssignVar();} #AssignVar) | ("[" Expression() "]" "=" Expression()  {jjtThis.action = new AssignVarArray();} #AssignVarArray) ) ";"
     | Expression() ";"
 }
 
