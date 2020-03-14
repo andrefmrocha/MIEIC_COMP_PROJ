@@ -37,6 +37,7 @@ TOKEN:
     | <WHILE: "while">
     | <TRUE: "true">
     | <FALSE: "false">
+    | <THIS: "this">
     | <NEW: "new">
     | <LENGTH: "length">
     | <INT: "int">
@@ -63,19 +64,19 @@ void ImportStatement() #void : {}
 
 void ClassDeclaration() #void : {}
 {
-    <CLASS> <IDENTIFIER>  [<EXTENDS> <IDENTIFIER> ]  "{"VarDeclaration() (MethodDeclaration())* "}"
+    <CLASS> <IDENTIFIER>  [<EXTENDS> <IDENTIFIER> ]  "{"(VarDeclaration())* (MethodDeclaration())* "}"
 }
 
 void VarDeclaration() #void : {}
 {
-   Type() <IDENTIFIER> [ VarDeclaration() ] ";"
+   Type() <IDENTIFIER> ";"
 }
 
 void MethodDeclaration() #void : {}
 {
     <PUBLIC>
-    (Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{" VarDeclaration() (Statement())* <RETURN> Stuff() ";" "}"
-    | (<STATIC> <VOID> <MAIN> "(" <STRING> "[" "]" <IDENTIFIER> ")" "{" VarDeclaration() (Statement())* "}")) //TODO: check if newly added production is correct
+    (Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{" ( LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> ComplementaryExpression() ";" "}"
+    | (<STATIC> <VOID> <MAIN> "(" <STRING> "[" "]" <IDENTIFIER> ")" "{" (LOOKAHEAD(2) VarDeclaration())* (Statement())* "}")) //TODO: check if newly added production is correct
 
 }
 
@@ -84,34 +85,29 @@ void Statement() #void : {}
     "{" (Statement())* "}"
     | <IF> "(" Expression() ")" Statement() <ELSE> Statement()
     | <WHILE> "(" Expression() ")" Statement()
-    //| <IDENTIFIER> (("=" Expression() ) | ("[" Expression() "]" "=" Expression() ) ) ";"
-    | <IDENTIFIER> ["[" Expression() "]"] "=" Expression() ";" //TODO: verify if this production is acceptable
     | Expression() ";"
 }
 
-void Stuff() : { Token t; }
+void ComplementaryExpression() #void : { Token t; }
 {
-     ("&&"|"<"|"+"|"-"|"*"|"/") Expression() Stuff()
-    | "[" Expression() #ArrayAccess "]" Stuff()
-    |"." ( <LENGTH> | (t=<IDENTIFIER> "(" [ Expression() ("," Expression() )* ] ")") { jjtThis.methodIdentifier = t.image; }#MethodCall  ) Stuff()
+     ("&&" #And(2) |"<" #LessThan(2) | "+"#Sum(2) | "-"#Minus(2) | "*"#Mul(2) | "/"#Div(2) ) Expression() ComplementaryExpression()
+    |"." ( <LENGTH>
+    | t=<IDENTIFIER> "(" [ Expression() ("," Expression() )* ] ")" { jjtThis.methodIdentifier = t.image; }#MethodCall  ) ComplementaryExpression()
 }
 
-void Expression() : { Token t; }{
-    t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric Stuff()
-    | <TRUE> { jjtThis.number = 1; } #Numeric Stuff()
-    | <FALSE> { jjtThis.number = 0; } #Numeric Stuff()
+void Expression() #void : { Token t; }{
+    t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric ComplementaryExpression()
+    | <TRUE> { jjtThis.number = 1; } #Numeric ComplementaryExpression()
+    | <FALSE> { jjtThis.number = 0; } #Numeric ComplementaryExpression()
+    | <THIS> #This ComplementaryExpression()
     | <NEW> (t= <IDENTIFIER>  { jjtThis.classIdentifier = t.image; }#New  "()" |
-     <INT> "[" Expression() "]" #NewArray ) Stuff()
-    | "!" #Negation Expression() Stuff()
-    | "(" Expression() ")" Stuff()
+     <INT> "[" Expression() "]" #NewArray ) ComplementaryExpression()
+    | "!" #Negation Expression() ComplementaryExpression()
+    | "(" Expression() ")" ComplementaryExpression()
+    | <IDENTIFIER> ("[" Expression() #ArrayAccess "]")* ["=" Expression()] ComplementaryExpression()
 }
 
 void Type() : {} //TODO: Type no longer a Token
 {
       <INT>["[]"] | <BOOLEAN> | <IDENTIFIER>
-}
-
-void NewType() : {} //TODO: Type no longer a Token
-{
-      <INT>["[]"] | <BOOLEAN>
 }
