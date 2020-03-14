@@ -37,6 +37,7 @@ TOKEN:
     | <WHILE: "while">
     | <TRUE: "true">
     | <FALSE: "false">
+    | <THIS: "this">
     | <NEW: "new">
     | <LENGTH: "length">
     | <INT: "int">
@@ -74,7 +75,7 @@ void VarDeclaration() #void : {}
 void MethodDeclaration() #void : {}
 {
     <PUBLIC>
-    (Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{" VarDeclaration() (Statement())* <RETURN> Stuff() ";" "}"
+    (Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{" VarDeclaration() (Statement())* <RETURN> ComplementaryExpression() ";" "}"
     | (<STATIC> <VOID> <MAIN> "(" <STRING> "[" "]" <IDENTIFIER> ")" "{" VarDeclaration() (Statement())* "}")) //TODO: check if newly added production is correct
 
 }
@@ -89,29 +90,26 @@ void Statement() #void : {}
     | Expression() ";"
 }
 
-void Stuff() : { Token t; }
+void ComplementaryExpression() : { Token t; }
 {
-     ("&&"|"<"|"+"|"-"|"*"|"/") Expression() Stuff()
-    | "[" Expression() #ArrayAccess "]" Stuff()
-    |"." ( <LENGTH> | (t=<IDENTIFIER> "(" [ Expression() ("," Expression() )* ] ")") { jjtThis.methodIdentifier = t.image; }#MethodCall  ) Stuff()
+     ("&&" #And |"<" #LessThan | "+"#Sum | "-"#Minus | "*"#Mul | "/"#Div ) Expression() ComplementaryExpression()
+    | "[" Expression() #ArrayAccess "]" ComplementaryExpression()
+    |"." ( <LENGTH>
+    | t=<IDENTIFIER> "(" [ Expression() ("," Expression() )* ] ")" { jjtThis.methodIdentifier = t.image; }#MethodCall  ) ComplementaryExpression()
 }
 
 void Expression() : { Token t; }{
-    t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric Stuff()
-    | <TRUE> { jjtThis.number = 1; } #Numeric Stuff()
-    | <FALSE> { jjtThis.number = 0; } #Numeric Stuff()
+    t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric ComplementaryExpression()
+    | <TRUE> { jjtThis.number = 1; } #Numeric ComplementaryExpression()
+    | <FALSE> { jjtThis.number = 0; } #Numeric ComplementaryExpression()
+    | <THIS> #This ComplementaryExpression()
     | <NEW> (t= <IDENTIFIER>  { jjtThis.classIdentifier = t.image; }#New  "()" |
-     <INT> "[" Expression() "]" #NewArray ) Stuff()
-    | "!" #Negation Expression() Stuff()
-    | "(" Expression() ")" Stuff()
+     <INT> "[" Expression() "]" #NewArray ) ComplementaryExpression()
+    | "!" #Negation Expression() ComplementaryExpression()
+    | "(" Expression() ")" ComplementaryExpression()
 }
 
 void Type() : {} //TODO: Type no longer a Token
 {
       <INT>["[]"] | <BOOLEAN> | <IDENTIFIER>
-}
-
-void NewType() : {} //TODO: Type no longer a Token
-{
-      <INT>["[]"] | <BOOLEAN>
 }
