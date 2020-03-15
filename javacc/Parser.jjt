@@ -133,7 +133,12 @@ void ArrayAccessExpression() #void : {}{
 
 void FragmentExpression() #void : { Token t; }
 {
-     ("&&" #And(2) |"<" #LessThan(2) | "+"#Sum(2) | "-"#Minus(2) | "*"#Mul(2) | "/"#Div(2) ) Expression() ComplementaryExpression()
+     ("&&" Expression() #And(2)
+     |"<" Expression()#LessThan(2)
+     | "+"Expression()#Sum(2)
+     | "-"Expression()#Minus(2)
+     | "*"Expression()#Mul(2)
+     | "/"Expression()#Div(2) )   ComplementaryExpression()
     |<DOT> ( <LENGTH> #Length
     | t=<IDENTIFIER> <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> { jjtThis.methodIdentifier = t.image; }#MethodCall  ) ComplementaryExpression()
     | {}
