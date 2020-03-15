@@ -63,6 +63,7 @@ TOKEN:
     | <SEMICOLON : ";">
     | <DOT : ".">
     | <COMMA : ",">
+    | <EQUALS : "=">
 }
 
 SimpleNode Program() : {}
@@ -105,10 +106,32 @@ void Statement() #void : {}
     <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
     | <IF> <LFTBRCKT> Expression() <RGHTBRCKT> Statement() <ELSE> Statement()
     | <WHILE> <LFTBRCKT> Expression() <RGHTBRCKT> Statement()
-    | Expression() <SEMICOLON>
+    | NonIdentifierExpression() <SEMICOLON>
+    | IdentifierStatement() <SEMICOLON>
 }
 
-void ComplementaryExpression() #void : { Token t; }
+void IdentifierStatement() #void : {}
+{
+    <IDENTIFIER>
+    (
+        <EQUALS> Expression()
+        | <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>
+            (<EQUALS> Expression() | ComplementaryExpression() )
+        | FragmentExpression()
+    )
+}
+
+void ComplementaryExpression() #void :{} {
+    ArrayAccessExpression()
+    |
+    FragmentExpression()
+}
+
+void ArrayAccessExpression() #void : {}{
+    <LFTSQRBRCKT> Expression() #ArrayAccess <RGHTSQRBRCKT> ComplementaryExpression()
+}
+
+void FragmentExpression() #void : { Token t; }
 {
      ("&&" #And(2) |"<" #LessThan(2) | "+"#Sum(2) | "-"#Minus(2) | "*"#Mul(2) | "/"#Div(2) ) Expression() ComplementaryExpression()
     |<DOT> ( <LENGTH> #Length
@@ -116,7 +139,13 @@ void ComplementaryExpression() #void : { Token t; }
     | {}
 }
 
-void Expression() #void : { Token t; }{
+void Expression() #void : {}{
+    IdentifierExpression()
+    |
+    NonIdentifierExpression()
+}
+
+void NonIdentifierExpression() #void :{ Token t; }{
     t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric ComplementaryExpression()
     | <TRUE> { jjtThis.number = 1; } #Numeric ComplementaryExpression()
     | <FALSE> { jjtThis.number = 0; } #Numeric ComplementaryExpression()
@@ -125,7 +154,10 @@ void Expression() #void : { Token t; }{
      <INT> <LFTSQRBRCKT> Expression() #NewArray <RGHTSQRBRCKT>  ) ComplementaryExpression()
     | "!" #Negation Expression() ComplementaryExpression()
     | <LFTBRCKT> Expression() <RGHTBRCKT> ComplementaryExpression()
-    | <IDENTIFIER> (<LFTSQRBRCKT> Expression() #ArrayAccess <RGHTSQRBRCKT> )* ["=" Expression()] ComplementaryExpression()
+}
+
+void IdentifierExpression() #void : { Token t; }{
+    t=<IDENTIFIER> { jjtThis.identifierName = t.image; } #Identifier ComplementaryExpression()
 }
 
 void Type() : {} //TODO: Type no longer a Token
