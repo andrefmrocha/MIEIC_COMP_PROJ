@@ -63,6 +63,7 @@ TOKEN:
     | <SEMICOLON : ";">
     | <DOT : ".">
     | <COMMA : ",">
+    | <EXCLAMATION: "!">
 }
 
 SimpleNode Program() : {}
@@ -104,8 +105,70 @@ void Statement() #void : {}
 {
     <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
     | <IF> <LFTBRCKT> Expression() <RGHTBRCKT> Statement() <ELSE> Statement()
-    | <WHILE> <LFTBRCKT> Expression() <RGHTBRCKT> Statement()
+    | WhileStatement()
     | Expression() <SEMICOLON>
+}
+
+void WhileStatement() #void : {}
+{
+    <WHILE>
+    ("(" | recoverFromError(new int[]{INTEGER,
+                                      TRUE,
+                                      FALSE,
+                                      THIS,
+                                      NEW,
+                                      EXCLAMATION,
+                                      LFTBRCKT,
+                                      IDENTIFIER
+                                      }, "(")) // all possible tokens to start an expression
+
+    try {
+        Expression()
+    }
+    catch (ParseException e) {
+        recoverFromError(new int[]{RGHTBRCKT}, "Expression"); // invalid expression
+    }
+
+    (")" | recoverFromError(new int[]{LFTCRLBRCKT,
+                                      IF,
+                                      WHILE,
+                                      INTEGER,
+                                      TRUE,
+                                      FALSE,
+                                      THIS,
+                                      NEW,
+                                      EXCLAMATION,
+                                      LFTBRCKT,
+                                      IDENTIFIER
+                                      }, ")")) // all possible tokens to start a statement
+
+    try {
+        Statement()
+    }
+    catch (ParseException e) {
+        recoverFromError(new int[]{RGHTCRLBRCKT}, "Statement"); // invalid statement
+    }
+}
+
+JAVACODE
+void recoverFromError(int[] skipTo, String expected) {
+
+    // Get the possible expected tokens
+    Token wrongToken = getToken(1);
+    System.out.println("Was expecting '" + expected + "', got '" + wrongToken + "'.");
+
+    // Recover
+    Token t;
+    boolean found = false;
+    do {
+        t = getNextToken();
+        for (int i = 0; i < skipTo.length; i++) {
+            if (skipTo[i] == t.kind) {
+                found = true;
+                break;
+            }
+        }
+    } while(!found);
 }
 
 void ComplementaryExpression() #void : { Token t; }
@@ -123,7 +186,7 @@ void Expression() #void : { Token t; }{
     | <THIS> #This ComplementaryExpression()
     | <NEW> (t= <IDENTIFIER>  { jjtThis.classIdentifier = t.image; }#New  "()" |
      <INT> <LFTSQRBRCKT> Expression() #NewArray <RGHTSQRBRCKT>  ) ComplementaryExpression()
-    | "!" #Negation Expression() ComplementaryExpression()
+    | <EXCLAMATION> #Negation Expression() ComplementaryExpression()
     | <LFTBRCKT> Expression() <RGHTBRCKT> ComplementaryExpression()
     | <IDENTIFIER> (<LFTSQRBRCKT> Expression() #ArrayAccess <RGHTSQRBRCKT> )* ["=" Expression()] ComplementaryExpression()
 }
