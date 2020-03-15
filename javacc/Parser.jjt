@@ -64,7 +64,7 @@ void ImportStatement() #void : {}
 
 void ClassDeclaration() #void : {}
 {
-    <CLASS> <IDENTIFIER>  [<EXTENDS> <IDENTIFIER> ]  "{"VarDeclaration() (MethodDeclaration())* "}"
+    <CLASS> <IDENTIFIER>  [<EXTENDS> <IDENTIFIER> ]  "{" (VarDeclaration())* (MethodDeclaration())* "}"
 }
 
 void VarDeclaration() #void : {}
@@ -75,8 +75,8 @@ void VarDeclaration() #void : {}
 void MethodDeclaration() #void : {}
 {
     <PUBLIC>
-    (Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{" VarDeclaration() (Statement())* <RETURN> ComplementaryExpression() ";" "}"
-    | (<STATIC> <VOID> <MAIN> "(" <STRING> "[" "]" <IDENTIFIER> ")" "{" VarDeclaration() (Statement())* "}")) //TODO: check if newly added production is correct
+    (Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{" (VarDeclaration())* (Statement())* <RETURN> Expression() ";" "}"
+    | (<STATIC> <VOID> <MAIN> "(" <STRING> "[" "]" <IDENTIFIER> ")" "{" (VarDeclaration())* (Statement())* "}")) //TODO: check if newly added production is correct
 
 }
 
@@ -89,15 +89,16 @@ void Statement() #void : {Token t;}
     | Expression() ";"
 }
 
-void ComplementaryExpression() : { Token t; }
+void ComplementaryExpression() #void : { Token t; }
 {
      ("&&" #And |"<" #LessThan | "+"#Sum | "-"#Minus | "*"#Mul | "/"#Div ) Expression() ComplementaryExpression()
     | "[" Expression() #ArrayAccess "]" ComplementaryExpression()
     |"." ( <LENGTH>
     | t=<IDENTIFIER> "(" [ Expression() ("," Expression() )* ] ")" { jjtThis.methodIdentifier = t.image; }#MethodCall  ) ComplementaryExpression()
+    | {}
 }
 
-void Expression() : { Token t; }{
+void Expression() #void: { Token t; }{
     t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric ComplementaryExpression()
     | <TRUE> { jjtThis.number = 1; } #Numeric ComplementaryExpression()
     | <FALSE> { jjtThis.number = 0; } #Numeric ComplementaryExpression()
