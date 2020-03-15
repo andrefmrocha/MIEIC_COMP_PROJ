@@ -112,7 +112,7 @@ void Statement() #void : {}
 void WhileStatement() #void : {}
 {
     <WHILE>
-    ("(" | recoverFromError(new int[]{INTEGER,
+    (<LFTBRCKT> | recoverFromError(new int[]{INTEGER,
                                       TRUE,
                                       FALSE,
                                       THIS,
@@ -120,16 +120,16 @@ void WhileStatement() #void : {}
                                       EXCLAMATION,
                                       LFTBRCKT,
                                       IDENTIFIER
-                                      }, "(")) // all possible tokens to start an expression
+                                      }, "(", false)) // all possible tokens to start an expression
 
     try {
         Expression()
     }
     catch (ParseException e) {
-        recoverFromError(new int[]{RGHTBRCKT}, "Expression"); // invalid expression
+        recoverFromError(new int[]{RGHTBRCKT}, "Expression", false); // invalid expression
     }
 
-    (")" | recoverFromError(new int[]{LFTCRLBRCKT,
+    (<RGHTBRCKT> | recoverFromError(new int[]{LFTCRLBRCKT,
                                       IF,
                                       WHILE,
                                       INTEGER,
@@ -140,35 +140,46 @@ void WhileStatement() #void : {}
                                       EXCLAMATION,
                                       LFTBRCKT,
                                       IDENTIFIER
-                                      }, ")")) // all possible tokens to start a statement
+                                      }, ")", false)) // all possible tokens to start a statement
 
     try {
         Statement()
     }
     catch (ParseException e) {
-        recoverFromError(new int[]{RGHTCRLBRCKT}, "Statement"); // invalid statement
+        recoverFromError(new int[]{RGHTCRLBRCKT}, "Statement", true); // invalid statement
     }
 }
 
 JAVACODE
-void recoverFromError(int[] skipTo, String expected) {
+void recoverFromError(int[] skipTo, String expected, boolean advanceWhenFound) {
 
     // Get the possible expected tokens
     Token wrongToken = getToken(1);
+    System.out.println("Curr is " + getToken(0));
     System.out.println("Was expecting '" + expected + "', got '" + wrongToken + "'.");
 
     // Recover
-    Token t;
+    Token t = getToken(1);
+    String skipped = "";
     boolean found = false;
-    do {
-        t = getNextToken();
+    while(!found) {
         for (int i = 0; i < skipTo.length; i++) {
-            if (skipTo[i] == t.kind) {
+            if (skipTo[i] == getToken(1).kind) {
                 found = true;
                 break;
             }
         }
-    } while(!found);
+        if(!found) {
+            skipped += getToken(1).toString();
+            t = getNextToken();
+       }
+    }
+    if (advanceWhenFound) {
+        skipped += getToken(0).toString();
+        getNextToken();
+    }
+
+    System.out.println("Skipped " + skipped + "\n");
 }
 
 void ComplementaryExpression() #void : { Token t; }

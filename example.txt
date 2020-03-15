@@ -6,8 +6,12 @@ class Fac {
             num_aux = 1;
         else
             num_aux = num * (this.ComputeFac(num-1));
-        while(1as) {
+        while(1as {
             num_aux = num_aux;
+        }
+
+        while 123) {
+            return 1;
         }
         return num_aux;
     }
