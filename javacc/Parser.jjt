@@ -7,6 +7,8 @@ PARSER_BEGIN(Parser)
 
 public class Parser{
 
+    int nErrors = 3;
+
     public static void main(String[] args) throws ParseException {
             Parser parser = new Parser(System.in);
             parser.Program();
@@ -152,6 +154,9 @@ void WhileStatement() #void : {}
 
 JAVACODE
 void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) {
+
+    if(nErrors <= 0) System.exit(0);
+    nErrors--;
 
     System.out.println(errorMsg);
 
