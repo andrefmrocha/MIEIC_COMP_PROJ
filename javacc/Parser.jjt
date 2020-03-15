@@ -104,19 +104,19 @@ void MethodDeclaration() #void : {}
 void Statement() #void : {Token t;}
 {
     <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
-    | <IF> #If <LFTBRCKT> Expression() <RGHTBRCKT> #Then Statement() <ELSE>  #Else Statement()
-    | <WHILE> #While <LFTBRCKT> Expression() <RGHTBRCKT> #Do Statement()
+    | <IF>  <LFTBRCKT> Expression() #If(1) <RGHTBRCKT> Statement()  #Then(1) <ELSE> Statement()  #Else(1)
+    | <WHILE> <LFTBRCKT> Expression() #While(1)  <RGHTBRCKT>  Statement() #Do(1)
     | NonIdentifierExpression() <SEMICOLON>
     | IdentifierStatement() <SEMICOLON>
 }
 
 void IdentifierStatement() #void : {Token t;}
 {
-    t=<IDENTIFIER>
+    t=<IDENTIFIER> #Identifier(true)
     (
-        <EQUALS> Expression() {jjtThis.varIdentifier = t.image;} #AssignVar
-        | <LFTSQRBRCKT> Expression() #ArrayAccess <RGHTSQRBRCKT> 
-            (<EQUALS> Expression() | ComplementaryExpression() ) {jjtThis.arrayIdentifier = t.image;} #AssignVarArray
+        <EQUALS> Expression() {jjtThis.varIdentifier = t.image;} #AssignVar(2)
+        | <LFTSQRBRCKT> Expression() #ArrayAccess <RGHTSQRBRCKT>
+            (<EQUALS> Expression() | ComplementaryExpression() ) {jjtThis.arrayIdentifier = t.image;} #AssignVarArray(2)
         | FragmentExpression()
     )
 }
