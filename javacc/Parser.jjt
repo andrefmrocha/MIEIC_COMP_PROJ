@@ -5,7 +5,7 @@ options {
 
 PARSER_BEGIN(Parser)
 
-public class Parser {
+public class Parser{
 
     public static void main(String[] args) throws ParseException {
             Parser parser = new Parser(System.in);
@@ -120,13 +120,13 @@ void WhileStatement() #void : {}
                                       EXCLAMATION,
                                       LFTBRCKT,
                                       IDENTIFIER
-                                      }, "(", false)) // all possible tokens to start an expression
+                                      }, "Got '" + getToken(1) + "', expected '('", false)) // all possible tokens to start an expression
 
     try {
         Expression()
     }
     catch (ParseException e) {
-        recoverFromError(new int[]{RGHTBRCKT}, "Expression", false); // invalid expression
+        recoverFromError(new int[]{RGHTBRCKT}, "Invalid Expression '" + e.currentToken + "'", false); // invalid expression
     }
 
     (<RGHTBRCKT> | recoverFromError(new int[]{LFTCRLBRCKT,
@@ -140,25 +140,21 @@ void WhileStatement() #void : {}
                                       EXCLAMATION,
                                       LFTBRCKT,
                                       IDENTIFIER
-                                      }, ")", false)) // all possible tokens to start a statement
+                                      }, "Got '" + getToken(1) + "', expected ')'", false)) // all possible tokens to start a statement
 
     try {
         Statement()
     }
     catch (ParseException e) {
-        recoverFromError(new int[]{RGHTCRLBRCKT}, "Statement", true); // invalid statement
+        recoverFromError(new int[]{RGHTCRLBRCKT}, "Invalid Statement '" + e.currentToken + "'", true); // invalid statement
     }
 }
 
 JAVACODE
-void recoverFromError(int[] skipTo, String expected, boolean advanceWhenFound) {
+void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) {
 
-    // Get the possible expected tokens
-    Token wrongToken = getToken(1);
-    System.out.println("Curr is " + getToken(0));
-    System.out.println("Was expecting '" + expected + "', got '" + wrongToken + "'.");
+    System.out.println(errorMsg);
 
-    // Recover
     Token t = getToken(1);
     String skipped = "";
     boolean found = false;
@@ -174,12 +170,13 @@ void recoverFromError(int[] skipTo, String expected, boolean advanceWhenFound) {
             t = getNextToken();
        }
     }
+
     if (advanceWhenFound) {
-        skipped += getToken(0).toString();
+        skipped += getToken(1).toString();
         getNextToken();
     }
 
-    System.out.println("Skipped " + skipped + "\n");
+    System.out.println("Skipped '" + skipped + "'\n");
 }
 
 void ComplementaryExpression() #void : { Token t; }
