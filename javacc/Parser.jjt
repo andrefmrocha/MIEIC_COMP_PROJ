@@ -68,9 +68,9 @@ void ImportDeclaration() #void : {}
     (<IMPORT> ImportStatement() ";")*
 }
 
-void ImportStatement() #void : {}
+void ImportStatement() #void : { Token t1; String t2;}
 {
-    <IDENTIFIER> ("." <IDENTIFIER>)* "(" Type() ")"
+    t1 =  <IDENTIFIER> ("." <IDENTIFIER>)* "(" t2 = Type() ")" {jjtThis.importIdentifier += t1.image;} #Import
 }
 
 
@@ -120,7 +120,7 @@ void Expression() #void : { Token t; }{
     | <IDENTIFIER> ("[" Expression() #ArrayAccess "]")* ["=" Expression()] ComplementaryExpression()
 }
 
-void Type() : {} //TODO: Type no longer a Token
+String Type() : {Token t = null;} //TODO: Type no longer a Token
 {
-      <INT>["[]"] | <BOOLEAN> | <IDENTIFIER>
+   t = <INT>["[]"] {return t.image;} | t = <BOOLEAN> {return t.image;} | t = <IDENTIFIER> {return t.image;}
 }
