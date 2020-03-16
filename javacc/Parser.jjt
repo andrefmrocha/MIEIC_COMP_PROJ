@@ -88,37 +88,64 @@ void ClassDeclaration() #void : {}
     <CLASS> <IDENTIFIER>  [<EXTENDS> <IDENTIFIER> ]  <LFTCRLBRCKT> (VarDeclaration())* (MethodDeclaration())* <RGHTCRLBRCKT>
 }
 
+void DeclarationFragment() #void : {}
+{
+   <IDENTIFIER> <SEMICOLON>
+}
+
+
 void VarDeclaration() #void : {}
 {
-   Type() <IDENTIFIER> <SEMICOLON>
+   Type() DeclarationFragment()
+}
+
+void NonTypeVarDeclaration() #void : {}
+{
+   NonIdentifierType() DeclarationFragment()
+}
+
+void MethodBody() #void : {} {
+
+    NonTypeVarDeclaration() MethodBody()
+    |
+    <IDENTIFIER> ( DeclarationFragment() MethodBody() | IdentifierStatementFragment() ( Statement() )* )
+    |
+    NonIdentifierStatement() (Statement())*
 }
 
 void MethodDeclaration() #void : {}
 {
     <PUBLIC>
-    (Type() <IDENTIFIER> <LFTBRCKT> [Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)*] <RGHTBRCKT> <LFTCRLBRCKT> ( LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() <SEMICOLON> <RGHTCRLBRCKT>
-    | (<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") <IDENTIFIER> <RGHTBRCKT> <LFTCRLBRCKT> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <RGHTCRLBRCKT> )) //TODO: check if newly added production is correct
+    (Type() <IDENTIFIER> <LFTBRCKT> [Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)*] <RGHTBRCKT>  <LFTCRLBRCKT> MethodBody() <RETURN> Expression() <SEMICOLON> <RGHTCRLBRCKT>
+    | (<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") <IDENTIFIER> <RGHTBRCKT> <LFTCRLBRCKT> MethodBody() <RGHTCRLBRCKT> )) //TODO: check if newly added production is correct
 
 }
 
-void Statement() #void : {}
+void NonIdentifierStatement() #void : {}
 {
     <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
     | <IF> <LFTBRCKT> Expression() <RGHTBRCKT> Statement() <ELSE> Statement()
     | <WHILE> <LFTBRCKT> Expression() <RGHTBRCKT> Statement()
     | NonIdentifierExpression() <SEMICOLON>
-    | IdentifierStatement() <SEMICOLON>
+}
+
+void Statement() #void : {}
+{
+     NonIdentifierStatement()
+    |
+     IdentifierStatement()
 }
 
 void IdentifierStatement() #void : {}
 {
-    <IDENTIFIER>
-    (
-        <EQUALS> Expression()
-        | <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>
-            (<EQUALS> Expression() | ComplementaryExpression() )
-        | FragmentExpression()
-    )
+    <IDENTIFIER> IdentifierStatementFragment()
+}
+
+void IdentifierStatementFragment() #void : {} {
+    (<EQUALS> Expression()
+    | <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>
+        (<EQUALS> Expression() | ComplementaryExpression() )
+    | FragmentExpression() ) <SEMICOLON>
 }
 
 void ComplementaryExpression() #void :{} {
@@ -165,7 +192,12 @@ void IdentifierExpression() #void : { Token t; }{
     t=<IDENTIFIER> { jjtThis.identifierName = t.image; }#Identifier ComplementaryExpression()
 }
 
-void Type() : {} //TODO: Type no longer a Token
+void Type() : {}
 {
-      <INT>["[]"] | <BOOLEAN> | <IDENTIFIER>
+     NonIdentifierExpression() | <IDENTIFIER>
+}
+
+void NonIdentifierType() : {}
+{
+      <INT>["[]"] | <BOOLEAN>
 }
