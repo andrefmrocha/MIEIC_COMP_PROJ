@@ -192,12 +192,12 @@ void IdentifierExpression() #void : { Token t; }{
     t=<IDENTIFIER> { jjtThis.identifierName = t.image; }#Identifier ComplementaryExpression()
 }
 
-void Type() : {}
+void Type() : {Token t;}
 {
-     NonIdentifierType() | <IDENTIFIER>
+     t = NonIdentifierType() {return t.image;} | t = <IDENTIFIER> {return t.image;}
 }
 
-void NonIdentifierType() : {}
+void NonIdentifierType() : {Token t;}
 {
-      <INT>["[]"] | <BOOLEAN>
+      t= <INT>["[]"] {return t.image;} | t = <BOOLEAN> {return t.image;}
 }
