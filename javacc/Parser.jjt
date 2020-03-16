@@ -128,19 +128,19 @@ void ComplementaryExpression() #void :{} {
 }
 
 void ArrayAccessExpression() #void : {}{
-    <LFTSQRBRCKT> Expression() #ArrayAccess <RGHTSQRBRCKT> ComplementaryExpression()
+    <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess ComplementaryExpression()
 }
 
 void FragmentExpression() #void : { Token t; }
 {
      ("&&" Expression() #And(2)
-     |"<" Expression()#LessThan(2)
-     | "+"Expression()#Sum(2)
-     | "-"Expression()#Minus(2)
-     | "*"Expression()#Mul(2)
-     | "/"Expression()#Div(2) )   ComplementaryExpression()
+     |"<" Expression() #LessThan(2)
+     | "+" Expression() #Sum(2)
+     | "-" Expression() #Minus(2)
+     | "*" Expression() #Mul(2)
+     | "/" Expression() #Div(2) ) ComplementaryExpression()
     |<DOT> ( <LENGTH> #Length
-    | t=<IDENTIFIER> <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> { jjtThis.methodIdentifier = t.image; }#MethodCall  ) ComplementaryExpression()
+    | t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> ) #MethodCall ComplementaryExpression()
     | {}
 }
 
@@ -155,14 +155,14 @@ void NonIdentifierExpression() #void :{ Token t; }{
     | <TRUE> { jjtThis.number = 1; } #Numeric ComplementaryExpression()
     | <FALSE> { jjtThis.number = 0; } #Numeric ComplementaryExpression()
     | <THIS> #This ComplementaryExpression()
-    | <NEW> (t= <IDENTIFIER>  { jjtThis.classIdentifier = t.image; }#New  "()" |
-     <INT> <LFTSQRBRCKT> Expression() #NewArray <RGHTSQRBRCKT>  ) ComplementaryExpression()
-    | "!" #Negation Expression() ComplementaryExpression()
+    | <NEW> (t= <IDENTIFIER> "()" { jjtThis.classIdentifier = t.image; } #New |
+     <INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #NewArray ) ComplementaryExpression()
+    | "!" Expression() #Negation ComplementaryExpression()
     | <LFTBRCKT> Expression() <RGHTBRCKT> ComplementaryExpression()
 }
 
 void IdentifierExpression() #void : { Token t; }{
-    t=<IDENTIFIER> { jjtThis.identifierName = t.image; } #Identifier ComplementaryExpression()
+    t=<IDENTIFIER> { jjtThis.identifierName = t.image; }#Identifier ComplementaryExpression()
 }
 
 void Type() : {} //TODO: Type no longer a Token

@@ -4,7 +4,7 @@ public class Main {
 		System.out.println("Write an arithmetic expression:");
 		try {
 			Parser parser = new Parser(System.in);
-			parser.Program().dump(" ");
+			parser.Program().dump("");
 		}catch (ParseException e){
 			e.printStackTrace();
 		}
