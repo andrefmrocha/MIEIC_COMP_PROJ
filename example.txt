@@ -2,10 +2,11 @@ import io.println(int); // by default considers the return as void
 class Fac {
     public int ComputeFac(int num){
         int num_aux ;
-        if (num < 1)
+        if (num < 1 && true)
             num_aux = 1;
         else
             num_aux = num * (this.ComputeFac(num-1));
+        num_aux[1] = 4;
         while(as) {
             num_aux = num_aux;
         }

@@ -104,8 +104,8 @@ void MethodDeclaration() #void : {}
 void Statement() #void : {Token t;}
 {
     <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
-    | <IF>  <LFTBRCKT> Expression() #If(1) <RGHTBRCKT> Statement()  #Then(1) <ELSE> Statement()  #Else(1)
-    | <WHILE> <LFTBRCKT> Expression() #While(1)  <RGHTBRCKT>  Statement() #Do(1)
+    | (<IF>  <LFTBRCKT> Expression()  <RGHTBRCKT> Statement() <ELSE> Statement() ) #If
+    | (<WHILE> <LFTBRCKT> Expression()  <RGHTBRCKT>  Statement()) #While
     | NonIdentifierExpression() <SEMICOLON>
     | IdentifierStatement() <SEMICOLON>
 }
@@ -115,8 +115,8 @@ void IdentifierStatement() #void : {Token t;}
     t=<IDENTIFIER> #Identifier(true)
     (
         <EQUALS> Expression() {jjtThis.varIdentifier = t.image;} #AssignVar(2)
-        | <LFTSQRBRCKT> Expression() #ArrayAccess <RGHTSQRBRCKT>
-            (<EQUALS> Expression() | ComplementaryExpression() ) {jjtThis.arrayIdentifier = t.image;} #AssignVarArray(2)
+        | <LFTSQRBRCKT> Expression() #ArrayAccess(2) <RGHTSQRBRCKT>
+            (<EQUALS> Expression() {jjtThis.arrayIdentifier = t.image;} #AssignVarArray(2) | ComplementaryExpression() )
         | FragmentExpression()
     )
 }
@@ -128,7 +128,7 @@ void ComplementaryExpression() #void :{} {
 }
 
 void ArrayAccessExpression() #void : {}{
-    <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess ComplementaryExpression()
+    <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess(2) ComplementaryExpression()
 }
 
 void FragmentExpression() #void : { Token t; }
