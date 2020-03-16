@@ -194,7 +194,7 @@ void IdentifierExpression() #void : { Token t; }{
 
 void Type() : {}
 {
-     NonIdentifierExpression() | <IDENTIFIER>
+     NonIdentifierType() | <IDENTIFIER>
 }
 
 void NonIdentifierType() : {}
