@@ -79,7 +79,7 @@ void ImportDeclaration() #void : {}
 
 void ImportStatement() #void : {}
 {
-    <IDENTIFIER> (<DOT> <IDENTIFIER>)* <LFTBRCKT> Type() <RGHTBRCKT>
+    [ <STATIC> ] <IDENTIFIER> (<DOT> <IDENTIFIER>)* <LFTBRCKT> Type() <RGHTBRCKT> Type()
 }
 
 
@@ -111,6 +111,8 @@ void MethodBody() #void : {} {
     <IDENTIFIER> ( DeclarationFragment() MethodBody() | IdentifierStatementFragment() ( Statement() )* )
     |
     NonIdentifierStatement() (Statement())*
+    |
+    {}
 }
 
 void MethodDeclaration() #void : {}
@@ -199,5 +201,5 @@ void Type() : {Token t;}
 
 void NonIdentifierType() : {Token t;}
 {
-      t= <INT>["[]"] {return t.image;} | t = <BOOLEAN> {return t.image;}
+      <INT>["[]"] | <BOOLEAN> | <VOID>
 }
