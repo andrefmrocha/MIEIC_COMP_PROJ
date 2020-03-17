@@ -34,7 +34,6 @@ SKIP :
 TOKEN:
 {
     < INTEGER: (["0"-"9"])+ >
-    | < LF: ";" >
     | <IMPORT: "import">
     | <CLASS: "class">
     | <EXTENDS: "extends">
@@ -55,6 +54,16 @@ TOKEN:
     | <INT: "int">
     | <BOOLEAN: "boolean">
     | <IDENTIFIER: ["A"-"Z", "a"-"z"](["0"-"9", "A"-"Z", "a" - "z", "_"])* >
+    | <LFTSQRBRCKT : "[">
+    | <RGHTSQRBRCKT : "]">
+    | <RGHTBRCKT : ")">
+    | <LFTBRCKT : "(">
+    | <LFTCRLBRCKT : "{">
+    | <RGHTCRLBRCKT : "}">
+    | <SEMICOLON : ";">
+    | <DOT : ".">
+    | <COMMA : ",">
+    | <EQUALS : "=">
 }
 
 SimpleNode Program() : {}
@@ -65,62 +74,102 @@ SimpleNode Program() : {}
 
 void ImportDeclaration() #void : {}
 {
-    (<IMPORT> ImportStatement() ";")*
+    (<IMPORT> ImportStatement() <SEMICOLON> )*
 }
 
 void ImportStatement() #void : { Token t1; String t2;}
 {
-    t1 =  <IDENTIFIER> ("." <IDENTIFIER>)* "(" t2 = Type() ")" {jjtThis.importIdentifier += t1.image;} #Import
+    <IDENTIFIER> (<DOT> <IDENTIFIER>)* <LFTBRCKT> Type() <RGHTBRCKT>
 }
 
 
 void ClassDeclaration() #void : {}
 {
-    <CLASS> <IDENTIFIER>  [<EXTENDS> <IDENTIFIER> ]  "{"(VarDeclaration())* (MethodDeclaration())* "}"
+    <CLASS> <IDENTIFIER>  [<EXTENDS> <IDENTIFIER> ]  <LFTCRLBRCKT> (VarDeclaration())* (MethodDeclaration())* <RGHTCRLBRCKT>
 }
 
 void VarDeclaration() #void : {}
 {
-   Type() <IDENTIFIER> ";"
+   Type() <IDENTIFIER> <SEMICOLON>
 }
 
 void MethodDeclaration() #void : {}
 {
     <PUBLIC>
-    (Type() <IDENTIFIER> "(" [Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*] ")" "{" ( LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() ";" "}"
-    | (<STATIC> <VOID> <MAIN> "(" <STRING> "[]" <IDENTIFIER> ")" "{" (LOOKAHEAD(2) VarDeclaration())* (Statement())* "}")) //TODO: check if newly added production is correct
+    (Type() <IDENTIFIER> <LFTBRCKT> [Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)*] <RGHTBRCKT> <LFTCRLBRCKT> ( LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() <SEMICOLON> <RGHTCRLBRCKT>
+    | (<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") <IDENTIFIER> <RGHTBRCKT> <LFTCRLBRCKT> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <RGHTCRLBRCKT> )) //TODO: check if newly added production is correct
 
 }
 
 void Statement() #void : {}
 {
-    "{" (Statement())* "}"
-    | <IF> "(" Expression() ")" Statement() <ELSE> Statement()
-    | <WHILE> "(" Expression() ")" Statement()
-    | Expression() ";"
+    <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
+    | <IF> <LFTBRCKT> Expression() <RGHTBRCKT> Statement() <ELSE> Statement()
+    | <WHILE> <LFTBRCKT> Expression() <RGHTBRCKT> Statement()
+    | NonIdentifierExpression() <SEMICOLON>
+    | IdentifierStatement() <SEMICOLON>
 }
 
-void ComplementaryExpression() #void : { Token t; }
+void IdentifierStatement() #void : {}
 {
-     ("&&" #And(2) |"<" #LessThan(2) | "+"#Sum(2) | "-"#Minus(2) | "*"#Mul(2) | "/"#Div(2) ) Expression() ComplementaryExpression()
-    |"." ( <LENGTH> #Length
-    | t=<IDENTIFIER> "(" [ Expression() ("," Expression() )* ] ")" { jjtThis.methodIdentifier = t.image; }#MethodCall  ) ComplementaryExpression()
+    <IDENTIFIER>
+    (
+        <EQUALS> Expression()
+        | <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>
+            (<EQUALS> Expression() | ComplementaryExpression() )
+        | FragmentExpression()
+    )
+}
+
+void ComplementaryExpression() #void :{} {
+    ArrayAccessExpression()
+    |
+    FragmentExpression()
+}
+
+void ArrayAccessExpression() #void : {}{
+    <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess ComplementaryExpression()
+}
+
+void TwoAryExpressions() #void : {} {
+     (("&&" Expression() #And(2))
+     |("<" Expression() #LessThan(2))
+     | ("+" Expression() #Sum(2))
+     | ("-" Expression() #Minus(2))
+     | ("*" Expression() #Mul(2))
+     | ("/" Expression() #Div(2))) ComplementaryExpression()
+}
+
+void FragmentExpression() #void : { Token t; }
+{
+    TwoAryExpressions()
+    |<DOT> ( <LENGTH> #Length
+    | (t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT>) #MethodCall )  ComplementaryExpression()
     | {}
 }
 
-void Expression() #void : { Token t; }{
+void Expression() #void : {}{
+    IdentifierExpression()
+    |
+    NonIdentifierExpression()
+}
+
+void NonIdentifierExpression() #void :{ Token t; }{
     t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric ComplementaryExpression()
     | <TRUE> { jjtThis.number = 1; } #Numeric ComplementaryExpression()
     | <FALSE> { jjtThis.number = 0; } #Numeric ComplementaryExpression()
-    | <THIS> #This ComplementaryExpression()
-    | <NEW> (t= <IDENTIFIER>  { jjtThis.classIdentifier = t.image; }#New  "()" |
-     <INT> "[" Expression() "]" #NewArray ) ComplementaryExpression()
-    | "!" #Negation Expression() ComplementaryExpression()
-    | "(" Expression() ")" ComplementaryExpression()
-    | <IDENTIFIER> ("[" Expression() #ArrayAccess "]")* ["=" Expression()] ComplementaryExpression()
+    | <THIS>  ComplementaryExpression() #This
+    | <NEW> (t= <IDENTIFIER> "()" { jjtThis.classIdentifier = t.image; } #New |
+     (<INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>) #NewArray ) ComplementaryExpression()
+    | "!" Expression() #Negation ComplementaryExpression()
+    | <LFTBRCKT> Expression() <RGHTBRCKT> ComplementaryExpression()
 }
 
-String Type() : {Token t = null;} //TODO: Type no longer a Token
+void IdentifierExpression() #void : { Token t; }{
+    t=<IDENTIFIER> { jjtThis.identifierName = t.image; }#Identifier ComplementaryExpression()
+}
+
+void Type() : {} //TODO: Type no longer a Token
 {
    t = <INT>["[]"] {return t.image;} | t = <BOOLEAN> {return t.image;} | t = <IDENTIFIER> {return t.image;}
 }
