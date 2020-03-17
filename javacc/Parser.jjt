@@ -143,15 +143,19 @@ void TwoAryExpressions() #void : {} {
 void FragmentExpression() #void : { Token t; }
 {
     TwoAryExpressions()
-    |<DOT> ( <LENGTH> #Length
-    | (t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT>) #MethodCall )  ComplementaryExpression()
+    |<DOT>
+        (
+        <LENGTH> #Length ComplementaryExpression()
+        |
+        ((t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT>)  #MethodCall ComplementaryExpression())
+        )
     | {}
 }
 
 void Expression() #void : {}{
-    IdentifierExpression()
+    IdentifierExpression() #GoingInIdentifier
     |
-    NonIdentifierExpression()
+    NonIdentifierExpression() #GoingNonIdentifier
 }
 
 void NonIdentifierExpression() #void :{ Token t; }{
@@ -159,14 +163,18 @@ void NonIdentifierExpression() #void :{ Token t; }{
     | <TRUE> { jjtThis.number = 1; } #Numeric ComplementaryExpression()
     | <FALSE> { jjtThis.number = 0; } #Numeric ComplementaryExpression()
     | <THIS>  ComplementaryExpression() #This
-    | <NEW> (t= <IDENTIFIER> "()" { jjtThis.classIdentifier = t.image; } #New |
-     (<INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>) #NewArray ) ComplementaryExpression()
+    | (
+        <NEW>
+        (
+        t= <IDENTIFIER> "()" { jjtThis.classIdentifier = t.image; } ComplementaryExpression()) #New
+        | <INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #NewArray
+        ) ComplementaryExpression()
     | "!" Expression() #Negation ComplementaryExpression()
     | <LFTBRCKT> Expression() <RGHTBRCKT> ComplementaryExpression()
 }
 
 void IdentifierExpression() #void : { Token t; }{
-    t=<IDENTIFIER> { jjtThis.identifierName = t.image; }#Identifier ComplementaryExpression()
+    (t=<IDENTIFIER> { jjtThis.identifierName = t.image; } ComplementaryExpression() ) #Identifier
 }
 
 void Type() : {} //TODO: Type no longer a Token
