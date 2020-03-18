@@ -90,30 +90,30 @@ void Identifier() #void : {Token t;}
 
 void ClassDeclaration() #void : {}
 {
-    <CLASS> <IDENTIFIER>  [<EXTENDS> <IDENTIFIER> ]  <LFTCRLBRCKT> (VarDeclaration())* (MethodDeclaration())* <RGHTCRLBRCKT>
+    (<CLASS> Identifier()   [<EXTENDS> Identifier() #Extend ]  <LFTCRLBRCKT> (VarDeclaration())* (MethodDeclaration())* <RGHTCRLBRCKT>) #Class
 }
 
 void DeclarationFragment() #void : {}
 {
-   <IDENTIFIER> <SEMICOLON>
+   Identifier() <SEMICOLON> #Declaration
 }
 
 
 void VarDeclaration() #void : {}
 {
-   Type() DeclarationFragment()
+   (Type() DeclarationFragment()) #Var
 }
 
 void NonTypeVarDeclaration() #void : {}
 {
-   NonIdentifierType() DeclarationFragment()
+   (NonIdentifierType() DeclarationFragment()) #NonTypeVar
 }
 
 void MethodBody() #void : {} {
 
     NonTypeVarDeclaration() MethodBody()
     |
-    <IDENTIFIER> ( DeclarationFragment() MethodBody() | IdentifierStatementFragment() ( Statement() )* )
+    Identifier() ( DeclarationFragment() MethodBody() | IdentifierStatementFragment() ( Statement() )* )
     |
     NonIdentifierStatement() (Statement())*
     |
@@ -122,11 +122,25 @@ void MethodBody() #void : {} {
 
 void MethodDeclaration() #void : {}
 {
-    <PUBLIC>
-    (Type() <IDENTIFIER> <LFTBRCKT> [Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)*] <RGHTBRCKT>  <LFTCRLBRCKT> MethodBody() <RETURN> Expression() <SEMICOLON> <RGHTCRLBRCKT>
-    | (<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") <IDENTIFIER> <RGHTBRCKT> <LFTCRLBRCKT> MethodBody() <RGHTCRLBRCKT> )) //TODO: check if newly added production is correct
+    (<PUBLIC>
+    (MethodName() <LFTBRCKT> [Parameter() (<COMMA> Parameter())*] <RGHTBRCKT>  <LFTCRLBRCKT> (MethodBody() <RETURN> Expression() <SEMICOLON>)#MethodBody <RGHTCRLBRCKT>
+    | ((<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") Identifier() <RGHTBRCKT> ) #Main <LFTCRLBRCKT> MethodBody() #MethodBody <RGHTCRLBRCKT>  ))
+    )#Method //TODO: check if newly added production is correct
 
 }
+
+
+void MethodName() #void : {}
+{
+    (Type() Identifier()) #MethodName
+}
+
+
+void Parameter() #void : {}
+{
+    (Type() Identifier()) #Parameter
+}
+
 
 void NonIdentifierStatement() #void : {}
 {
@@ -202,12 +216,13 @@ void NonIdentifierExpression() #void :{ Token t; }{
 void IdentifierExpression() #void : { Token t; }{
     t=<IDENTIFIER> { jjtThis.identifierName = t.image; }#Identifier ComplementaryExpression()
 }
+
 void Type() #void : {} //TODO: Type no longer a Token
 {
-    (<INT>("[]" #IntArray|{}#Int)) | <BOOLEAN> #Boolean | Identifier()
+    NonIdentifierType() | Identifier()
 }
 
-void NonIdentifierType() : {Token t;}
+void NonIdentifierType() : {}
 {
-      <INT>["[]"] | <BOOLEAN> | <VOID>
+       (<INT>("[]" #IntArray|{}#Int))  | <BOOLEAN> #Boolean | <VOID> #Void
 }
