@@ -7,6 +7,8 @@ PARSER_BEGIN(Parser)
 
 public class Parser {
 
+    int nErrors = 3;
+
     public static void main(String[] args) throws ParseException {
             Parser parser = new Parser(System.in);
             parser.Program();
@@ -63,6 +65,7 @@ TOKEN:
     | <SEMICOLON : ";">
     | <DOT : ".">
     | <COMMA : ",">
+    | <EXCLAMATION: "!">
     | <EQUALS : "=">
 }
 
@@ -105,7 +108,7 @@ void Statement() #void : {}
 {
     <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
     | <IF> <LFTBRCKT> Expression() <RGHTBRCKT> Statement() <ELSE> Statement()
-    | <WHILE> <LFTBRCKT> Expression() <RGHTBRCKT> Statement()
+    | WhileStatement()
     | NonIdentifierExpression() <SEMICOLON>
     | IdentifierStatement() <SEMICOLON>
 }
@@ -140,6 +143,80 @@ void TerminalArrayAccessExpression() #void : {}{
     <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess
 }
 
+void WhileStatement() #void : {}
+{
+    <WHILE>
+    (<LFTBRCKT> | recoverFromError(new int[]{INTEGER,
+                                      TRUE,
+                                      FALSE,
+                                      THIS,
+                                      NEW,
+                                      EXCLAMATION,
+                                      LFTBRCKT,
+                                      IDENTIFIER
+                                      }, "Got '" + getToken(1) + "', expected '('", false)) // all possible tokens to start an expression
+
+    try {
+        Expression()
+    }
+    catch (ParseException e) {
+        recoverFromError(new int[]{RGHTBRCKT}, "Invalid Expression '" + e.currentToken + "'", false); // invalid expression
+    }
+
+    (<RGHTBRCKT> | recoverFromError(new int[]{LFTCRLBRCKT,
+                                      IF,
+                                      WHILE,
+                                      INTEGER,
+                                      TRUE,
+                                      FALSE,
+                                      THIS,
+                                      NEW,
+                                      EXCLAMATION,
+                                      LFTBRCKT,
+                                      IDENTIFIER
+                                      }, "Got '" + getToken(1) + "', expected ')'", false)) // all possible tokens to start a statement
+
+    try {
+        Statement()
+    }
+    catch (ParseException e) {
+        recoverFromError(new int[]{RGHTCRLBRCKT}, "Invalid Statement '" + e.currentToken + "'", true); // invalid statement
+    }
+}
+
+JAVACODE
+void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) {
+
+    if(nErrors <= 0) System.exit(0);
+    nErrors--;
+
+    System.out.println(errorMsg);
+
+    Token t = getToken(1);
+    String skipped = "";
+    boolean found = false;
+    while(!found) {
+        for (int i = 0; i < skipTo.length; i++) {
+            if (skipTo[i] == getToken(1).kind) {
+                found = true;
+                break;
+            }
+        }
+        if(!found) {
+            skipped += getToken(1).toString();
+            t = getNextToken();
+       }
+    }
+
+    if (advanceWhenFound) {
+        skipped += getToken(1).toString();
+        getNextToken();
+    }
+
+    System.out.println("Skipped '" + skipped + "'\n");
+}
+
+void ComplementaryExpression() #void : { Token t; }
 void TwoAryExpressions() #void : {} {
      (("&&" Expression() #And(2))
      |("<" TerminalExpression() #LessThan(2))
@@ -188,7 +265,7 @@ void NonIdentifierExpression() #void :{ Token t; }{
         t= <IDENTIFIER> "()" { jjtThis.classIdentifier = t.image; } #New ComplementaryExpression()
         | <INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #NewArray
         ) ComplementaryExpression()
-    | "!" Expression() #Negation ComplementaryExpression()
+    | <EXCLAMATION> Expression() #Negation ComplementaryExpression()
     | <LFTBRCKT> Expression() <RGHTBRCKT> ComplementaryExpression()
 }
 
