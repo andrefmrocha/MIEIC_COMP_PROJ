@@ -221,7 +221,6 @@ void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) {
     System.out.println("Skipped '" + skipped + "'\n");
 }
 
-void ComplementaryExpression() #void : { Token t; }
 void TwoAryExpressions() #void : {} {
      (("&&" Expression() #And(2))
      |("<" TerminalExpression() #LessThan(2))
@@ -288,10 +287,10 @@ void TerminalExpression() #void :{ Token t; }{
     | <LFTBRCKT> Expression() <RGHTBRCKT> TerminalComplementaryExpression()
 }
 
-void IdentifierExpression() #void : { Token t; }{
-    t=<IDENTIFIER> { jjtThis.identifierName = t.image; } #Identifier ComplementaryExpression()
+void IdentifierExpression() #void : {}{
+    Identifier() ComplementaryExpression()
 }
-void Type() #void : {} //TODO: Type no longer a Token
+void Type() #void : {}
 {
     (<INT>("[]" #IntArray|{}#Int)) | <BOOLEAN> #Boolean | Identifier()
 }
