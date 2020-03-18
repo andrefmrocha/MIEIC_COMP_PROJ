@@ -3,7 +3,6 @@
 public
 class ASTImport extends SimpleNode {
 
-  public String importIdentifier;
   public ASTImport(int id) {
     super(id);
   }

@@ -77,11 +77,16 @@ void ImportDeclaration() #void : {}
     (<IMPORT> ImportStatement() <SEMICOLON> )*
 }
 
-void ImportStatement() #void : { Token t1; String t2;}
+void ImportStatement() #void : {  }
 {
-    <IDENTIFIER> (<DOT> <IDENTIFIER>)* <LFTBRCKT> Type() <RGHTBRCKT>
+    ( Identifier()  (<DOT> Identifier() )* <LFTBRCKT>  Type() <RGHTBRCKT> ) #Import
 }
 
+void Identifier() #void : {Token t;}
+{
+    t = <IDENTIFIER> {jjtThis.identifierName = t.image;} #Identifier
+
+}
 
 void ClassDeclaration() #void : {}
 {
@@ -168,8 +173,7 @@ void NonIdentifierExpression() #void :{ Token t; }{
 void IdentifierExpression() #void : { Token t; }{
     t=<IDENTIFIER> { jjtThis.identifierName = t.image; }#Identifier ComplementaryExpression()
 }
-
-void Type() : {} //TODO: Type no longer a Token
+void Type() #void : {} //TODO: Type no longer a Token
 {
-   t = <INT>["[]"] {return t.image;} | t = <BOOLEAN> {return t.image;} | t = <IDENTIFIER> {return t.image;}
+    (<INT>("[]" #IntArray|{}#Int)) | <BOOLEAN> #Boolean | Identifier()
 }
