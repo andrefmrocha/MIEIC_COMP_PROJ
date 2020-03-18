@@ -80,11 +80,16 @@ void ImportDeclaration() #void : {}
     (<IMPORT> ImportStatement() <SEMICOLON> )*
 }
 
-void ImportStatement() #void : {}
+void ImportStatement() #void : {  }
 {
-    <IDENTIFIER> (<DOT> <IDENTIFIER>)* <LFTBRCKT> Type() <RGHTBRCKT>
+    ( Identifier()  (<DOT> Identifier() )* <LFTBRCKT>  Type() <RGHTBRCKT> ) #Import
 }
 
+void Identifier() #void : {Token t;}
+{
+    t = <IDENTIFIER> {jjtThis.identifierName = t.image;} #Identifier
+
+}
 
 void ClassDeclaration() #void : {}
 {
@@ -286,8 +291,7 @@ void TerminalExpression() #void :{ Token t; }{
 void IdentifierExpression() #void : { Token t; }{
     t=<IDENTIFIER> { jjtThis.identifierName = t.image; } #Identifier ComplementaryExpression()
 }
-
-void Type() : {} //TODO: Type no longer a Token
+void Type() #void : {} //TODO: Type no longer a Token
 {
-      <INT>["[]"] | <BOOLEAN> | <IDENTIFIER>
+    (<INT>("[]" #IntArray|{}#Int)) | <BOOLEAN> #Boolean | Identifier()
 }
