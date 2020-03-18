@@ -7,6 +7,7 @@ public class Main {
 			parser.Program().dump("");
 		}catch (ParseException e){
 			e.printStackTrace();
+			throw new RuntimeException();
 		}
 	}
 }
