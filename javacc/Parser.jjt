@@ -222,13 +222,30 @@ void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) {
 }
 
 void TwoAryExpressions() #void : {} {
-     (("&&" Expression() #And(2))
-     |("<" TerminalExpression() #LessThan(2))
-     | ("+" Expression() #Sum(2))
-     | ("-" Expression() #Minus(2))
-     | ("*" TerminalExpression() #Mul(2))
-     | ("/" TerminalExpression() #Div(2))) ComplementaryExpression()
+    AndExpression() ComplementaryExpression()
 }
+
+void AndExpression() #void : {} {
+    LOOKAHEAD(2) LessThanExpression() | ([ LessThanExpression() ] "&&" Expression()) #And(2)
+}
+
+void LessThanExpression() #void : {} {
+    LOOKAHEAD(2) PlusMinusExpression()|  ([PlusMinusExpression()] "<"  TerminalExpression()) #LessThan(2)
+}
+
+void PlusMinusExpression()#void : {} {
+    LOOKAHEAD(2) MulDivExpression()
+    |
+    ("+" TerminalExpression()  [ LOOKAHEAD(2) PlusMinusExpression()] ) #Sum(2)
+    |
+    ("-" TerminalExpression() [ LOOKAHEAD(2) PlusMinusExpression()] ) #Minus(2)
+}
+
+void MulDivExpression() #void : {} {
+    (LOOKAHEAD(2)(("*" TerminalExpression() #Mul(2) ) | ("/" TerminalExpression() #Div(2) )))+
+}
+
+
 
 void FragmentExpression() #void : { Token t; }
 {
