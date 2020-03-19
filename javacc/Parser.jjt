@@ -95,18 +95,18 @@ void ClassDeclaration() #void : {}
 
 void DeclarationFragment() #void : {}
 {
-   Identifier() <SEMICOLON> #Declaration
+   Identifier() <SEMICOLON> #Var(2)
 }
 
 
 void VarDeclaration() #void : {}
 {
-   (Type() DeclarationFragment()) #Var
+   Type() DeclarationFragment()
 }
 
 void NonTypeVarDeclaration() #void : {}
 {
-   (NonIdentifierType() DeclarationFragment()) #NonTypeVar
+   NonIdentifierType() DeclarationFragment()
 }
 
 void MethodBody() #void : {} {
@@ -222,7 +222,7 @@ void Type() #void : {} //TODO: Type no longer a Token
     NonIdentifierType() | Identifier()
 }
 
-void NonIdentifierType() : {}
+void NonIdentifierType() #void : {}
 {
        (<INT>("[]" #IntArray|{}#Int))  | <BOOLEAN> #Boolean | <VOID> #Void
 }
