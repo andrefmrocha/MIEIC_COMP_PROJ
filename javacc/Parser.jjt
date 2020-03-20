@@ -113,7 +113,7 @@ void Statement() #void : {Token t;}
 {
     <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
     | (<IF>  <LFTBRCKT> Expression()  <RGHTBRCKT> Statement() <ELSE> Statement() ) #If
-    | WhileStatement()
+    | (WhileStatement()) #While
     | NonIdentifierExpression() <SEMICOLON>
     | IdentifierStatement() <SEMICOLON>
 }
@@ -151,7 +151,7 @@ void TerminalArrayAccessExpression() #void : {}{
 void WhileStatement() #void : {}
 {
     <WHILE>
-    (<LFTBRCKT> | recoverFromError(new int[]{INTEGER,
+    (<LFTBRCKT> | (recoverFromError(new int[]{INTEGER,
                                       TRUE,
                                       FALSE,
                                       THIS,
@@ -159,7 +159,7 @@ void WhileStatement() #void : {}
                                       EXCLAMATION,
                                       LFTBRCKT,
                                       IDENTIFIER
-                                      }, "Got '" + getToken(1) + "', expected '('", false)) // all possible tokens to start an expression
+                                      }, "Got '" + getToken(1) + "', expected '('", false)) #RecoverFromError)// all possible tokens to start an expression
 
     try {
         Expression()
@@ -168,7 +168,7 @@ void WhileStatement() #void : {}
         recoverFromError(new int[]{RGHTBRCKT}, "Invalid Expression '" + e.currentToken + "'", false); // invalid expression
     }
 
-    (<RGHTBRCKT> | recoverFromError(new int[]{LFTCRLBRCKT,
+    (<RGHTBRCKT> | (recoverFromError(new int[]{LFTCRLBRCKT,
                                       IF,
                                       WHILE,
                                       INTEGER,
@@ -179,7 +179,7 @@ void WhileStatement() #void : {}
                                       EXCLAMATION,
                                       LFTBRCKT,
                                       IDENTIFIER
-                                      }, "Got '" + getToken(1) + "', expected ')'", false)) // all possible tokens to start a statement
+                                      }, "Got '" + getToken(1) + "', expected ')'", false)) #RecoverFromError) // all possible tokens to start a statement
 
     try {
         Statement()
@@ -190,7 +190,7 @@ void WhileStatement() #void : {}
 }
 
 JAVACODE
-void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) {
+void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #void {
 
     if(nErrors <= 0) System.exit(0);
     nErrors--;
