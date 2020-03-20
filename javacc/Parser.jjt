@@ -7,6 +7,8 @@ PARSER_BEGIN(Parser)
 
 public class Parser {
 
+    int nErrors = 3;
+
     public static void main(String[] args) throws ParseException {
             Parser parser = new Parser(System.in);
             parser.Program();
@@ -63,6 +65,7 @@ TOKEN:
     | <SEMICOLON : ";">
     | <DOT : ".">
     | <COMMA : ",">
+    | <EXCLAMATION: "!">
     | <EQUALS : "=">
 }
 
@@ -146,7 +149,7 @@ void NonIdentifierStatement() #void : {}
 {
     <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
     | <IF> <LFTBRCKT> Expression() <RGHTBRCKT> Statement() <ELSE> Statement()
-    | <WHILE> <LFTBRCKT> Expression() <RGHTBRCKT> Statement()
+    | WhileStatement()
     | NonIdentifierExpression() <SEMICOLON>
 }
 
@@ -174,25 +177,139 @@ void ComplementaryExpression() #void :{} {
     |
     FragmentExpression()
 }
+void TerminalComplementaryExpression() #void :{} {
+    TerminalArrayAccessExpression()
+    |
+    TerminalFragmentExpression()
+}
 
 void ArrayAccessExpression() #void : {}{
     <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess ComplementaryExpression()
 }
 
-void TwoAryExpressions() #void : {} {
-     (("&&" Expression() #And(2))
-     |("<" Expression() #LessThan(2))
-     | ("+" Expression() #Sum(2))
-     | ("-" Expression() #Minus(2))
-     | ("*" Expression() #Mul(2))
-     | ("/" Expression() #Div(2))) ComplementaryExpression()
+void TerminalArrayAccessExpression() #void : {}{
+    <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess
 }
+
+void WhileStatement() #void : {}
+{
+    <WHILE>
+    (<LFTBRCKT> | recoverFromError(new int[]{INTEGER,
+                                      TRUE,
+                                      FALSE,
+                                      THIS,
+                                      NEW,
+                                      EXCLAMATION,
+                                      LFTBRCKT,
+                                      IDENTIFIER
+                                      }, "Got '" + getToken(1) + "', expected '('", false)) // all possible tokens to start an expression
+
+    try {
+        Expression()
+    }
+    catch (ParseException e) {
+        recoverFromError(new int[]{RGHTBRCKT}, "Invalid Expression '" + e.currentToken + "'", false); // invalid expression
+    }
+
+    (<RGHTBRCKT> | recoverFromError(new int[]{LFTCRLBRCKT,
+                                      IF,
+                                      WHILE,
+                                      INTEGER,
+                                      TRUE,
+                                      FALSE,
+                                      THIS,
+                                      NEW,
+                                      EXCLAMATION,
+                                      LFTBRCKT,
+                                      IDENTIFIER
+                                      }, "Got '" + getToken(1) + "', expected ')'", false)) // all possible tokens to start a statement
+
+    try {
+        Statement()
+    }
+    catch (ParseException e) {
+        recoverFromError(new int[]{RGHTCRLBRCKT}, "Invalid Statement '" + e.currentToken + "'", true); // invalid statement
+    }
+}
+
+JAVACODE
+void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) {
+
+    if(nErrors <= 0) System.exit(0);
+    nErrors--;
+
+    System.out.println(errorMsg);
+
+    Token t = getToken(1);
+    String skipped = "";
+    boolean found = false;
+    while(!found) {
+        for (int i = 0; i < skipTo.length; i++) {
+            if (skipTo[i] == getToken(1).kind) {
+                found = true;
+                break;
+            }
+        }
+        if(!found) {
+            skipped += getToken(1).toString();
+            t = getNextToken();
+       }
+    }
+
+    if (advanceWhenFound) {
+        skipped += getToken(1).toString();
+        getNextToken();
+    }
+
+    System.out.println("Skipped '" + skipped + "'\n");
+}
+
+void TwoAryExpressions() #void : {} {
+    AndExpression() ComplementaryExpression()
+}
+
+void AndExpression() #void : {} {
+    LOOKAHEAD(2) LessThanExpression() | ([ LessThanExpression() ] "&&" Expression()) #And(2)
+}
+
+void LessThanExpression() #void : {} {
+    LOOKAHEAD(2) PlusMinusExpression()|  ([PlusMinusExpression()] "<"  TerminalExpression()) #LessThan(2)
+}
+
+void PlusMinusExpression()#void : {} {
+    LOOKAHEAD(2) MulDivExpression()
+    |
+    ("+" TerminalExpression()  [ LOOKAHEAD(2) PlusMinusExpression()] ) #Sum(2)
+    |
+    ("-" TerminalExpression() [ LOOKAHEAD(2) PlusMinusExpression()] ) #Minus(2)
+}
+
+void MulDivExpression() #void : {} {
+    (LOOKAHEAD(2)(("*" TerminalExpression() #Mul(2) ) | ("/" TerminalExpression() #Div(2) )))+
+}
+
+
 
 void FragmentExpression() #void : { Token t; }
 {
     TwoAryExpressions()
-    |<DOT> ( <LENGTH> #Length
-    | (t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT>) #MethodCall )  ComplementaryExpression()
+    |<DOT>
+        (
+        <LENGTH> #Length ComplementaryExpression()
+        |
+        ((t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT>)  #MethodCall(2) ComplementaryExpression())
+        )
+    | {}
+}
+
+void TerminalFragmentExpression() #void : { Token t; }
+{
+    <DOT>
+        (
+        <LENGTH> #Length ComplementaryExpression()
+        |
+        ((t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT>)  #MethodCall(2) ComplementaryExpression())
+        )
     | {}
 }
 
@@ -206,18 +323,34 @@ void NonIdentifierExpression() #void :{ Token t; }{
     t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric ComplementaryExpression()
     | <TRUE> { jjtThis.number = 1; } #Numeric ComplementaryExpression()
     | <FALSE> { jjtThis.number = 0; } #Numeric ComplementaryExpression()
-    | <THIS>  ComplementaryExpression() #This
-    | <NEW> (t= <IDENTIFIER> "()" { jjtThis.classIdentifier = t.image; } #New |
-     (<INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>) #NewArray ) ComplementaryExpression()
-    | "!" Expression() #Negation ComplementaryExpression()
+    | <THIS>  #This ComplementaryExpression()
+    | (
+        <NEW>
+        t= <IDENTIFIER> "()" { jjtThis.classIdentifier = t.image; } #New ComplementaryExpression()
+        | <INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #NewArray
+        ) ComplementaryExpression()
+    | <EXCLAMATION> Expression() #Negation ComplementaryExpression()
     | <LFTBRCKT> Expression() <RGHTBRCKT> ComplementaryExpression()
 }
 
-void IdentifierExpression() #void : { Token t; }{
-    t=<IDENTIFIER> { jjtThis.identifierName = t.image; }#Identifier ComplementaryExpression()
+void TerminalExpression() #void :{ Token t; }{
+    t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric TerminalComplementaryExpression()
+    | <TRUE> { jjtThis.number = 1; } #Numeric TerminalComplementaryExpression()
+    | <FALSE> { jjtThis.number = 0; } #Numeric TerminalComplementaryExpression()
+    | <THIS>  #This TerminalComplementaryExpression()
+    | (
+        <NEW>
+        t= <IDENTIFIER> "()" { jjtThis.classIdentifier = t.image; } #New TerminalComplementaryExpression()
+        | <INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #NewArray
+        ) TerminalComplementaryExpression()
+    | "!" Expression() #Negation TerminalComplementaryExpression()
+    | <LFTBRCKT> Expression() <RGHTBRCKT> TerminalComplementaryExpression()
 }
 
-void Type() #void : {} //TODO: Type no longer a Token
+void IdentifierExpression() #void : {}{
+    Identifier() ComplementaryExpression()
+}
+void Type() #void : {}
 {
     NonIdentifierType() | Identifier()
 }
