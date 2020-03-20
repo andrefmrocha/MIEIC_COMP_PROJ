@@ -5,7 +5,7 @@ options {
 
 PARSER_BEGIN(Parser)
 
-public class Parser{
+public class Parser {
 
     int nErrors = 3;
 
@@ -66,6 +66,7 @@ TOKEN:
     | <DOT : ".">
     | <COMMA : ",">
     | <EXCLAMATION: "!">
+    | <EQUALS : "=">
 }
 
 SimpleNode Program() : {}
@@ -79,11 +80,16 @@ void ImportDeclaration() #void : {}
     (<IMPORT> ImportStatement() <SEMICOLON> )*
 }
 
-void ImportStatement() #void : {}
+void ImportStatement() #void : {  }
 {
-    <IDENTIFIER> (<DOT> <IDENTIFIER>)* <LFTBRCKT> Type() <RGHTBRCKT>
+    ( Identifier()  (<DOT> Identifier() )* <LFTBRCKT>  Type() <RGHTBRCKT> ) #Import
 }
 
+void Identifier() #void : {Token t;}
+{
+    t = <IDENTIFIER> {jjtThis.identifierName = t.image;} #Identifier
+
+}
 
 void ClassDeclaration() #void : {}
 {
@@ -108,7 +114,38 @@ void Statement() #void : {}
     <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
     | <IF> <LFTBRCKT> Expression() <RGHTBRCKT> Statement() <ELSE> Statement()
     | WhileStatement()
-    | Expression() <SEMICOLON>
+    | NonIdentifierExpression() <SEMICOLON>
+    | IdentifierStatement() <SEMICOLON>
+}
+
+void IdentifierStatement() #void : {}
+{
+    <IDENTIFIER>
+    (
+        <EQUALS> Expression()
+        | <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>
+            (<EQUALS> Expression() | ComplementaryExpression() )
+        | FragmentExpression()
+    )
+}
+
+void ComplementaryExpression() #void :{} {
+    ArrayAccessExpression()
+    |
+    FragmentExpression()
+}
+void TerminalComplementaryExpression() #void :{} {
+    TerminalArrayAccessExpression()
+    |
+    TerminalFragmentExpression()
+}
+
+void ArrayAccessExpression() #void : {}{
+    <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess ComplementaryExpression()
+}
+
+void TerminalArrayAccessExpression() #void : {}{
+    <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess
 }
 
 void WhileStatement() #void : {}
@@ -184,27 +221,93 @@ void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) {
     System.out.println("Skipped '" + skipped + "'\n");
 }
 
-void ComplementaryExpression() #void : { Token t; }
+void TwoAryExpressions() #void : {} {
+    AndExpression() ComplementaryExpression()
+}
+
+void AndExpression() #void : {} {
+    LOOKAHEAD(2) LessThanExpression() | ([ LessThanExpression() ] "&&" Expression()) #And(2)
+}
+
+void LessThanExpression() #void : {} {
+    LOOKAHEAD(2) PlusMinusExpression()|  ([PlusMinusExpression()] "<"  TerminalExpression()) #LessThan(2)
+}
+
+void PlusMinusExpression()#void : {} {
+    LOOKAHEAD(2) MulDivExpression()
+    |
+    ("+" TerminalExpression()  [ LOOKAHEAD(2) PlusMinusExpression()] ) #Sum(2)
+    |
+    ("-" TerminalExpression() [ LOOKAHEAD(2) PlusMinusExpression()] ) #Minus(2)
+}
+
+void MulDivExpression() #void : {} {
+    (LOOKAHEAD(2)(("*" TerminalExpression() #Mul(2) ) | ("/" TerminalExpression() #Div(2) )))+
+}
+
+
+
+void FragmentExpression() #void : { Token t; }
 {
-     ("&&" #And(2) |"<" #LessThan(2) | "+"#Sum(2) | "-"#Minus(2) | "*"#Mul(2) | "/"#Div(2) ) Expression() ComplementaryExpression()
-    |<DOT> ( <LENGTH> #Length
-    | t=<IDENTIFIER> <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> { jjtThis.methodIdentifier = t.image; }#MethodCall  ) ComplementaryExpression()
+    TwoAryExpressions()
+    |<DOT>
+        (
+        <LENGTH> #Length ComplementaryExpression()
+        |
+        ((t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT>)  #MethodCall(2) ComplementaryExpression())
+        )
     | {}
 }
 
-void Expression() #void : { Token t; }{
+void TerminalFragmentExpression() #void : { Token t; }
+{
+    <DOT>
+        (
+        <LENGTH> #Length ComplementaryExpression()
+        |
+        ((t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT>)  #MethodCall(2) ComplementaryExpression())
+        )
+    | {}
+}
+
+void Expression() #void : {}{
+    IdentifierExpression()
+    |
+    NonIdentifierExpression()
+}
+
+void NonIdentifierExpression() #void :{ Token t; }{
     t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric ComplementaryExpression()
     | <TRUE> { jjtThis.number = 1; } #Numeric ComplementaryExpression()
     | <FALSE> { jjtThis.number = 0; } #Numeric ComplementaryExpression()
-    | <THIS> #This ComplementaryExpression()
-    | <NEW> (t= <IDENTIFIER>  { jjtThis.classIdentifier = t.image; }#New  "()" |
-     <INT> <LFTSQRBRCKT> Expression() #NewArray <RGHTSQRBRCKT>  ) ComplementaryExpression()
-    | <EXCLAMATION> #Negation Expression() ComplementaryExpression()
+    | <THIS>  #This ComplementaryExpression()
+    | (
+        <NEW>
+        t= <IDENTIFIER> "()" { jjtThis.classIdentifier = t.image; } #New ComplementaryExpression()
+        | <INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #NewArray
+        ) ComplementaryExpression()
+    | <EXCLAMATION> Expression() #Negation ComplementaryExpression()
     | <LFTBRCKT> Expression() <RGHTBRCKT> ComplementaryExpression()
-    | <IDENTIFIER> (<LFTSQRBRCKT> Expression() #ArrayAccess <RGHTSQRBRCKT> )* ["=" Expression()] ComplementaryExpression()
 }
 
-void Type() : {} //TODO: Type no longer a Token
+void TerminalExpression() #void :{ Token t; }{
+    t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric TerminalComplementaryExpression()
+    | <TRUE> { jjtThis.number = 1; } #Numeric TerminalComplementaryExpression()
+    | <FALSE> { jjtThis.number = 0; } #Numeric TerminalComplementaryExpression()
+    | <THIS>  #This TerminalComplementaryExpression()
+    | (
+        <NEW>
+        t= <IDENTIFIER> "()" { jjtThis.classIdentifier = t.image; } #New TerminalComplementaryExpression()
+        | <INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #NewArray
+        ) TerminalComplementaryExpression()
+    | "!" Expression() #Negation TerminalComplementaryExpression()
+    | <LFTBRCKT> Expression() <RGHTBRCKT> TerminalComplementaryExpression()
+}
+
+void IdentifierExpression() #void : {}{
+    Identifier() ComplementaryExpression()
+}
+void Type() #void : {}
 {
-      <INT>["[]"] | <BOOLEAN> | <IDENTIFIER>
+    (<INT>("[]" #IntArray|{}#Int)) | <BOOLEAN> #Boolean | Identifier()
 }
