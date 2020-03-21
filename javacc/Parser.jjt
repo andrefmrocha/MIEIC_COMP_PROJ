@@ -82,7 +82,7 @@ void ImportDeclaration() #void : {}
 
 void ImportStatement() #void : {  }
 {
-    ( Identifier()  (<DOT> Identifier() )* <LFTBRCKT>  Type() <RGHTBRCKT> ) #Import
+    (  [<STATIC>]#Static Identifier()  (<DOT> Identifier() )* (<LFTBRCKT>  Type() <RGHTBRCKT> | "()") Type() #Return ) #Import
 }
 
 void Identifier() #void : {Token t;}
@@ -126,7 +126,7 @@ void MethodBody() #void : {} {
 void MethodDeclaration() #void : {}
 {
     (<PUBLIC>
-    (MethodName() <LFTBRCKT> [Parameter() (<COMMA> Parameter())*] <RGHTBRCKT>  <LFTCRLBRCKT> (MethodBody() (<RETURN> Expression()) #Return <SEMICOLON>)#MethodBody <RGHTCRLBRCKT>
+    (MethodName() (<LFTBRCKT> [Parameter() (<COMMA> Parameter())*] <RGHTBRCKT> | "()" )  <LFTCRLBRCKT> (MethodBody() (<RETURN> Expression()) #Return <SEMICOLON>)#MethodBody <RGHTCRLBRCKT>
     | ((<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") Identifier() <RGHTBRCKT> ) #Main <LFTCRLBRCKT> MethodBody() #MethodBody <RGHTCRLBRCKT>  ))
     )#Method //TODO: check if newly added production is correct
 
@@ -279,9 +279,12 @@ void LessThanExpression() #void : {} {
 void PlusMinusExpression()#void : {} {
     LOOKAHEAD(2) MulDivExpression()
     |
-    ("+" TerminalExpression()  [ LOOKAHEAD(2) PlusMinusExpression()] ) #Sum(2)
-    |
-    ("-" TerminalExpression() [ LOOKAHEAD(2) PlusMinusExpression()] ) #Minus(2)
+    [MulDivExpression()]
+    (
+        ( "+" TerminalExpression()  [ LOOKAHEAD(2) PlusMinusExpression()] ) #Sum(2)
+        |
+        ( "-" TerminalExpression() [ LOOKAHEAD(2) PlusMinusExpression()] ) #Minus(2)
+    )
 }
 
 void MulDivExpression() #void : {} {
@@ -297,7 +300,7 @@ void FragmentExpression() #void : { Token t; }
         (
         <LENGTH> #Length ComplementaryExpression()
         |
-        ((t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT>)  #MethodCall(2) ComplementaryExpression())
+        ((t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } (<LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> | "()"))  #MethodCall(2) ComplementaryExpression())
         )
     | {}
 }
@@ -332,7 +335,13 @@ void NonIdentifierExpression() #void :{ Token t; }{
     | <LFTBRCKT> Expression() <RGHTBRCKT> ComplementaryExpression()
 }
 
-void TerminalExpression() #void :{ Token t; }{
+void TerminalExpression() #void: {}{
+    NonIdentifierTerminalExpression()
+    |
+    IdentifierTerminalExpression()
+}
+
+void NonIdentifierTerminalExpression() #void :{ Token t; }{
     t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric TerminalComplementaryExpression()
     | <TRUE> { jjtThis.number = 1; } #Numeric TerminalComplementaryExpression()
     | <FALSE> { jjtThis.number = 0; } #Numeric TerminalComplementaryExpression()
@@ -347,6 +356,10 @@ void TerminalExpression() #void :{ Token t; }{
 
 void IdentifierExpression() #void : {}{
     Identifier() ComplementaryExpression()
+}
+
+void IdentifierTerminalExpression() #void : {}{
+    Identifier() TerminalComplementaryExpression()
 }
 void Type() #void : {}
 {
