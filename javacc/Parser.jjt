@@ -174,11 +174,7 @@ void IdentifierStatementFragment() #void : {} {
     ) <SEMICOLON>
 }
 
-void ComplementaryExpression() #void :{} {
-    ArrayAccessExpression()
-    |
-    FragmentExpression()
-}
+
 void TerminalComplementaryExpression() #void :{} {
     TerminalArrayAccessExpression()
     |
@@ -267,7 +263,7 @@ void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #
 }
 
 void TwoAryExpressions() #void : {} {
-    AndExpression() ComplementaryExpression()
+    AndExpression()
 }
 
 void AndExpression() #void : {} {
@@ -323,9 +319,9 @@ void TerminalFragmentExpression() #void : { }
 }
 
 void Expression() #void : {}{
-    IdentifierExpression()
+    Exp()
     |
-    NonIdentifierExpression()
+    NewExpression()
 }
 
 void NonIdentifierExpression() #void :{ Token t; }{
@@ -352,12 +348,18 @@ void NonIdentifierTerminalExpression() #void :{ Token t; }{
     | <TRUE> { jjtThis.number = 1; } #Numeric TerminalComplementaryExpression()
     | <FALSE> { jjtThis.number = 0; } #Numeric TerminalComplementaryExpression()
     | <THIS>  #This TerminalComplementaryExpression()
-    |<NEW> (
-             (Identifier() ("()" | <LFTBRCKT> <RGHTBRCKT> )) #New
-             | <INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #NewArray
-             ) TerminalComplementaryExpression()
-    | "!" Expression() #Negation TerminalComplementaryExpression()
+    | <NEW> (
+        (Identifier() ("()" | <LFTBRCKT> <RGHTBRCKT> )) #New
+        | <INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #NewArray
+        ) TerminalComplementaryExpression()
+    | <EXCLAMATION> Expression() #Negation TerminalComplementaryExpression()
     | <LFTBRCKT> Expression() <RGHTBRCKT> TerminalComplementaryExpression()
+}
+
+void ComplementaryExpression() #void :{} {
+    ArrayAccessExpression()
+    |
+    FragmentExpression()
 }
 
 void IdentifierExpression() #void : {}{
@@ -375,4 +377,66 @@ void Type() #void : {}
 void NonIdentifierType() #void : {}
 {
        (<INT>("[]" #IntArray|{}#Int))  | <BOOLEAN> #Boolean | <VOID> #Void
+}
+
+void Exp() #void:{} {
+    Exp1() ExpL()
+}
+
+void ExpL() #void : {} {
+    ("&&" Exp1() ExpL()) #And(2) | {}
+}
+
+void Exp1() #void : {} {
+    Exp2() Exp1L()
+}
+
+void Exp1L() #void : {} {
+    ("<" Exp2() Exp1L()) #LessThan(2) | {}
+}
+
+void Exp2() #void : {} {
+    Exp3() Exp2L()
+}
+
+void Exp2L() #void : {} {
+    ("-" Exp3() Exp2L()) #Sub(2) | ("+" Exp3() Exp2L()) #Sum(2) | {}
+}
+
+void Exp3() #void : {} {
+    NewExpression() Exp3L()
+}
+
+void Exp3L() #void : {} {
+    ("*" NewExpression() Exp3L()) #Mul(2) | ("/" NewExpression() Exp3L()) #Div(2) | {}
+}
+
+
+void NewExpression() #void : {} {
+    Terminals() (
+        <LFTSQRBRCKT> NewExpression() <RGHTSQRBRCKT> #ArrayAccess(2)
+        |
+        <DOT>
+                (
+                <LENGTH> #Length(1)
+                |
+                 MethodCall() #MethodCall(2)
+                )
+        | {}
+    )
+}
+
+void Terminals() # void : { Token t; } {
+    t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric
+    | <TRUE> { jjtThis.number = 1; } #Numeric
+    | <FALSE> { jjtThis.number = 0; } #Numeric
+    | <THIS> #This
+    | <NEW> (
+              (Identifier() ("()" | <LFTBRCKT> <RGHTBRCKT> )) #New
+             |
+              (<INT> <LFTSQRBRCKT> NewExpression() <RGHTSQRBRCKT>) #NewArray
+             )
+    | "!" #Negation NewExpression()
+    | <LFTBRCKT> NewExpression() <RGHTBRCKT>
+    | Identifier()
 }
