@@ -3,7 +3,6 @@
 public
 class ASTNew extends SimpleNode {
   public String classIdentifier;
-
   public ASTNew(int id) {
     super(id);
   }

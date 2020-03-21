@@ -3,7 +3,6 @@
 public
 class ASTMethodCall extends SimpleNode {
   protected String methodIdentifier;
-
   public ASTMethodCall(int id) {
     super(id);
   }
