@@ -3,7 +3,6 @@
 public
 class ASTNumeric extends SimpleNode {
   public int number;
-
   public ASTNumeric(int id) {
     super(id);
   }

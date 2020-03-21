@@ -132,6 +132,7 @@ void MethodDeclaration() #void : {}
 
 }
 
+<<<<<<< HEAD
 
 void MethodName() #void : {}
 {
@@ -146,10 +147,13 @@ void Parameter() #void : {}
 
 
 void NonIdentifierStatement() #void : {}
+=======
+void Statement() #void : {Token t;}
+>>>>>>> feature/statement-code-information
 {
     <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
-    | <IF> <LFTBRCKT> Expression() <RGHTBRCKT> Statement() <ELSE> Statement()
-    | WhileStatement()
+    | (<IF>  <LFTBRCKT> Expression()  <RGHTBRCKT> Statement() <ELSE> Statement() ) #If
+    | (WhileStatement()) #While
     | NonIdentifierExpression() <SEMICOLON>
 }
 
@@ -160,8 +164,9 @@ void Statement() #void : {}
      IdentifierStatement()
 }
 
-void IdentifierStatement() #void : {}
+void IdentifierStatement() #void : {Token t;}
 {
+<<<<<<< HEAD
     <IDENTIFIER> IdentifierStatementFragment()
 }
 
@@ -170,6 +175,15 @@ void IdentifierStatementFragment() #void : {} {
     | <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>
         (<EQUALS> Expression() | ComplementaryExpression() )
     | FragmentExpression() ) <SEMICOLON>
+=======
+    t=<IDENTIFIER> #Identifier(true)
+    (
+        <EQUALS> Expression() {jjtThis.varIdentifier = t.image;} #AssignVar(2)
+        | <LFTSQRBRCKT> Expression() #ArrayAccess(2) <RGHTSQRBRCKT>
+            (<EQUALS> Expression() {jjtThis.arrayIdentifier = t.image;} #AssignVarArray(2) | ComplementaryExpression() )
+        | FragmentExpression()
+    )
+>>>>>>> feature/statement-code-information
 }
 
 void ComplementaryExpression() #void :{} {
@@ -184,7 +198,7 @@ void TerminalComplementaryExpression() #void :{} {
 }
 
 void ArrayAccessExpression() #void : {}{
-    <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess ComplementaryExpression()
+    <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess(2) ComplementaryExpression()
 }
 
 void TerminalArrayAccessExpression() #void : {}{
@@ -202,7 +216,7 @@ void WhileStatement() #void : {}
                                       EXCLAMATION,
                                       LFTBRCKT,
                                       IDENTIFIER
-                                      }, "Got '" + getToken(1) + "', expected '('", false)) // all possible tokens to start an expression
+                                      }, "Got '" + getToken(1) + "', expected '('", false))// all possible tokens to start an expression
 
     try {
         Expression()
@@ -233,7 +247,7 @@ void WhileStatement() #void : {}
 }
 
 JAVACODE
-void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) {
+void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #RecoverFromError {
 
     if(nErrors <= 0) System.exit(0);
     nErrors--;
