@@ -12,5 +12,9 @@ class ASTIdentifier extends SimpleNode {
     super(p, id);
   }
 
+  public String toString() {
+    return ParserTreeConstants.jjtNodeName[id] + "[" + identifierName + "]";
+  }
+
 }
 /* JavaCC - OriginalChecksum=75abfe948da46b0c7b3a59b2cae3a666 (do not edit this line) */

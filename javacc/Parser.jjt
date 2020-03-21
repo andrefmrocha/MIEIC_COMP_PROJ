@@ -7,7 +7,7 @@ PARSER_BEGIN(Parser)
 
 public class Parser {
 
-    int nErrors = 3;
+    int nErrors = 1;
 
     public static void main(String[] args) throws ParseException {
             Parser parser = new Parser(System.in);
@@ -55,7 +55,7 @@ TOKEN:
     | <LENGTH: "length">
     | <INT: "int">
     | <BOOLEAN: "boolean">
-    | <IDENTIFIER: ["A"-"Z", "a"-"z"](["0"-"9", "A"-"Z", "a" - "z", "_"])* >
+    | <IDENTIFIER: ["A"-"Z", "a"-"z", "_", "$"](["0"-"9", "A"-"Z", "a" - "z", "_"])* >
     | <LFTSQRBRCKT : "[">
     | <RGHTSQRBRCKT : "]">
     | <RGHTBRCKT : ")">
@@ -82,7 +82,7 @@ void ImportDeclaration() #void : {}
 
 void ImportStatement() #void : {  }
 {
-    (  [<STATIC>]#Static Identifier()  (<DOT> Identifier() )* (<LFTBRCKT>  Type() <RGHTBRCKT> | "()") Type() #Return ) #Import
+    (  [<STATIC>]#Static Identifier()  (<DOT> Identifier() )* [(<LFTBRCKT>  Type() (<COMMA> Type())* <RGHTBRCKT> | "()") Type()] #Return ) #Import
 }
 
 void Identifier() #void : {Token t;}
@@ -132,8 +132,6 @@ void MethodDeclaration() #void : {}
 
 }
 
-<<<<<<< HEAD
-
 void MethodName() #void : {}
 {
     (Type() Identifier()) #MethodName
@@ -147,9 +145,7 @@ void Parameter() #void : {}
 
 
 void NonIdentifierStatement() #void : {}
-=======
-void Statement() #void : {Token t;}
->>>>>>> feature/statement-code-information
+
 {
     <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
     | (<IF>  <LFTBRCKT> Expression()  <RGHTBRCKT> Statement() <ELSE> Statement() ) #If
@@ -166,24 +162,16 @@ void Statement() #void : {}
 
 void IdentifierStatement() #void : {Token t;}
 {
-<<<<<<< HEAD
-    <IDENTIFIER> IdentifierStatementFragment()
+    Identifier() IdentifierStatementFragment()
 }
 
 void IdentifierStatementFragment() #void : {} {
-    (<EQUALS> Expression()
-    | <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>
-        (<EQUALS> Expression() | ComplementaryExpression() )
-    | FragmentExpression() ) <SEMICOLON>
-=======
-    t=<IDENTIFIER> #Identifier(true)
     (
-        <EQUALS> Expression() {jjtThis.varIdentifier = t.image;} #AssignVar(2)
+        (<EQUALS> Expression()) #AssignVar(2)
         | <LFTSQRBRCKT> Expression() #ArrayAccess(2) <RGHTSQRBRCKT>
-            (<EQUALS> Expression() {jjtThis.arrayIdentifier = t.image;} #AssignVarArray(2) | ComplementaryExpression() )
+            (<EQUALS> Expression() #AssignVarArray(2) | ComplementaryExpression() )
         | FragmentExpression()
-    )
->>>>>>> feature/statement-code-information
+    ) <SEMICOLON>
 }
 
 void ComplementaryExpression() #void :{} {
@@ -307,25 +295,29 @@ void MulDivExpression() #void : {} {
 
 
 
-void FragmentExpression() #void : { Token t; }
+void FragmentExpression() #void : {}
 {
     TwoAryExpressions()
     |<DOT>
         (
-        <LENGTH> #Length ComplementaryExpression()
+        <LENGTH> #Length(1) ComplementaryExpression()
         |
-        ((t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } (<LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> | "()"))  #MethodCall(2) ComplementaryExpression())
+        (MethodCall() #MethodCall(2) ComplementaryExpression())
         )
     | {}
 }
 
-void TerminalFragmentExpression() #void : { Token t; }
+void MethodCall() #Method : {} {
+    Identifier() (<LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> | "()")
+}
+
+void TerminalFragmentExpression() #void : { }
 {
     <DOT>
         (
-        <LENGTH> #Length ComplementaryExpression()
+        <LENGTH> #Length(1) ComplementaryExpression()
         |
-        ((t=<IDENTIFIER> { jjtThis.methodIdentifier = t.image; } <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT>)  #MethodCall(2) ComplementaryExpression())
+         (MethodCall() #MethodCall(2) ComplementaryExpression())
         )
     | {}
 }
@@ -342,7 +334,7 @@ void NonIdentifierExpression() #void :{ Token t; }{
     | <FALSE> { jjtThis.number = 0; } #Numeric ComplementaryExpression()
     | <THIS>  #This ComplementaryExpression()
     | <NEW> (
-        t= <IDENTIFIER> "()" { jjtThis.classIdentifier = t.image; } #New ComplementaryExpression()
+        (Identifier() ("()" | <LFTBRCKT> <RGHTBRCKT> )) #New
         | <INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #NewArray
         ) ComplementaryExpression()
     | <EXCLAMATION> Expression() #Negation ComplementaryExpression()
@@ -360,10 +352,10 @@ void NonIdentifierTerminalExpression() #void :{ Token t; }{
     | <TRUE> { jjtThis.number = 1; } #Numeric TerminalComplementaryExpression()
     | <FALSE> { jjtThis.number = 0; } #Numeric TerminalComplementaryExpression()
     | <THIS>  #This TerminalComplementaryExpression()
-    | <NEW> (
-        t= <IDENTIFIER> "()" { jjtThis.classIdentifier = t.image; } #New TerminalComplementaryExpression()
-        | <INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #NewArray
-        ) TerminalComplementaryExpression()
+    |<NEW> (
+             (Identifier() ("()" | <LFTBRCKT> <RGHTBRCKT> )) #New
+             | <INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #NewArray
+             ) TerminalComplementaryExpression()
     | "!" Expression() #Negation TerminalComplementaryExpression()
     | <LFTBRCKT> Expression() <RGHTBRCKT> TerminalComplementaryExpression()
 }
