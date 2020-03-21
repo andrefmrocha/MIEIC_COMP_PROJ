@@ -118,13 +118,13 @@ void Statement() #void : {Token t;}
     | IdentifierStatement() <SEMICOLON>
 }
 
-void IdentifierStatement() #void : {Token t;}
+void IdentifierStatement() #void : {}
 {
-    t=<IDENTIFIER> #Identifier(true)
+    Identifier()
     (
-        <EQUALS> Expression() {jjtThis.varIdentifier = t.image;} #AssignVar(2)
+        <EQUALS> Expression() {} #AssignVar(2)
         | <LFTSQRBRCKT> Expression() #ArrayAccess(2) <RGHTSQRBRCKT>
-            (<EQUALS> Expression() {jjtThis.arrayIdentifier = t.image;} #AssignVarArray(2) | ComplementaryExpression() )
+            (<EQUALS> Expression() {} #AssignVarArray(2) | ComplementaryExpression() )
         | FragmentExpression()
     )
 }
