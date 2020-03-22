@@ -82,7 +82,7 @@ void ImportDeclaration() #void : {}
 
 void ImportStatement() #void : {  }
 {
-    (  [<STATIC>]#Static Identifier()  (<DOT> Identifier() )* [(<LFTBRCKT>  Type() (<COMMA> Type())* <RGHTBRCKT> | "()") Type()] #Return ) #Import
+    (  [ <STATIC> #Static ] Identifier()  (<DOT> Identifier() )* [(<LFTBRCKT>  Type() (<COMMA> Type())* <RGHTBRCKT> | "()") Type()] #Return ) #Import
 }
 
 void Identifier() #void : {Token t;}
@@ -263,114 +263,114 @@ void NonIdentifierType() #void : {}
 }
 
 void Expression() #void:{} {
-    Exp1() ExpL()
+    Level1Operators() AndFragment()
 }
 
 void NonIdentifierExpression() #void:{} {
-    NonIdExp1() ExpL()
+    NonIdLevel1Operators() AndFragment()
 }
 
 void FragmentExpression() #void:{} {
-    FragmentExp1() ExpL()
+    FragmentLevel1Operators() AndFragment()
 }
 
 void ComplementaryExpression() #void:{} {
-    ComplementaryExpressionExp1() ExpL()
+    ComplementaryLevel1Operators() AndFragment()
 }
 
-void ExpL() #void : {} {
-    ("&&"  Exp1() ExpL()) #And(2) | {}
+void AndFragment() #void : {} {
+    ("&&"  Level1Operators() AndFragment()) #And(2) | {}
 }
 
-void Exp1() #void : {} {
-    Exp2() Exp1L()
+void Level1Operators() #void : {} {
+    Level2Operators() LessThanFragment()
 }
 
-void NonIdExp1() #void : {} {
-    NonIdExp2() Exp1L()
+void NonIdLevel1Operators() #void : {} {
+    NonIdLevel2Operators() LessThanFragment()
 }
 
-void FragmentExp1() #void : {} {
-    FragmentExp2() Exp1L()
+void FragmentLevel1Operators() #void : {} {
+    FragmentLevel2Operators() LessThanFragment()
 }
 
-void ComplementaryExpressionExp1() #void : {} {
-    ComplementaryExpressionExp2() Exp1L()
+void ComplementaryLevel1Operators() #void : {} {
+    ComplementaryLevel2Operators() LessThanFragment()
 }
 
-void Exp1L() #void : {} {
-    ("<"  Exp2() Exp1L()) #LessThan(2) | {}
+void LessThanFragment() #void : {} {
+    ("<"  Level2Operators() LessThanFragment()) #LessThan(2) | {}
 }
 
-void Exp2() #void : {} {
-    Exp3() Exp2L()
+void Level2Operators() #void : {} {
+    Level3Operators() PlusMinusFragments()
 }
 
-void NonIdExp2() #void : {} {
-    NonIdExp3() Exp2L()
+void NonIdLevel2Operators() #void : {} {
+    NonIdLevel3Operators() PlusMinusFragments()
 }
 
-void FragmentExp2() #void : {} {
-    FragmentExp3() Exp2L()
+void FragmentLevel2Operators() #void : {} {
+    FragmentLevel3Operators() PlusMinusFragments()
 }
 
-void ComplementaryExpressionExp2() #void : {} {
-    ComplementaryExpressionExp3() Exp2L()
+void ComplementaryLevel2Operators() #void : {} {
+    ComplementaryExpressionLevel3Operators() PlusMinusFragments()
 }
 
-void Exp2L() #void : {} {
-    ("-"  Exp3() Exp2L()) #Sub(2) | ("+" Exp3() Exp2L()) #Sum(2) | {}
+void PlusMinusFragments() #void : {} {
+    ("-"  Level3Operators() PlusMinusFragments()) #Sub(2) | ("+" Level3Operators() PlusMinusFragments()) #Sum(2) | {}
 }
 
-void Exp3() #void : {} {
-    Exp4() Exp3L()
+void Level3Operators() #void : {} {
+    Level4Operators() MulDivFragment()
 }
 
-void NonIdExp3() #void : {} {
-    NonIdExp4() Exp3L()
+void NonIdLevel3Operators() #void : {} {
+    NonIdLevel4Operators() MulDivFragment()
 }
 
-void FragmentExp3() #void : {} {
-    FragmentExp4() Exp3L()
+void FragmentLevel3Operators() #void : {} {
+    FragmentLevel4Operators() MulDivFragment()
 }
 
-void ComplementaryExpressionExp3() #void : {} {
-    ComplementaryExpressionExp4() Exp3L()
+void ComplementaryExpressionLevel3Operators() #void : {} {
+    ComplementaryExpressionExp4() MulDivFragment()
 }
 
-void Exp3L() #void : {} {
-    ("*" Exp4() Exp3L()) #Mul(2) | ("/" Exp4() Exp3L()) #Div(2) | {}
+void MulDivFragment() #void : {} {
+    ("*" Level4Operators() MulDivFragment()) #Mul(2) | ("/" Level4Operators() MulDivFragment()) #Div(2) | {}
 }
 
-void Exp4() #void : {} {
-    Exp5() Exp4L() | (<EXCLAMATION> Exp5() Exp4L()) #Negation
+void Level4Operators() #void : {} {
+    Level5Operators() OneAryFragments() | (<EXCLAMATION> Level5Operators() OneAryFragments()) #Negation
 }
 
-void NonIdExp4() #void : {} {
-    NonIdExp5() Exp4L() | (<EXCLAMATION> NonIdExp5() Exp4L()) #Negation
+void NonIdLevel4Operators() #void : {} {
+    NonIdLevel5Operators() OneAryFragments() | (<EXCLAMATION> NonIdLevel5Operators() OneAryFragments()) #Negation
 }
 
-void FragmentExp4() #void : {} {
-    FragmentExp4L() | (<EXCLAMATION> FragmentExp4L()) #Negation
+void FragmentLevel4Operators() #void : {} {
+    FragmentExpLevel4() | (<EXCLAMATION> FragmentExpLevel4()) #Negation
 }
 
 void ComplementaryExpressionExp4() #void : {} {
-    Exp4L() | (<EXCLAMATION> Exp4L()) #Negation
+    OneAryFragments() | (<EXCLAMATION> OneAryFragments()) #Negation
 }
 
-void Exp4L() #void : {} {
-    AllExpressions() Exp4L() | {}
+void OneAryFragments() #void : {} {
+    AllExpressions() OneAryFragments() | {}
 }
 
-void FragmentExp4L() #void : {} {
-    ComplementExpressions() Exp4L() | {}
+void FragmentExpLevel4() #void : {} {
+    ComplementExpressions() OneAryFragments() | {}
 }
 
-void Exp5() #void : {} {
+void Level5Operators() #void : {} {
     AllTerminals()
 }
 
-void NonIdExp5() #void : {} {
+void NonIdLevel5Operators() #void : {} {
     Terminals()
 }
 
