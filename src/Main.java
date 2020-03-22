@@ -7,14 +7,16 @@ public class Main {
 		Parser parser;
 		try {
 			parser = new Parser(new java.io.FileInputStream(args[0]));
-			parser.Program().dump("");
+			SimpleNode node = parser.Program();
+			if(parser.nErrors < Parser.NUM_ERRORS)
+				throw new RuntimeException();
+			node.dump("");
 		}catch (ParseException | FileNotFoundException e){
 			e.printStackTrace();
 			throw new RuntimeException();
 		}
 
-		if(parser.nErrors < Parser.NUM_ERRORS)
-			throw new RuntimeException();
+
 	}
 }
 	
