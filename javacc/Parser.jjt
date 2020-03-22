@@ -7,7 +7,7 @@ PARSER_BEGIN(Parser)
 
 public class Parser {
 
-    int nErrors = 1;
+    int nErrors = 0;
 
     public static void main(String[] args) throws ParseException {
             Parser parser = new Parser(System.in);
@@ -311,15 +311,15 @@ void Exp3L() #void : {} {
 }
 
 void Exp4() #void : {} {
-    Exp5() Exp4L()
+    Exp5() Exp4L() | (<EXCLAMATION> Exp5() Exp4L()) #Negation
 }
 
 void NonIdExp4() #void : {} {
-    NonIdExp5() Exp4L()
+    NonIdExp5() Exp4L() | (<EXCLAMATION> NonIdExp5() Exp4L()) #Negation
 }
 
 void Exp4L() #void : {} {
-    AllExpressions() ExpL() | {}
+    AllExpressions() Exp4L() | {}
 }
 
 void Exp5() #void : {} {
@@ -363,6 +363,5 @@ void Terminals() # void : { Token t; } {
              |
               (<INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>) #NewArray
              )
-    | "!" #Negation Expression()
     | <LFTBRCKT> Expression() <RGHTBRCKT>
 }
