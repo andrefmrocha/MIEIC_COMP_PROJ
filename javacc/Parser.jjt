@@ -323,26 +323,24 @@ void Exp4L() #void : {} {
 }
 
 void Exp5() #void : {} {
-    Terminals() | Identifier()
+    AllTerminals()
 }
 
 void NonIdExp5() #void : {} {
     Terminals()
 }
 
-
-
-
-void NewExpression() #void : {} {
-    (Identifier() | Terminals()) AllExpressions()
+void AllTerminals() #void :{} {
+    Identifier() | Terminals()
 }
+
 
 void AllExpressions() #void : {} {
     ArrayExpression() | ComplementExpressions()
 }
 
 void ArrayExpression() #void : {} {
-   <LFTSQRBRCKT> NewExpression() <RGHTSQRBRCKT> #ArrayAccess(2)
+   <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess(2)
 }
 
 void ComplementExpressions() #void : {} {
@@ -363,8 +361,8 @@ void Terminals() # void : { Token t; } {
     | <NEW> (
               (Identifier() ("()" | <LFTBRCKT> <RGHTBRCKT> )) #New
              |
-              (<INT> <LFTSQRBRCKT> NewExpression() <RGHTSQRBRCKT>) #NewArray
+              (<INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>) #NewArray
              )
-    | "!" #Negation NewExpression()
-    | <LFTBRCKT> NewExpression() <RGHTBRCKT>
+    | "!" #Negation Expression()
+    | <LFTBRCKT> Expression() <RGHTBRCKT>
 }
