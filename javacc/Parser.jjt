@@ -6,8 +6,8 @@ options {
 PARSER_BEGIN(Parser)
 
 public class Parser {
-
-    int nErrors = 0;
+    public static final int NUM_ERRORS = 10;
+    int nErrors = 1;
 
     public static void main(String[] args) throws ParseException {
             Parser parser = new Parser(System.in);
@@ -69,7 +69,7 @@ TOKEN:
     | <EQUALS : "=">
 }
 
-SimpleNode Program() : {}
+SimpleNode Program() : { this.nErrors =  Parser.NUM_ERRORS;}
 {
     ImportDeclaration() ClassDeclaration() <EOF> { return jjtThis; }
 }
@@ -169,8 +169,8 @@ void IdentifierStatementFragment() #void : {} {
     (
         (<EQUALS> Expression()) #AssignVar(2)
         | <LFTSQRBRCKT> Expression() #ArrayAccess(2) <RGHTSQRBRCKT>
-            (<EQUALS> Expression() #AssignVarArray(2) | ComplementExpressions() )
-        | ComplementExpressions()
+            (<EQUALS> Expression() #AssignVarArray(2) | ComplementaryExpression() )
+        | FragmentExpression()
     ) <SEMICOLON>
 }
 
@@ -219,7 +219,7 @@ void WhileStatement() #void : {}
 JAVACODE
 void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #RecoverFromError {
 
-    if(nErrors <= 0) System.exit(0);
+    if(nErrors <= 0) throw new ParseException();
     nErrors--;
 
     System.out.println(errorMsg);
@@ -270,6 +270,14 @@ void NonIdentifierExpression() #void:{} {
     NonIdExp1() ExpL()
 }
 
+void FragmentExpression() #void:{} {
+    FragmentExp1() ExpL()
+}
+
+void ComplementaryExpression() #void:{} {
+    ComplementaryExpressionExp1() ExpL()
+}
+
 void ExpL() #void : {} {
     ("&&"  Exp1() ExpL()) #And(2) | {}
 }
@@ -280,6 +288,14 @@ void Exp1() #void : {} {
 
 void NonIdExp1() #void : {} {
     NonIdExp2() Exp1L()
+}
+
+void FragmentExp1() #void : {} {
+    FragmentExp2() Exp1L()
+}
+
+void ComplementaryExpressionExp1() #void : {} {
+    ComplementaryExpressionExp2() Exp1L()
 }
 
 void Exp1L() #void : {} {
@@ -294,6 +310,14 @@ void NonIdExp2() #void : {} {
     NonIdExp3() Exp2L()
 }
 
+void FragmentExp2() #void : {} {
+    FragmentExp3() Exp2L()
+}
+
+void ComplementaryExpressionExp2() #void : {} {
+    ComplementaryExpressionExp3() Exp2L()
+}
+
 void Exp2L() #void : {} {
     ("-"  Exp3() Exp2L()) #Sub(2) | ("+" Exp3() Exp2L()) #Sum(2) | {}
 }
@@ -304,6 +328,14 @@ void Exp3() #void : {} {
 
 void NonIdExp3() #void : {} {
     NonIdExp4() Exp3L()
+}
+
+void FragmentExp3() #void : {} {
+    FragmentExp4() Exp3L()
+}
+
+void ComplementaryExpressionExp3() #void : {} {
+    ComplementaryExpressionExp4() Exp3L()
 }
 
 void Exp3L() #void : {} {
@@ -318,8 +350,20 @@ void NonIdExp4() #void : {} {
     NonIdExp5() Exp4L() | (<EXCLAMATION> NonIdExp5() Exp4L()) #Negation
 }
 
+void FragmentExp4() #void : {} {
+    FragmentExp4L() | (<EXCLAMATION> FragmentExp4L()) #Negation
+}
+
+void ComplementaryExpressionExp4() #void : {} {
+    Exp4L() | (<EXCLAMATION> Exp4L()) #Negation
+}
+
 void Exp4L() #void : {} {
     AllExpressions() Exp4L() | {}
+}
+
+void FragmentExp4L() #void : {} {
+    ComplementExpressions() Exp4L() | {}
 }
 
 void Exp5() #void : {} {
@@ -355,8 +399,8 @@ void ComplementExpressions() #void : {} {
 
 void Terminals() # void : { Token t; } {
     t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric
-    | <TRUE> { jjtThis.number = 1; } #Numeric
-    | <FALSE> { jjtThis.number = 0; } #Numeric
+    | <TRUE> { jjtThis.bool = true; } #BooleanValue
+    | <FALSE> { jjtThis.bool = false; } #BooleanValue
     | <THIS> #This
     | <NEW> (
               (Identifier() ("()" | <LFTBRCKT> <RGHTBRCKT> )) #New

@@ -1,4 +1,4 @@
-import io.println(int); // by default considers the return as void
+import io.println(int) void; // by default considers the return as void
 class Fac {
     public int ComputeFac(int num){
         int num_aux ;

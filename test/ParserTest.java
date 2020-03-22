@@ -153,11 +153,11 @@ public class ParserTest {
 //        test("fixtures/public/fail/semantic/extra/miss_type.jmm", true);
 //    }
 //
-//    @Test
-//    public void testBlowUp() {
-//        test("fixtures/public/fail/syntactical/BlowUp.jmm", true);
-//    }
-//
+    @Test
+    public void testBlowUp() {
+        test("fixtures/public/fail/syntactical/BlowUp.jmm", true);
+    }
+
     @Test
     public void testCompleteWhileTest() {
         test("fixtures/public/fail/syntactical/CompleteWhileTest.jmm", true);
