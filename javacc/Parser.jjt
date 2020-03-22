@@ -343,19 +343,19 @@ void MulDivFragment() #void : {} {
 }
 
 void Level4Operators() #void : {} {
-    Level5Operators() OneAryFragments() | (<EXCLAMATION> Level5Operators() OneAryFragments()) #Negation
+    Level5Operators() OneAryFragments() | (<EXCLAMATION> Level4Operators() )#Negation
 }
 
 void NonIdLevel4Operators() #void : {} {
-    NonIdLevel5Operators() OneAryFragments() | (<EXCLAMATION> NonIdLevel5Operators() OneAryFragments()) #Negation
+    NonIdLevel5Operators() OneAryFragments() | (<EXCLAMATION> Level4Operators()) #Negation
 }
 
 void FragmentLevel4Operators() #void : {} {
-    FragmentExpLevel4() | (<EXCLAMATION> FragmentExpLevel4()) #Negation
+    FragmentExpLevel4() | (<EXCLAMATION> ComplementaryExpressionExp4() ) #Negation
 }
 
 void ComplementaryExpressionExp4() #void : {} {
-    OneAryFragments() | (<EXCLAMATION> OneAryFragments()) #Negation
+    OneAryFragments() | (<EXCLAMATION> ComplementaryExpressionExp4() ) #Negation
 }
 
 void OneAryFragments() #void : {} {
