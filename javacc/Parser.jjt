@@ -319,7 +319,7 @@ void ComplementaryLevel2Operators() #void : {} {
 }
 
 void PlusMinusFragments() #void : {} {
-    ("-"  Level3Operators() PlusMinusFragments()) #Sub(2) | ("+" Level3Operators() PlusMinusFragments()) #Sum(2) | {}
+    ("-"  Level3Operators()) #Sub(2) PlusMinusFragments() | ("+" Level3Operators()) #Sum(2) PlusMinusFragments() | {}
 }
 
 void Level3Operators() #void : {} {
@@ -339,7 +339,7 @@ void ComplementaryExpressionLevel3Operators() #void : {} {
 }
 
 void MulDivFragment() #void : {} {
-    ("*" Level4Operators() MulDivFragment()) #Mul(2) | ("/" Level4Operators() MulDivFragment()) #Div(2) | {}
+    ("*" Level4Operators() )#Mul(2) MulDivFragment() | ("/" Level4Operators()) #Div(2) MulDivFragment() | {}
 }
 
 void Level4Operators() #void : {} {
