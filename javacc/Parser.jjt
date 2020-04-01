@@ -222,7 +222,9 @@ void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #
     if(nErrors <= 0) throw new ParseException();
     nErrors--;
 
-    System.out.println(errorMsg);
+    ParseException e = generateParseException();  // generate the exception object.
+    System.out.println("Error in line " + e.currentToken.beginLine + ", column " + e.currentToken.beginColumn + ":");
+    System.out.println("> " + errorMsg);
 
     Token t = getToken(1);
     String skipped = "";
@@ -245,7 +247,7 @@ void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #
         getNextToken();
     }
 
-    System.out.println("Skipped '" + skipped + "'\n");
+    System.out.println("> Skipped '" + skipped + "'\n");
 }
 
 void MethodCall() #Method : {} {
