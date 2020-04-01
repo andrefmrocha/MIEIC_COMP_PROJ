@@ -279,7 +279,7 @@ void ComplementaryExpression() #void:{} {
 }
 
 void AndFragment() #void : {} {
-    ("&&"  Level1Operators() AndFragment()) #And(2) | {}
+    ("&&"  Level1Operators()) #And(2) AndFragment()  | {}
 }
 
 void Level1Operators() #void : {} {
@@ -299,7 +299,7 @@ void ComplementaryLevel1Operators() #void : {} {
 }
 
 void LessThanFragment() #void : {} {
-    ("<"  Level2Operators() LessThanFragment()) #LessThan(2) | {}
+    ("<"  Level2Operators()) #LessThan(2) LessThanFragment()  | {}
 }
 
 void Level2Operators() #void : {} {
