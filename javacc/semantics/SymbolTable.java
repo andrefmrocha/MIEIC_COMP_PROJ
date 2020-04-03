@@ -6,9 +6,9 @@ public class SymbolTable {
     final private HashMap<String, Symbol> table = new HashMap<>();
     private SymbolTable parent = null;
 
-    SymbolTable(){}
+    public SymbolTable(){}
 
-    SymbolTable(SymbolTable parent){
+    public SymbolTable(SymbolTable parent){
         this.parent = parent;
     }
 

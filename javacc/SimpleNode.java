@@ -28,6 +28,9 @@ class SimpleNode implements Node {
   public void jjtOpen() {
   }
 
+  public void eval() throws SemanticsException {}
+
+
   public void jjtClose() {
   }
 
