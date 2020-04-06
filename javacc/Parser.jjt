@@ -126,7 +126,7 @@ void MethodBody() #void : {} {
 void MethodDeclaration() #void : {}
 {
     (<PUBLIC>
-    (MethodName() (<LFTBRCKT> [Parameter() (<COMMA> Parameter())*] <RGHTBRCKT> | "()" )  <LFTCRLBRCKT> (MethodBody() (<RETURN> Expression()) #Return <SEMICOLON>)#MethodBody <RGHTCRLBRCKT>
+    (MethodName() (<LFTBRCKT> [Parameters()] <RGHTBRCKT> | "()" )  <LFTCRLBRCKT> (MethodBody() (<RETURN> Expression()) #Return <SEMICOLON>)#MethodBody <RGHTCRLBRCKT>
     | ((<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") Identifier() <RGHTBRCKT> ) #Main <LFTCRLBRCKT> MethodBody() #MethodBody <RGHTCRLBRCKT>  ))
     )#Method //TODO: check if newly added production is correct
 
@@ -137,6 +137,10 @@ void MethodName() #void : {}
     (Type() Identifier()) #MethodName
 }
 
+void Parameters() #void : {}
+{
+    (Parameter() (<COMMA> Parameter())*) #Parameters
+}
 
 void Parameter() #void : {}
 {
