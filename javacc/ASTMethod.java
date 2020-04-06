@@ -14,22 +14,40 @@ class ASTMethod extends SimpleNode {
 
   @Override
   public void eval() throws SemanticsException {
-    if (this.jjtGetNumChildren() != 2) throw new SemanticsException("Lacks the number of required children!");
+    if (this.jjtGetNumChildren() != 2 && this.jjtGetNumChildren() != 3) throw new SemanticsException("Lacks the number of required children!");
     SimpleNode methodType = (SimpleNode) this.jjtGetChild(0);
-    final SymbolTable table = new SymbolTable();
+    SimpleNode parameters;
+    SimpleNode methodBody;
+
+    if(this.jjtGetNumChildren() == 2) {
+      parameters = null;
+      methodBody = (SimpleNode) this.jjtGetChild(1);
+    } else {
+      parameters = (SimpleNode) this.jjtGetChild(1);
+      methodBody = (SimpleNode) this.jjtGetChild(2);
+    }
+    //TODO: class must create the symbol table of the method
+    final SymbolTable newTable = new SymbolTable(); //use while not using the table created by parent
 
     if (methodType.id == ParserTreeConstants.JJTMETHODNAME){
-      //TODO: Are you supposed to have a method symbol table or not?
+      //TODO: add method symbol to parent symbol table
     } else if(methodType.id == ParserTreeConstants.JJTMAIN) {
-      //TODO: Denote as main
+      //TODO: make sure that only one definition of the main exists
     } else {
       throw new SemanticsException("No method type was found");
     }
 
-    SimpleNode methodBody = (SimpleNode) this.jjtGetChild(1);
+    if(parameters != null) {
+      for(int i = 0; i < parameters.jjtGetNumChildren(); i++) {
+        SimpleNode parameter = (SimpleNode) parameters.jjtGetChild(i);
+        parameter.setTable(newTable);
+        parameter.eval();
+      }
+    }
+
     if(methodBody.id != ParserTreeConstants.JJTMETHODBODY)
       throw new SemanticsException("No method body found!");
-    methodBody.setTable(table);
+    methodBody.setTable(newTable);
     methodBody.eval();
 
   }
