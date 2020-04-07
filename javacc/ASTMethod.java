@@ -33,8 +33,9 @@ class ASTMethod extends SimpleNode {
       //TODO: add method symbol to parent symbol table
     } else if(methodType.id == ParserTreeConstants.JJTMAIN) {
       //TODO: make sure that only one definition of the main exists
+      parameters = (SimpleNode) methodType.jjtGetChild(0);
     } else {
-      throw new SemanticsException("No method type was found");
+      throw new SemanticsException("Wrong method type was found");
     }
 
     if(parameters != null) {

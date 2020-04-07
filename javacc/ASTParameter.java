@@ -47,7 +47,7 @@ class ASTParameter extends SimpleNode {
         throw new SemanticsException("Error type in parameter");
     }
 
-    Symbol parameterSym = new Symbol(type,"",true); //TODO: get parameter value
+    Symbol parameterSym = new Symbol(type); //TODO: get parameter value
     table.addSymbol(name, parameterSym);
 
   }

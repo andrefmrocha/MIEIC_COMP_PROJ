@@ -31,6 +31,7 @@ class SimpleNode implements Node {
   public void eval() throws SemanticsException {
     for(int i = 0; i< this.jjtGetNumChildren(); i++) {
       SimpleNode node = (SimpleNode) this.jjtGetChild(i);
+      node.setTable(this.table);
       node.eval();
     }
   }

@@ -9,9 +9,9 @@ class ASTReturn extends SimpleNode {
   public ASTReturn(Parser p, int id) {
     super(p, id);
   }
-  @Override
-  public void eval() throws SemanticsException {
-
-  }
+//  @Override
+//  public void eval() throws SemanticsException {
+//
+//  }
 }
 /* JavaCC - OriginalChecksum=0d7badc8de429fd7f39c8b2723d9a136 (do not edit this line) */

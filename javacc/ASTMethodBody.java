@@ -18,7 +18,7 @@ class ASTMethodBody extends SimpleNode {
     for(; i < this.jjtGetNumChildren(); i++){
       SimpleNode methodNode = (SimpleNode) this.jjtGetChild(i);
       methodNode.setTable(table);
-      //methodNode.eval(); //TODO: fix failing tests
+      methodNode.eval();
       if(methodNode.id == ParserTreeConstants.JJTRETURN){
         this.returnValue = (ASTReturn) methodNode;
         break;
