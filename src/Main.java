@@ -11,8 +11,10 @@ public class Main {
 			if(parser.nErrors < Parser.NUM_ERRORS)
 				throw new RuntimeException();
 			node.dump("");
-		}catch (ParseException | FileNotFoundException e){
+			node.eval();
+		}catch (ParseException | FileNotFoundException | SemanticsException e){
 			e.printStackTrace();
+			System.out.println(e.toString());
 			throw new RuntimeException();
 		}
 

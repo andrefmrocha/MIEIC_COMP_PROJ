@@ -28,7 +28,12 @@ class SimpleNode implements Node {
   public void jjtOpen() {
   }
 
-  public void eval() throws SemanticsException {}
+  public void eval() throws SemanticsException {
+    for(int i = 0; i< this.jjtGetNumChildren(); i++) {
+      SimpleNode node = (SimpleNode) this.jjtGetChild(i);
+      node.eval();
+    }
+  }
 
 
   public void jjtClose() {
