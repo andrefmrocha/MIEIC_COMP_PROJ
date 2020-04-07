@@ -24,7 +24,7 @@ class ASTParameter extends SimpleNode {
       name = temp.identifierName;
     } else throw new SemanticsException("Parameter has not a valid identifier");
 
-    if(table.checkSymbol(name)) throw new SemanticsException("Parameter has been defined previously")
+    if(table.checkSymbol(name)) throw new SemanticsException("Parameter has been defined previously");
 
     Symbol.Type type;
     switch (typeNode.id) {
@@ -48,7 +48,7 @@ class ASTParameter extends SimpleNode {
     }
 
     Symbol parameterSym = new Symbol(type,"",true); //TODO: get parameter value
-    table.addSymbol(parameterSym);
+    table.addSymbol(name, parameterSym);
 
   }
 
