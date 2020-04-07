@@ -127,7 +127,7 @@ void MethodDeclaration() #void : {}
 {
     (<PUBLIC>
     (MethodName() (<LFTBRCKT> [Parameters()] <RGHTBRCKT> | "()" )  <LFTCRLBRCKT> (MethodBody() (<RETURN> Expression()) #Return <SEMICOLON>)#MethodBody <RGHTCRLBRCKT>
-    | ((<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") Identifier() <RGHTBRCKT> ) #Main <LFTCRLBRCKT> MethodBody() #MethodBody <RGHTCRLBRCKT>  ))
+    | ((<STATIC> <VOID> <MAIN> <LFTBRCKT>( <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") Identifier()) #Parameter <RGHTBRCKT> ) #Main <LFTCRLBRCKT> MethodBody() #MethodBody <RGHTCRLBRCKT>  ))
     )#Method //TODO: check if newly added production is correct
 
 }
@@ -254,8 +254,8 @@ void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #
     System.out.println("> Skipped '" + skipped + "'\n");
 }
 
-void MethodCall() #Method : {} {
-    Identifier() (<LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> | "()")
+void MethodCall() #MethodCall : {} {
+    Identifier() (<LFTBRCKT> [ (Expression() (<COMMA> Expression() )*) #Arguments ] <RGHTBRCKT> | "()")
 }
 
 void Type() #void : {}
@@ -399,7 +399,7 @@ void ComplementExpressions() #void : {} {
             (
             <LENGTH> #Length(1)
             |
-             MethodCall() #MethodCall(2)
+             MethodCall()
     )
 }
 
