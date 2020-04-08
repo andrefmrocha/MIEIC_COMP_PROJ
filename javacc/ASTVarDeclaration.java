@@ -1,4 +1,5 @@
 import semantics.Symbol;
+import semantics.Symbol.Type;
 import semantics.SymbolTable;
 
 public class ASTVarDeclaration extends SimpleNode {
@@ -28,32 +29,30 @@ public class ASTVarDeclaration extends SimpleNode {
         if(identifier instanceof ASTIdentifier) {
             ASTIdentifier temp = (ASTIdentifier) identifier;
             name = temp.identifierName;
-        } else throw new SemanticsException("Parameter has not a valid identifier");
+        } else throw new SemanticsException("Variable has not a valid identifier");
 
         if(table.checkSymbol(name)) throw new SemanticsException("Parameter has been defined previously");
 
-        Symbol.Type type;
-        switch (typeNode.id) {
-            case ParserTreeConstants.JJTINTARRAY:
-                type = Symbol.Type.INT_ARRAY;
-                break;
-            case ParserTreeConstants.JJTINT:
-                type = Symbol.Type.INT;
-                break;
-            case ParserTreeConstants.JJTBOOLEAN:
-                type = Symbol.Type.BOOL;
-                break;
-            case ParserTreeConstants.JJTVOID:
-                type = Symbol.Type.VOID;
-                break;
-            case ParserTreeConstants.JJTIDENTIFIER:
-                type = Symbol.Type.OBJ;
-                break;
-            default:
-                throw new SemanticsException("Error type in parameter");
-        }
+        Type type = getType(typeNode.id);
 
         Symbol parameterSym = new Symbol(type); //TODO: get parameter value
-        table.addSymbol(name, parameterSym);
+        table.putSymbol(name, parameterSym);
+    }
+
+    public static Symbol.Type getType(int id) throws SemanticsException {
+        switch (id) {
+            case ParserTreeConstants.JJTINTARRAY:
+                return Symbol.Type.INT_ARRAY;
+            case ParserTreeConstants.JJTINT:
+                return Symbol.Type.INT;
+            case ParserTreeConstants.JJTBOOLEAN:
+                return Symbol.Type.BOOL;
+            case ParserTreeConstants.JJTVOID:
+                return Symbol.Type.VOID;
+            case ParserTreeConstants.JJTIDENTIFIER:
+                return Symbol.Type.OBJ;
+            default:
+                throw new SemanticsException("Found invalid type");
+        }
     }
 }

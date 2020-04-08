@@ -16,6 +16,10 @@ public class SymbolTable {
         return table;
     }
 
+    public Symbol getSymbol(String key) {
+        return table.get(key);
+    }
+
     public boolean checkSymbol(String symbol) {
         if (table.containsKey(symbol))
             return true;
@@ -24,7 +28,7 @@ public class SymbolTable {
         return false;
     }
 
-    public void addSymbol(String name, Symbol symbol) {
+    public void putSymbol(String name, Symbol symbol) {
         table.put(name, symbol);
     }
 }
