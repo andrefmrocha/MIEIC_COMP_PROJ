@@ -30,6 +30,8 @@ class ASTAssignVar extends SimpleNode {
 //      throw new SemanticsException("Variable " + name + " has not been initialized");
 //
 //    SimpleNode expression = (SimpleNode) this.jjtGetChild(1);
+      //must be TypeNode
+      //eval the expression and retrieve the value
 //  }
 }
 /* JavaCC - OriginalChecksum=661756e145ed220ec46575b3a8adecd3 (do not edit this line) */

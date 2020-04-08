@@ -12,5 +12,10 @@ class ASTMethodCall extends TypeNode {
   }
 
   //TODO: set the type according to the type of the method already in the table
+
+  @Override
+  public void eval() throws SemanticsException {
+
+  }
 }
 /* JavaCC - OriginalChecksum=c431bc197d60321c47680450a6c0622a (do not edit this line) */
