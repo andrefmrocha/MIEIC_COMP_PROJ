@@ -1,13 +1,13 @@
 import io.println(int) void; // by default considers the return as void
 class Fac {
-    public int ComputeFac(int num){
+    public int ComputeFac(int num,int num2,int abs){
         int num_aux ;
         if (num < 1) {
             num[2] = 1+1;
             num_aux = 1;
         }
         else
-            num_aux = num * (this.ComputeFac(num-1));
+            num_aux = num * (this.ComputeFac(num-1,abs,1));
         while(1) {
             num_aux = 2;
         }
@@ -22,10 +22,10 @@ class Fac {
         return num_aux;
     }
     public static void main(String[] args){
+        int aux;
+        void aubs;
         io.println(new Fac().ComputeFac(10)); //assuming the existence
         // of the classfile io.class
     }
-    public int function(int num,int num,int num) {
-        return num;
-    }
+
 }

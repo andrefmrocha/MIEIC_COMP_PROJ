@@ -12,6 +12,9 @@ public class SymbolTable {
         this.parent = parent;
     }
 
+    public HashMap<String, Symbol> getTable() {
+        return table;
+    }
 
     public boolean checkSymbol(String symbol) {
         if (table.containsKey(symbol))
