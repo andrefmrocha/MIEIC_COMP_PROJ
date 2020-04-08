@@ -26,24 +26,22 @@ class ASTMethod extends SimpleNode {
       parameters = (SimpleNode) this.jjtGetChild(1);
       methodBody = (SimpleNode) this.jjtGetChild(2);
     }
-    //TODO: class must create the symbol table of the method
-    final SymbolTable newTable = new SymbolTable(); //use while not using the table created by parent
+    //TODO: class must set the table of the method instead of using this
+    final SymbolTable newTable = new SymbolTable();
+    this.setTable(newTable);
 
     if (methodType.id == ParserTreeConstants.JJTMETHODNAME){
       //TODO: add method symbol to parent symbol table
+      if(parameters != null) {
+        parameters.setTable(newTable);
+        parameters.eval();
+      }
     } else if(methodType.id == ParserTreeConstants.JJTMAIN) {
       //TODO: make sure that only one definition of the main exists
+      //TODO: identifier only
       parameters = (SimpleNode) methodType.jjtGetChild(0);
     } else {
       throw new SemanticsException("Wrong method type was found");
-    }
-
-    if(parameters != null) {
-      for(int i = 0; i < parameters.jjtGetNumChildren(); i++) {
-        SimpleNode parameter = (SimpleNode) parameters.jjtGetChild(i);
-        parameter.setTable(newTable);
-        parameter.eval();
-      }
     }
 
     if(methodBody.id != ParserTreeConstants.JJTMETHODBODY)

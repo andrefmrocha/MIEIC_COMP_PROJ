@@ -3,7 +3,7 @@
 import semantics.Symbol;
 
 public
-class ASTVar extends SimpleNode {
+class ASTVar extends ASTVarDeclaration {
   public ASTVar(int id) {
     super(id);
   }
@@ -12,44 +12,5 @@ class ASTVar extends SimpleNode {
     super(p, id);
   }
 
-  public void eval() throws SemanticsException {
-    if(this.jjtGetNumChildren() != 2) throw new SemanticsException("Variable declaration must have type and identifier");
-
-    SimpleNode typeNode = (SimpleNode) this.jjtGetChild(0);
-    SimpleNode identifier = (SimpleNode) this.jjtGetChild(1);
-
-    String name = null;
-    if(identifier instanceof ASTIdentifier) {
-      ASTIdentifier temp = (ASTIdentifier) identifier;
-      name = temp.identifierName;
-    } else  throw new SemanticsException("Variable has not a valid identifier");
-
-    if(this.table.checkSymbol(name))
-      throw new SemanticsException("Symbol already exists with name: " + name);
-
-    Symbol.Type type;
-      switch (typeNode.id) {
-        case ParserTreeConstants.JJTINTARRAY:
-          type = Symbol.Type.INT_ARRAY;
-          break;
-        case ParserTreeConstants.JJTINT:
-          type = Symbol.Type.INT;
-          break;
-        case ParserTreeConstants.JJTBOOLEAN:
-          type = Symbol.Type.BOOL;
-          break;
-        case ParserTreeConstants.JJTVOID:
-          type = Symbol.Type.VOID;
-          break;
-        case ParserTreeConstants.JJTIDENTIFIER:
-          type = Symbol.Type.OBJ;
-          break;
-        default:
-          throw new SemanticsException("Error type in variable");
-      }
-
-    Symbol varSym = new Symbol(type); //TODO: get parameter value
-    this.table.addSymbol(name, varSym);
-  }
 }
 /* JavaCC - OriginalChecksum=d3558354610a208fcf13fa1f04295551 (do not edit this line) */
