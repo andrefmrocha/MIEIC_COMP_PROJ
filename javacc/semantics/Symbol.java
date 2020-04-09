@@ -22,4 +22,8 @@ public class Symbol {
         this.val = val;
         this.isInitialized = isInitialized;
     }
+
+    public Type getType() {
+        return this.type;
+    }
 }
