@@ -12,7 +12,6 @@ class ASTMethodCall extends TypeNode {
   }
 
   //TODO: set the type according to the type of the method already in the table
-
   @Override
   public void eval() throws SemanticsException {
 

@@ -14,5 +14,6 @@ class ASTLength extends TypeNode {
     type = Symbol.Type.INT;
   }
 
+  //TODO: Evaluate identifier that calls length, could be either int[] or Object with that attribute
 }
 /* JavaCC - OriginalChecksum=d20841b9a326e3b2ada1a7a0c3a4a9a1 (do not edit this line) */

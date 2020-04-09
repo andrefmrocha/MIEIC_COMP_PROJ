@@ -9,6 +9,10 @@ public class Symbol {
     final private String val;
     final private boolean isInitialized;
 
+    public Type getType() {
+        return type;
+    }
+
     public Symbol(Type type) {
         this(type, "");
     }
