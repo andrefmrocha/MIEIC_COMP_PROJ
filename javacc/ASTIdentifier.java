@@ -8,21 +8,15 @@ class ASTIdentifier extends TypeNode {
 
   public ASTIdentifier(int id) {
     super(id);
-    type = Type.OBJ;
   }
 
   public ASTIdentifier(Parser p, int id) {
     super(p, id);
-    type = Type.OBJ;
   }
 
   public String toString() {
     return ParserTreeConstants.jjtNodeName[id] + "[" + identifierName + "]";
   }
 
-//  @Override
-//  public void eval() throws SemanticsException {
-//    if(!this.table.checkSymbol(identifierName)) throw new SemanticsException("Symbol '" + identifierName + "' has not been declared.");
-//  }
 }
 /* JavaCC - OriginalChecksum=75abfe948da46b0c7b3a59b2cae3a666 (do not edit this line) */
