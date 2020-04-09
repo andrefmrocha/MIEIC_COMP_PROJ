@@ -127,7 +127,7 @@ void MethodDeclaration() #void : {}
 {
     (<PUBLIC>
     (MethodName() (<LFTBRCKT> [Parameters()] <RGHTBRCKT> | "()" )  <LFTCRLBRCKT> (MethodBody() (<RETURN> Expression()) #Return <SEMICOLON>)#MethodBody <RGHTCRLBRCKT>
-    | ((<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") Identifier() <RGHTBRCKT> ) #Main <LFTCRLBRCKT> MethodBody() #MethodBody <RGHTCRLBRCKT>  ))
+    | ((<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") Identifier()  <RGHTBRCKT> ) #Main <LFTCRLBRCKT> MethodBody() #MethodBody <RGHTCRLBRCKT>  ))
     )#Method //TODO: check if newly added production is correct
 
 }
@@ -144,7 +144,7 @@ void Parameters() #void : {}
 
 void Parameter() #void : {}
 {
-    (Type() Identifier()) #Parameter
+    Type() Identifier()
 }
 
 
@@ -254,7 +254,7 @@ void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #
     System.out.println("> Skipped '" + skipped + "'\n");
 }
 
-void MethodCall() #Method : {} {
+void MethodCall() #Call : {} {
     Identifier() (<LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> | "()")
 }
 

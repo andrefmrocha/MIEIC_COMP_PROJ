@@ -12,6 +12,13 @@ public class SymbolTable {
         this.parent = parent;
     }
 
+    public HashMap<String, Symbol> getTable() {
+        return table;
+    }
+
+    public Symbol getSymbol(String key) {
+        return table.get(key);
+    }
 
     public boolean checkSymbol(String symbol) {
         if (table.containsKey(symbol))
@@ -21,7 +28,7 @@ public class SymbolTable {
         return false;
     }
 
-    public void addSymbol(String name, Symbol symbol) {
+    public void putSymbol(String name, Symbol symbol) {
         table.put(name, symbol);
     }
 }
