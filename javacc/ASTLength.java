@@ -14,6 +14,38 @@ class ASTLength extends TypeNode {
     type = Symbol.Type.INT;
   }
 
-  //TODO: Evaluate identifier that calls length, could be either int[] or Object with that attribute
+  @Override
+  public void eval() throws SemanticsException {
+    if (this.jjtGetNumChildren() != 1) throw new SemanticsException("Wrong number of children found");
+
+
+    final SimpleNode var = (SimpleNode) this.jjtGetChild(0);
+    switch (var.id){
+      case ParserTreeConstants.JJTIDENTIFIER:
+        final ASTIdentifier identifier = (ASTIdentifier) var;
+        if (!this.table.checkSymbol(identifier.identifierName))
+          throw new SemanticsException("No variable " + identifier.identifierName + " was found");
+
+        final Symbol symbol = table.getSymbol(identifier.identifierName);
+        if(symbol.getType() != Symbol.Type.INT_ARRAY)
+          throw new SemanticsException("Variable is not an int array");
+        break;
+
+      case ParserTreeConstants.JJTMETHODCALL:
+        final ASTMethodCall call = (ASTMethodCall) var;
+        call.eval();
+
+        if(call.type != Symbol.Type.INT_ARRAY)
+          throw new SemanticsException("Method call not does return int array");
+
+        break;
+
+      default:
+        throw new SemanticsException("No valid array provided for length call");
+
+    }
+
+
+  }
 }
 /* JavaCC - OriginalChecksum=d20841b9a326e3b2ada1a7a0c3a4a9a1 (do not edit this line) */

@@ -2,7 +2,7 @@ package semantics;
 
 public class Symbol {
     public enum Type{
-        INT, BOOL, OBJ, INT_ARRAY, VOID
+        INT, BOOL, OBJ, INT_ARRAY, VOID, METHOD
     }
 
     final private Type type;

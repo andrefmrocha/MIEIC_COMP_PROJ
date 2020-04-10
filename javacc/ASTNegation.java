@@ -20,19 +20,7 @@ class ASTNegation extends TypeNode {
         if (this.jjtGetNumChildren() != 1) throw new SemanticsException("Negation is a unary operation");
 
         SimpleNode child = (SimpleNode) this.jjtGetChild(0);
-        if (child.id == ParserTreeConstants.JJTIDENTIFIER) {  //Check if the node is a variable
-            ASTIdentifier temp = (ASTIdentifier) child;
-            String name = temp.identifierName;
-            if (table.checkSymbol(name)) { //And check if the identifier already has a symbol declared
-                Symbol sym = table.getSymbol(name);
-                if (type != sym.getType())
-                    throw new SemanticsException("Identifier '" + name + "' is not of type: " + type.toString());
-            }
-        } else if (child instanceof TypeNode && child.id != ParserTreeConstants.JJTMETHODCALL) { //TODO: REMOVE METHOD CALL CONDITION
-            TypeNode temp = (TypeNode) child;
-            if (type != temp.type) throw new SemanticsException("Expression is not of type: " + type.toString());
-        } else if (child.id != ParserTreeConstants.JJTMETHODCALL)
-            new SemanticsException("Invalid expression"); //TODO: REMOVE METHOD CALL CONDITION
+        this.evaluateChild(child, type);
     }
 }
 /* JavaCC - OriginalChecksum=13de953db4e66e1048f234f837f24db4 (do not edit this line) */

@@ -22,19 +22,7 @@ class ASTNew extends TypeNode {
         if (this.jjtGetNumChildren() != 1) throw new SemanticsException("New operation is unary");
 
         SimpleNode child = (SimpleNode) this.jjtGetChild(0);
-        if (child.id == ParserTreeConstants.JJTIDENTIFIER) {  //Check if the node is a variable
-            ASTIdentifier temp = (ASTIdentifier) child;
-            String name = temp.identifierName;
-            if (table.checkSymbol(name)) { //And check if the identifier already has a symbol declared
-                Symbol sym = table.getSymbol(name);
-                if (type != sym.getType())
-                    throw new SemanticsException("Identifier '" + name + "' is not of type: " + type.toString());
-            }
-        } else if (child instanceof TypeNode && child.id != ParserTreeConstants.JJTMETHODCALL) { //TODO: REMOVE METHOD CALL CONDITION
-            TypeNode temp = (TypeNode) child;
-            if (type != temp.type) throw new SemanticsException("Expression is not of type: " + type.toString());
-        } else if (child.id != ParserTreeConstants.JJTMETHODCALL)
-            new SemanticsException("Invalid expression"); //TODO: REMOVE METHOD CALL CONDITION
+        this.evaluateChild(child, type);
     }
 }
 /* JavaCC - OriginalChecksum=c6d588009442d8c81f835326710afcd3 (do not edit this line) */
