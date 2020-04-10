@@ -87,6 +87,7 @@ class SimpleNode implements Node {
   public void dump(String prefix) {
     System.out.println(toString(prefix));
 
+    // Test Symbol Table
 //    if( this.table != null) {
 //      System.out.println("print the method" + this.table.getTable().toString());
 //    }

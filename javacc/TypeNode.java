@@ -21,18 +21,20 @@ public abstract class TypeNode extends SimpleNode {
                 if (expectedType != sym.getType())
                     throw new SemanticsException("Identifier '" + name + "' is not of type: " + expectedType.toString());
             }
-        } else if (child.id == ParserTreeConstants.JJTMETHODCALL) { //TODO: REMOVE METHOD CALL CONDITION
+        } else if (child.id == ParserTreeConstants.JJTMETHODCALL) {
             final ASTMethodCall call = (ASTMethodCall) child;
-            call.eval();
+            call.eval(); //set table before eval
 
             if(call.type != expectedType)
                 throw new SemanticsException("Method call not does return " + type.toString());
 
-        } else if (child instanceof TypeNode) { //TODO: REMOVE METHOD CALL CONDITION
+        } else if (child instanceof TypeNode) {
             TypeNode temp = (TypeNode) child;
             if (expectedType != temp.type)
                 throw new SemanticsException("Expression is not of type: " + expectedType.toString());
+            child.setTable(table);
+            child.eval();
         } else
-            new SemanticsException("Invalid expression"); //TODO: REMOVE METHOD CALL CONDITION
+            new SemanticsException("Invalid expression");
     }
 }

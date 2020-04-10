@@ -22,24 +22,8 @@ class ASTArrayAccess extends TypeNode {
         SimpleNode arrayName = (SimpleNode) this.jjtGetChild(0);
         SimpleNode indexValue = (SimpleNode) this.jjtGetChild(1);
 
-        checkArrayOperand(arrayName, Type.INT_ARRAY);
-        checkArrayOperand(indexValue, Type.INT);
-    }
-
-    public void checkArrayOperand(SimpleNode operand, Type type) throws SemanticsException {
-        if (operand.id == ParserTreeConstants.JJTIDENTIFIER) {  //Check if the node is a variable
-            ASTIdentifier temp = (ASTIdentifier) operand;
-            String name = temp.identifierName;
-            if (table.checkSymbol(name)) { //And check if the identifier already has a symbol declared
-                Symbol leftSymbol = table.getSymbol(name);
-                if (type != leftSymbol.getType())
-                    throw new SemanticsException("Identifier '" + name + "' is not of type: int array");
-            }
-        } else if (operand instanceof TypeNode && operand.id != ParserTreeConstants.JJTMETHODCALL) { //TODO: REMOVE METHOD CALL CONDITION
-            TypeNode temp = (TypeNode) operand;
-            if (type != temp.type) throw new SemanticsException("Expression is not of type: int array");
-        } else if (operand.id != ParserTreeConstants.JJTMETHODCALL)
-            new SemanticsException("Invalid expression"); //TODO: REMOVE METHOD CALL CONDITION
+        this.evaluateChild(arrayName, Type.INT_ARRAY);
+        this.evaluateChild(indexValue, Type.INT);
     }
 }
 /* JavaCC - OriginalChecksum=07823d6065ca9b37f085148b14d167b9 (do not edit this line) */

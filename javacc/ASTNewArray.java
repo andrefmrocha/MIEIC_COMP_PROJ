@@ -20,7 +20,7 @@ class ASTNewArray extends TypeNode {
         if (this.jjtGetNumChildren() != 1) throw new SemanticsException("New array operation is unary");
 
         SimpleNode child = (SimpleNode) this.jjtGetChild(0);
-        this.evaluateChild(child, type);
+        this.evaluateChild(child, Type.INT);
     }
 }
 /* JavaCC - OriginalChecksum=3a631d25cbdc4e13263745a21c4cb259 (do not edit this line) */
