@@ -26,7 +26,7 @@ public class VarNode extends SimpleNode {
         SimpleNode identifier = (SimpleNode) this.jjtGetChild(1);
 
         String name;
-        if(identifier instanceof ASTIdentifier) {
+        if(identifier.id == ParserTreeConstants.JJTIDENTIFIER) {
             ASTIdentifier temp = (ASTIdentifier) identifier;
             name = temp.identifierName;
         } else throw new SemanticsException("Variable has not a valid identifier");

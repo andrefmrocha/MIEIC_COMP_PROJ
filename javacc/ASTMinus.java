@@ -12,5 +12,9 @@ class ASTMinus extends BinaryOperatorNode {
     super(p, id,Type.INT,Type.INT);
   }
 
+  @Override
+  public Type[] getSupportedTypes() {
+    return new Type[]{Type.INT};
+  }
 }
 /* JavaCC - OriginalChecksum=bbfd8df0d693716f262be0a04e48a128 (do not edit this line) */

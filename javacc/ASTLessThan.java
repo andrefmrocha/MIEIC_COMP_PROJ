@@ -11,5 +11,9 @@ class ASTLessThan extends BinaryOperatorNode {
     super(p, id, Type.BOOL,Type.INT);
   }
 
+  @Override
+  public Type[] getSupportedTypes() {
+    return new Type[]{Type.INT};
+  }
 }
 /* JavaCC - OriginalChecksum=c0d8a8972c0a4b4df64282733df15850 (do not edit this line) */

@@ -11,5 +11,9 @@ class ASTSub extends BinaryOperatorNode {
     super(p, id,Type.INT,Type.INT);
   }
 
+  @Override
+  public Type[] getSupportedTypes() {
+    return new Type[]{Type.INT};
+  }
 }
 /* JavaCC - OriginalChecksum=b7fc14f4941a1c938c1b03e9740f85d8 (do not edit this line) */

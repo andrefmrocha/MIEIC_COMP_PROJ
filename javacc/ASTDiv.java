@@ -12,5 +12,9 @@ class ASTDiv extends BinaryOperatorNode {
     super(p, id,Type.INT,Type.INT);
   }
 
+  @Override
+  public Type[] getSupportedTypes() {
+    return new Type[]{Type.INT};
+  }
 }
 /* JavaCC - OriginalChecksum=a6ae99679f76890aff99ebcee897988e (do not edit this line) */

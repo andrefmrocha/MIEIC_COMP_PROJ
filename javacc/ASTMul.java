@@ -12,5 +12,9 @@ class ASTMul extends BinaryOperatorNode {
     super(p, id, Type.INT,Type.INT);
   }
 
+  @Override
+  public Type[] getSupportedTypes() {
+    return new Type[]{Type.INT};
+  }
 }
 /* JavaCC - OriginalChecksum=e5abe143d74eea8d5312703bd5001c7a (do not edit this line) */

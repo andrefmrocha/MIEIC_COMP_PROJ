@@ -5,33 +5,36 @@ import semantics.Symbol.Type;
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTNew extends TypeNode {
-  public String classIdentifier;
-  public ASTNew(int id) {
-    super(id);
-    type = Type.OBJ;
-  }
+    public String classIdentifier;
 
-  public ASTNew(Parser p, int id) {
-    super(p, id);
-    type = Type.OBJ;
-  }
+    public ASTNew(int id) {
+        super(id);
+        type = Type.OBJ;
+    }
 
-  @Override
-  public void eval() throws SemanticsException {
-    if(this.jjtGetNumChildren() != 1) throw new SemanticsException("New operation is unary");
+    public ASTNew(Parser p, int id) {
+        super(p, id);
+        type = Type.OBJ;
+    }
 
-    SimpleNode child = (SimpleNode) this.jjtGetChild(0);
-    if(child instanceof ASTIdentifier) {  //Check if the node is a variable
-      ASTIdentifier temp  = (ASTIdentifier) child;
-      String name = temp.identifierName;
-      if(table.checkSymbol(name)) { //And check if the identifier already has a symbol declared
-        Symbol sym = table.getSymbol(name);
-        if(type != sym.getType()) throw new SemanticsException("Identifier '" + name + "' is not of type: " + type.toString());
-      }
-    } else if(child instanceof TypeNode && !(child instanceof ASTMethodCall)) { //TODO: REMOVE METHOD CALL CONDITION
-      TypeNode temp = (TypeNode) child;
-      if(type != temp.type) throw new SemanticsException("Expression is not of type: " + type.toString());
-    } else if(!(child instanceof ASTMethodCall)) new SemanticsException("Invalid expression"); //TODO: REMOVE METHOD CALL CONDITION
-  }
+    @Override
+    public void eval() throws SemanticsException {
+        if (this.jjtGetNumChildren() != 1) throw new SemanticsException("New operation is unary");
+
+        SimpleNode child = (SimpleNode) this.jjtGetChild(0);
+        if (child.id == ParserTreeConstants.JJTIDENTIFIER) {  //Check if the node is a variable
+            ASTIdentifier temp = (ASTIdentifier) child;
+            String name = temp.identifierName;
+            if (table.checkSymbol(name)) { //And check if the identifier already has a symbol declared
+                Symbol sym = table.getSymbol(name);
+                if (type != sym.getType())
+                    throw new SemanticsException("Identifier '" + name + "' is not of type: " + type.toString());
+            }
+        } else if (child instanceof TypeNode && child.id != ParserTreeConstants.JJTMETHODCALL) { //TODO: REMOVE METHOD CALL CONDITION
+            TypeNode temp = (TypeNode) child;
+            if (type != temp.type) throw new SemanticsException("Expression is not of type: " + type.toString());
+        } else if (child.id != ParserTreeConstants.JJTMETHODCALL)
+            new SemanticsException("Invalid expression"); //TODO: REMOVE METHOD CALL CONDITION
+    }
 }
 /* JavaCC - OriginalChecksum=c6d588009442d8c81f835326710afcd3 (do not edit this line) */

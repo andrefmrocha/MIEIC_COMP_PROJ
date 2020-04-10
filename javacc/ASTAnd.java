@@ -10,5 +10,10 @@ class ASTAnd extends BinaryOperatorNode {
   public ASTAnd(Parser p, int id) {
     super(p, id,Type.BOOL,Type.BOOL);
   }
+
+  @Override
+  public Type[] getSupportedTypes() {
+    return new Type[]{Type.BOOL};
+  }
 }
 /* JavaCC - OriginalChecksum=1766d5431be81e19119cf5feee80cd49 (do not edit this line) */

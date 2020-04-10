@@ -11,5 +11,9 @@ class ASTSum extends BinaryOperatorNode {
     super(p, id, Type.INT,Type.INT);
   }
 
+  @Override
+  public Type[] getSupportedTypes() {
+    return new Type[]{Type.INT};
+  }
 }
 /* JavaCC - OriginalChecksum=4ff6a21ad754b297da0cfd725ff9d094 (do not edit this line) */
