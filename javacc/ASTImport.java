@@ -1,4 +1,4 @@
-import semantics.Symbol;
+import semantics.MethodSymbol;
 import semantics.Symbol.Type;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ class ASTImport extends SimpleNode {
     }
 
     String fullImportName = String.join(".", identifiers);
-    table.putSymbol(fullImportName, new Symbol(returnValue, "", false, params));
+    table.putSymbol(fullImportName, new MethodSymbol(returnValue, params));
 
   }
 
