@@ -1,4 +1,6 @@
 import io.println(int) void; // by default considers the return as void
+import test.batata(int,int[]) int;
+import test(batata,int,int[]) int;
 class Fac extends bananas {
     public int ComputeFac(int num){
         int num_aux ;

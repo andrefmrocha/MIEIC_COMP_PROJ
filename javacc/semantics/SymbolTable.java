@@ -17,7 +17,11 @@ public class SymbolTable {
     }
 
     public Symbol getSymbol(String key) {
-        return table.get(key);
+        if (table.containsKey(key))
+            return table.get(key);
+        else if (parent != null)
+            return parent.getSymbol(key);
+        return null;
     }
 
     public boolean checkSymbol(String symbol) {

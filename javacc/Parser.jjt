@@ -82,7 +82,7 @@ void ImportDeclaration() #void : {}
 
 void ImportStatement() #void : {  }
 {
-    (  [ <STATIC> #Static ] Identifier()  (<DOT> Identifier() )* [(<LFTBRCKT>  Type() (<COMMA> Type())* <RGHTBRCKT> | "()") Type() #Return ] ) #Import
+    (  [ <STATIC> #Static ] Identifier()  (<DOT> Identifier() )* [(<LFTBRCKT>  Type() (<COMMA> Type())* <RGHTBRCKT> | "()") #ImportParams Type() #Return ] ) #Import
 }
 
 void Identifier() #void : {Token t;}
