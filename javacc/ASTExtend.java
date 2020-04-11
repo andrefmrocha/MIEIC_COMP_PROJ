@@ -20,7 +20,7 @@ class ASTExtend extends SimpleNode {
     SimpleNode child = (SimpleNode) this.jjtGetChild(0);
 
     String name;
-    if(child instanceof ASTIdentifier) {
+    if(child.id == ParserTreeConstants.JJTIDENTIFIER) {
       ASTIdentifier temp = (ASTIdentifier) child;
       name = temp.identifierName;
     } else throw new SemanticsException("Parameter has not a valid identifier");

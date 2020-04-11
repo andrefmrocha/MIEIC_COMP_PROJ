@@ -21,8 +21,17 @@ class ASTClass extends SimpleNode {
     {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
 
-      if(child.id == ParserTreeConstants.JJTVAR ||child.id == ParserTreeConstants.JJTEXTEND  || child.id == ParserTreeConstants.JJTIDENTIFIER)
+      if(child.id == ParserTreeConstants.JJTVAR ||child.id == ParserTreeConstants.JJTEXTEND)
       {
+        child.setTable(newTable);
+        child.eval();
+      }
+      else if( child.id == ParserTreeConstants.JJTIDENTIFIER)
+      {
+        ASTIdentifier temp = (ASTIdentifier) child;
+        String name = temp.identifierName;
+        Symbol identifier = new Symbol(Symbol.Type.OBJ);
+        this.table.putSymbol(name,identifier);
         child.setTable(newTable);
         child.eval();
       }
