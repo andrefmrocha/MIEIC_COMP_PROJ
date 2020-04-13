@@ -25,7 +25,8 @@ public abstract class TypeNode extends SimpleNode {
             }
         } else if (child.id == ParserTreeConstants.JJTMETHODCALL) {
             final ASTMethodCall call = (ASTMethodCall) child;
-            call.eval(); //set table before eval
+            call.setTable(table);
+            call.eval();
 
             if(call.type != expectedType)
                 throw new SemanticsException("Method call not does return " + type.toString());
