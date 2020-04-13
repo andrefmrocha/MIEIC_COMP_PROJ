@@ -1,5 +1,10 @@
 import java.io.FileNotFoundException;
-import semantics.SymbolTable;
+import base.semantics.SymbolTable;
+import base.Parser;
+import base.SimpleNode;
+import base.SemanticsException;
+import base.ParseException;
+
 public class Main {
 	
 	public static void main(String[] args) {
@@ -7,7 +12,7 @@ public class Main {
 		try {
 			parser = new Parser(new java.io.FileInputStream(args[0]));
 			SimpleNode node = parser.Program();
-			if(parser.nErrors < Parser.NUM_ERRORS)
+			if(parser.getNumErrors() < Parser.NUM_ERRORS)
 				throw new RuntimeException();
 			SymbolTable newTable = new SymbolTable();
 			node.setTable(newTable);
