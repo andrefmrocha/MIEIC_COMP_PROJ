@@ -29,12 +29,12 @@ public abstract class TypeNode extends SimpleNode {
                 throw new SemanticsException("Method call not does return " + type.toString());
 
         } else if (child instanceof TypeNode) {
+            child.setTable(table);
+            child.eval();
             TypeNode temp = (TypeNode) child;
             if (expectedType != temp.type)
                 throw new SemanticsException("Expression is not of type: " + expectedType.toString());
-            child.setTable(table);
-            child.eval();
         } else
-            new SemanticsException("Invalid expression");
+            throw new SemanticsException("Invalid expression");
     }
 }

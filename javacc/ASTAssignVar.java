@@ -21,16 +21,19 @@ class ASTAssignVar extends TypeNode {
     SimpleNode identifier = (SimpleNode) this.jjtGetChild(0);
 
     String name;
-    if(identifier.id == ParserTreeConstants.JJTIDENTIFIER) {
-      ASTIdentifier temp = (ASTIdentifier) identifier;
-      name = temp.identifierName;
-    } else throw new SemanticsException("Variable has not a valid identifier");
+    if(identifier.id != ParserTreeConstants.JJTIDENTIFIER)
+      throw new SemanticsException("Variable has not a valid identifier");
+
+    ASTIdentifier temp = (ASTIdentifier) identifier;
+    name = temp.identifierName;
 
     Type type;
-    if(this.table.checkSymbol(name)) {
-      Symbol symbol = this.table.getSymbol(name);
-      type = symbol.getType();
-    } else return;//throw new SemanticsException("Variable " + name + " has not been initialized");
+    if(!this.table.checkSymbol(name))
+      throw new SemanticsException("Variable " + name + " has not been initialized");
+
+    Symbol symbol = this.table.getSymbol(name);
+    type = symbol.getType();
+
 
     SimpleNode expression = (SimpleNode) this.jjtGetChild(1);
     this.evaluateChild(expression, type);
