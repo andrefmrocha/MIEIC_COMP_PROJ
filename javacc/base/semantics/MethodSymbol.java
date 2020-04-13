@@ -1,7 +1,5 @@
 package base.semantics;
 
-import base.semantics.Symbol;
-
 import java.util.ArrayList;
 import java.util.List;
 
