@@ -36,6 +36,12 @@ compileJavacc {
 
 // Project sources
 sourceSets {
+   javacc {
+       java {
+           srcDir 'javacc'
+       }
+   }
+
    main {
       java {
          srcDir 'src'
