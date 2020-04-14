@@ -16,6 +16,7 @@ class ASTMethodBody extends SimpleNode {
 
   @Override
   public void eval() throws SemanticsException {
+    //TODO: Add verification for methods called. Check if they are declared
     int i = 0;
     for(; i < this.jjtGetNumChildren(); i++){
       SimpleNode methodNode = (SimpleNode) this.jjtGetChild(i);

@@ -88,7 +88,7 @@ class ASTMethod extends TypeNode {
       throw new SemanticsException("No method body found!");
     }
     else {
-      methodBody.setTable(new SymbolTable());
+      methodBody.setTable(this.table);
       methodBody.eval();
     }
 
