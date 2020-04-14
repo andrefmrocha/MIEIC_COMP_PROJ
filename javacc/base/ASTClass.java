@@ -47,6 +47,13 @@ class ASTClass extends SimpleNode {
         throw new SemanticsException("Incorrect child node.");
       }
     }
+    for(int i = 0; i < this.jjtGetNumChildren(); i++) {
+      ASTMethod child = (ASTMethod) this.jjtGetChild(i);
+
+      if (child.id == ParserTreeConstants.JJTMETHOD) {
+        child.processBody();
+      }
+    }
   }
 }
 /* JavaCC - OriginalChecksum=f92e5600b4d1b54c8cf65f0fa9dc9373 (do not edit this line) */
