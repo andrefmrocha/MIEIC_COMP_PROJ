@@ -56,9 +56,7 @@ class ASTMethod extends TypeNode {
     }
 
     if(methodBody.id != ParserTreeConstants.JJTMETHODBODY)
-    {
       throw new SemanticsException("No method body found!");
-    }
     else {
       methodBody.setTable(this.table);
       methodBody.eval();

@@ -28,11 +28,9 @@ class ASTMain extends SimpleNode {
     SimpleNode child = (SimpleNode) this.jjtGetChild(0);
     if(child.id != ParserTreeConstants.JJTIDENTIFIER)
       throw new SemanticsException("Invalid child to body!");
-    else
-    {
-      ASTIdentifier identifier = (ASTIdentifier) child;
-      this.table.putSymbol(identifier.identifierName, new Symbol(Symbol.Type.OBJ));
-    }
+
+    ASTIdentifier identifier = (ASTIdentifier) child;
+    this.table.putSymbol(identifier.identifierName, new Symbol(Symbol.Type.OBJ));
 
     parametersTypes.add(Symbol.Type.OBJ);
     this.table.getParent().putSymbol("main",new MethodSymbol(Symbol.Type.MAIN,parametersTypes));

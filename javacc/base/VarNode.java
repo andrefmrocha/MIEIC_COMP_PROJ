@@ -30,10 +30,9 @@ public class VarNode extends SimpleNode {
         String name;
         if(identifier.id != ParserTreeConstants.JJTIDENTIFIER)
             throw new SemanticsException(" Variable has not a valid identifier");
-        else {
-            ASTIdentifier temp = (ASTIdentifier) identifier;
-            name = temp.identifierName;
-        }
+
+        ASTIdentifier temp = (ASTIdentifier) identifier;
+        name = temp.identifierName;
 
         if(table.checkSymbolWithinScope(name)) throw new SemanticsException("Variable " + name + " has been defined previously");
 
