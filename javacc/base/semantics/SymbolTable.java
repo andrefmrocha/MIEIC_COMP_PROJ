@@ -34,6 +34,10 @@ public class SymbolTable {
         return false;
     }
 
+    public boolean checkSymbolWithinScope(String symbol) {
+        return table.containsKey(symbol);
+    }
+
     public void putSymbol(String name, Symbol symbol) {
         table.put(name, symbol);
     }

@@ -28,8 +28,9 @@ public abstract class TypeNode extends SimpleNode {
             call.setTable(table);
             call.eval(); //set table before eval
 
-            if(call.type != expectedType)
-                throw new SemanticsException("Method call not does return " + type.toString());
+//            if(call.type != expectedType)
+//                throw new SemanticsException("Method call not does return " + type.toString());
+//TODO: after return value
 
         } else if (child instanceof TypeNode) {
             child.setTable(table);

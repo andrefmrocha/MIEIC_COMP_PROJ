@@ -23,10 +23,16 @@ class ASTClass extends SimpleNode {
     {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
 
-      if(child.id == ParserTreeConstants.JJTVAR ||child.id == ParserTreeConstants.JJTEXTEND)
+      if(child.id == ParserTreeConstants.JJTVAR)
       {
         child.setTable(newTable);
         child.eval();
+      }
+      else if(child.id == ParserTreeConstants.JJTEXTEND)
+      {
+        child.setTable(newTable);
+        //child.eval();
+        //TODO: solve problem in imports
       }
       else if( child.id == ParserTreeConstants.JJTIDENTIFIER)
       {
@@ -48,10 +54,10 @@ class ASTClass extends SimpleNode {
       }
     }
     for(int i = 0; i < this.jjtGetNumChildren(); i++) {
-      ASTMethod child = (ASTMethod) this.jjtGetChild(i);
-
+      SimpleNode child = (SimpleNode) this.jjtGetChild(i);
       if (child.id == ParserTreeConstants.JJTMETHOD) {
-        child.processBody();
+        ASTMethod method = (ASTMethod) child;
+        method.processBody();
       }
     }
   }

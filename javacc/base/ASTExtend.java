@@ -27,6 +27,9 @@ class ASTExtend extends SimpleNode {
       name = temp.identifierName;
     } else throw new SemanticsException("Parameter has not a valid identifier");
 
+    if(!this.table.checkSymbol(name))
+      throw new SemanticsException("Class " + name + " was not found");
+
     Symbol identifier = this.table.getSymbol(name);
 
     if(identifier.getType() != Symbol.Type.OBJ) {

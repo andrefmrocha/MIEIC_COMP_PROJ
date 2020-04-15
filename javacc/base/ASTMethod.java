@@ -44,11 +44,10 @@ class ASTMethod extends TypeNode {
 
       if(parameters != null) {
         parameters.setTable(this.table);
-        if(this.jjtGetNumChildren() % 2 != 0) throw new SemanticsException("Invalid set of parameters. Must be in pairs: <TYPE> <NAME>");
-        for(int i = 0; i < this.jjtGetNumChildren(); i+=2) {
-          VarNode parameter = new VarNode(i,this.jjtGetChild(i),this.jjtGetChild(i+1),table);
+        for(int i = 0; i < parameters.jjtGetNumChildren(); i+=2) {
+          VarNode parameter = new VarNode(i,parameters.jjtGetChild(i),parameters.jjtGetChild(i+1),table);
           parameter.eval();
-          parameters_types.add(parameter.getType(this.jjtGetChild(i).getId()));
+          parameters_types.add(parameter.getType(parameters.jjtGetChild(i).getId()));
         }
       }
       this.table.getParent().putSymbol(method_name,new MethodSymbol(type,parameters_types));
