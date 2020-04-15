@@ -29,7 +29,7 @@ class ASTLength extends TypeNode {
           throw new SemanticsException("No variable " + identifier.identifierName + " was found");
 
         final Symbol symbol = table.getSymbol(identifier.identifierName);
-        if(symbol.getType() != Symbol.Type.INT_ARRAY)
+        if(symbol.getType() != Symbol.Type.INT_ARRAY) //TODO this condition is triggered in 'testLife'
           throw new SemanticsException("Variable is not an int array");
         break;
 

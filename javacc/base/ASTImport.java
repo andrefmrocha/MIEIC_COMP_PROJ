@@ -1,6 +1,7 @@
 package base;
 
 import base.semantics.MethodSymbol;
+import base.semantics.Symbol;
 import base.semantics.Symbol.Type;
 
 import java.util.ArrayList;
@@ -10,6 +11,8 @@ import java.util.List;
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTImport extends SimpleNode {
+
+  public boolean isStatic;
 
   public ASTImport(int id) {
     super(id);
@@ -41,7 +44,8 @@ class ASTImport extends SimpleNode {
     }
 
     String fullImportName = String.join(".", identifiers);
-    table.putSymbol(fullImportName, new MethodSymbol(returnValue, params));
+    Symbol importSymbol = fullImportName.length() == 1 ? new Symbol(Type.CLASS) : new MethodSymbol(returnValue, params);
+    table.putSymbol(fullImportName, importSymbol);
 
   }
 

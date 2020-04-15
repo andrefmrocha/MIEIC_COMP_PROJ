@@ -85,9 +85,14 @@ void ImportDeclaration() #void : {}
     (<IMPORT> ImportStatement() <SEMICOLON> )*
 }
 
-void ImportStatement() #void : {  }
+void ImportStatement() #void : {}
 {
-    (  [ <STATIC> #Static ] Identifier()  (<DOT> Identifier() )* [(<LFTBRCKT>  Type() (<COMMA> Type())* <RGHTBRCKT> | "()") #ImportParams Type() #Return ] ) #Import
+    (  [ <STATIC> #Static {jjtThis.isStatic=true;}] Identifier()  [<DOT> Identifier()] [((<LFTBRCKT> ImportParamList() <RGHTBRCKT>) | "()") Type() #Return ] ) #Import
+}
+
+void ImportParamList() #void : {}
+{
+    [Type() (<COMMA> Type())*] #ImportParams
 }
 
 void Identifier() #void : {Token t;}

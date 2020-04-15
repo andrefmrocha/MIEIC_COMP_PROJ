@@ -6,7 +6,7 @@ import base.SimpleNode;
 
 public class Symbol {
     public enum Type{
-        INT, BOOL, OBJ, INT_ARRAY, VOID, MAIN,METHOD
+        INT, BOOL, OBJ, INT_ARRAY, VOID, MAIN, METHOD, CLASS
     }
 
     final protected Type type;
