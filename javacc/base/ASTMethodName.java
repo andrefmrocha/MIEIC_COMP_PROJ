@@ -19,24 +19,24 @@ class ASTMethodName extends SimpleNode {
   }
 
   public void eval(SimpleNode parameters) throws SemanticsException {
-    String method_name = null;
+    String methodName = null;
     Symbol.Type type = null;
-    List<Symbol.Type> parameters_types =  new ArrayList<>();
+    List<Symbol.Type> parametersTypes =  new ArrayList<>();
 
-    ASTIdentifier namenode = (ASTIdentifier) this.jjtGetChild(1);
-    SimpleNode typenode = (SimpleNode) this.jjtGetChild(0);
-    method_name = namenode.identifierName;
-    type = VarNode.getType(typenode.id);
+    ASTIdentifier nameNode = (ASTIdentifier) this.jjtGetChild(1);
+    SimpleNode typeNode = (SimpleNode) this.jjtGetChild(0);
+    methodName = nameNode.identifierName;
+    type = VarNode.getType(typeNode.id);
 
     if(parameters != null) {
       parameters.setTable(this.table);
       for(int i = 0; i < parameters.jjtGetNumChildren(); i+=2) {
         VarNode parameter = new VarNode(i,parameters.jjtGetChild(i),parameters.jjtGetChild(i+1),table);
         parameter.eval();
-        parameters_types.add(parameter.getType(parameters.jjtGetChild(i).getId()));
+        parametersTypes.add(parameter.getType(parameters.jjtGetChild(i).getId()));
       }
     }
-    this.table.getParent().putSymbol(method_name,new MethodSymbol(type,parameters_types));
+    this.table.getParent().putSymbol(methodName,new MethodSymbol(type,parametersTypes));
   }
 
 }

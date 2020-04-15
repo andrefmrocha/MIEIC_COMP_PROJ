@@ -23,34 +23,32 @@ class ASTClass extends SimpleNode {
     {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
 
-      if(child.id == ParserTreeConstants.JJTVAR)
+      switch(child.id)
       {
-        child.setTable(newTable);
-        child.eval();
-      }
-      else if(child.id == ParserTreeConstants.JJTEXTEND)
-      {
-        child.setTable(newTable);
-        //child.eval();
-        //TODO: solve problem in imports
-      }
-      else if( child.id == ParserTreeConstants.JJTIDENTIFIER)
-      {
-        ASTIdentifier temp = (ASTIdentifier) child;
-        String name = temp.identifierName;
-        Symbol identifier = new Symbol(Symbol.Type.OBJ);
-        this.table.putSymbol(name,identifier);
-        child.setTable(newTable);
-        child.eval();
-      }
-      else if(child.id == ParserTreeConstants.JJTMETHOD)
-      {
-        SymbolTable MethodTable = new SymbolTable(newTable);
-        child.setTable(MethodTable);
-        child.eval();
-      }
-      else {
-        throw new SemanticsException("Incorrect child node.");
+        case ParserTreeConstants.JJTVAR:
+          child.setTable(newTable);
+          child.eval();
+          break;
+        case ParserTreeConstants.JJTEXTEND:
+          child.setTable(newTable);
+          //child.eval();
+          //TODO: solve problem in imports
+          break;
+        case ParserTreeConstants.JJTIDENTIFIER:
+          ASTIdentifier temp = (ASTIdentifier) child;
+          String name = temp.identifierName;
+          Symbol identifier = new Symbol(Symbol.Type.OBJ);
+          this.table.putSymbol(name,identifier);
+          child.setTable(newTable);
+          child.eval();
+          break;
+        case ParserTreeConstants.JJTMETHOD:
+          SymbolTable MethodTable = new SymbolTable(newTable);
+          child.setTable(MethodTable);
+          child.eval();
+          break;
+        default:
+          throw new SemanticsException("Incorrect child node.");
       }
     }
     for(int i = 0; i < this.jjtGetNumChildren(); i++) {

@@ -20,22 +20,22 @@ class ASTMain extends SimpleNode {
 
   @Override
   public void eval() throws SemanticsException {
-    List<Symbol.Type> parameters_types =  new ArrayList<>();
+    List<Symbol.Type> parametersTypes =  new ArrayList<>();
 
     if(this.table.getParent().getSymbol("main") != null)
       throw new SemanticsException("Main is already defined in this class!");
 
     SimpleNode child = (SimpleNode) this.jjtGetChild(0);
-    if(child.id == ParserTreeConstants.JJTIDENTIFIER)
+    if(child.id != ParserTreeConstants.JJTIDENTIFIER)
+      throw new SemanticsException("Invalid child to body!");
+    else
     {
       ASTIdentifier identifier = (ASTIdentifier) child;
       this.table.putSymbol(identifier.identifierName, new Symbol(Symbol.Type.OBJ));
     }
-    else
-      throw new SemanticsException("Invalid child to body!");
 
-    parameters_types.add(Symbol.Type.OBJ);
-    this.table.getParent().putSymbol("main",new MethodSymbol(Symbol.Type.MAIN,parameters_types));
+    parametersTypes.add(Symbol.Type.OBJ);
+    this.table.getParent().putSymbol("main",new MethodSymbol(Symbol.Type.MAIN,parametersTypes));
   }
 
 }
