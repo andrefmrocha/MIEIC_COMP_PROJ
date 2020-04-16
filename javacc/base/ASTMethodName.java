@@ -10,34 +10,34 @@ import java.util.List;
 
 public
 class ASTMethodName extends SimpleNode {
-  public ASTMethodName(int id) {
-    super(id);
-  }
-
-  public ASTMethodName(Parser p, int id) {
-    super(p, id);
-  }
-
-  public void eval(SimpleNode parameters) throws SemanticsException {
-    String methodName = null;
-    Symbol.Type type = null;
-    List<Symbol.Type> parametersTypes =  new ArrayList<>();
-
-    ASTIdentifier nameNode = (ASTIdentifier) this.jjtGetChild(1);
-    SimpleNode typeNode = (SimpleNode) this.jjtGetChild(0);
-    methodName = nameNode.identifierName;
-    type = VarNode.getType(typeNode.id);
-
-    if(parameters != null) {
-      parameters.setTable(this.table);
-      for(int i = 0; i < parameters.jjtGetNumChildren(); i+=2) {
-        VarNode parameter = new VarNode(i,parameters.jjtGetChild(i),parameters.jjtGetChild(i+1),table);
-        parameter.eval();
-        parametersTypes.add(parameter.getType(parameters.jjtGetChild(i).getId()));
-      }
+    public Symbol.Type returnType = null;
+    public ASTMethodName(int id) {
+        super(id);
     }
-    this.table.getParent().putSymbol(methodName,new MethodSymbol(type,parametersTypes));
-  }
+
+    public ASTMethodName(Parser p, int id) {
+        super(p, id);
+    }
+
+    public void eval(SimpleNode parameters) throws SemanticsException {
+        List<Symbol.Type> parametersTypes = new ArrayList<>();
+
+        ASTIdentifier nameNode = (ASTIdentifier) this.jjtGetChild(1);
+        SimpleNode typeNode = (SimpleNode) this.jjtGetChild(0);
+        String methodName  = nameNode.identifierName;
+        Symbol.Type type = VarNode.getType(typeNode.id);
+
+        if (parameters != null) {
+            parameters.setTable(this.table);
+            for (int i = 0; i < parameters.jjtGetNumChildren(); i += 2) {
+                VarNode parameter = new VarNode(i, parameters.jjtGetChild(i), parameters.jjtGetChild(i + 1), table);
+                parameter.eval();
+                parametersTypes.add(parameter.getType(parameters.jjtGetChild(i).getId()));
+            }
+        }
+        this.table.getParent().putSymbol(methodName, new MethodSymbol(type, parametersTypes));
+        this.returnType = type;
+    }
 
 }
 /* JavaCC - OriginalChecksum=4573a3da8b3ef87c2c4dda84d8669778 (do not edit this line) */

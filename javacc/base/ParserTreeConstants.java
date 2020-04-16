@@ -42,6 +42,7 @@ public interface ParserTreeConstants
     public int JJTTHIS = 36;
     public int JJTNEW = 37;
     public int JJTNEWARRAY = 38;
+    public int JJTMETHODRETURN = 39;
 
 
     public String[] jjtNodeName = {
@@ -84,6 +85,7 @@ public interface ParserTreeConstants
             "This",
             "New",
             "NewArray",
+            "MethodReturn"
     };
 }
 /* JavaCC - OriginalChecksum=1eaead22e08643eb1c16fe97aed01532 (do not edit this line) */

@@ -35,7 +35,9 @@ class ASTMethod extends TypeNode {
 
     if (methodType.id == ParserTreeConstants.JJTMETHODNAME){
       methodType.setTable(this.table);
-      ((ASTMethodName)methodType).eval(parameters);
+      ASTMethodName method = (ASTMethodName)methodType;
+      method.eval(parameters);
+      this.type = method.returnType;
     } else if(methodType.id == ParserTreeConstants.JJTMAIN) {
       methodType.setTable(this.table);
       methodType.eval();
@@ -54,16 +56,9 @@ class ASTMethod extends TypeNode {
     } else {
       methodBody = (ASTMethodBody) this.jjtGetChild(2);
     }
-
-    if(methodBody.id != ParserTreeConstants.JJTMETHODBODY)
-    {
-      throw new SemanticsException("No method body found!");
-    }
-    else {
-      methodBody.setTable(this.table);
-      methodBody.eval();
-    }
-
+    methodBody.returnValue = this.type;
+    methodBody.setTable(this.table);
+    methodBody.eval();
   }
 }
 /* JavaCC - OriginalChecksum=e01bdf01dd9e8aa606ef225a59a26df3 (do not edit this line) */
