@@ -31,7 +31,7 @@ class ASTClass extends SimpleNode {
           break;
         case ParserTreeConstants.JJTEXTEND:
           child.setTables(table, newTable);
-          //child.eval();
+          child.eval();
           //TODO: solve problem in imports
           break;
         case ParserTreeConstants.JJTIDENTIFIER:

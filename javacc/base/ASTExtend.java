@@ -29,13 +29,13 @@ class ASTExtend extends SimpleNode {
       name = temp.identifierName;
     }
 
-    if(!this.table.checkSymbol(name))
+    if(!this.methodTable.checkSymbol(name))
       throw new SemanticsException("Class " + name + " was not found");
 
-    Symbol identifier = this.table.getSymbol(name);
+    Symbol identifier = this.methodTable.getSymbol(name);
 
-    if(identifier.getType() != Symbol.Type.OBJ) {
-      throw new SemanticsException("Invalid type in extend identifier!");
+    if(identifier.getType() != Symbol.Type.CLASS) {
+      throw new SemanticsException(name + " is not a class, got " + identifier.getType() + " in line " + getLine());
     }
 
   }

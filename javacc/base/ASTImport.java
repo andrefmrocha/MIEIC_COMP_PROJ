@@ -44,8 +44,9 @@ class ASTImport extends SimpleNode {
     }
 
     String fullImportName = String.join(".", identifiers);
-    Symbol importSymbol = fullImportName.length() == 1 ? new Symbol(Type.CLASS) : new MethodSymbol(returnValue, params);
+    Symbol importSymbol = identifiers.size() == 1 ? new Symbol(Type.CLASS) : new MethodSymbol(returnValue, params);
     methodTable.putSymbol(fullImportName, importSymbol);
+    System.out.println("Storing " + fullImportName + " as type " + importSymbol.getType());
 
   }
 
