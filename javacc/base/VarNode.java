@@ -17,7 +17,7 @@ public class VarNode extends SimpleNode {
         super(i);
         this.jjtAddChild(type,0);
         this.jjtAddChild(identifier,1);
-        this.setTable(table);
+        this.setTables(table, methodTable);
     }
 
     @Override

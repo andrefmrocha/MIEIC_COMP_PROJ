@@ -17,7 +17,7 @@ public class ASTMethodCall extends TypeNode {
 
         final SimpleNode methodName = (SimpleNode) this.jjtGetChild(0);
         final ASTCall call = ((ASTCall) this.jjtGetChild(1));
-        call.setTable(this.table);
+        call.setTables(table, methodTable);
         if (methodName.id == ParserTreeConstants.JJTIDENTIFIER){
             final String methodIdentifier = ((ASTIdentifier) methodName).identifierName;
             //call.evalWithIdentifier(methodIdentifier);

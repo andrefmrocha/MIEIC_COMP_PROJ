@@ -21,12 +21,13 @@ class ASTMethodBody extends SimpleNode {
         int i = 0;
         for (; i < this.jjtGetNumChildren(); i++) {
             SimpleNode methodNode = (SimpleNode) this.jjtGetChild(i);
-            methodNode.setTable(table);
+            methodNode.setTables(table, methodTable);
             methodNode.eval();
             if (methodNode.id == ParserTreeConstants.JJTMETHODRETURN) {
                 ASTMethodReturn methodReturn = (ASTMethodReturn) methodNode;
-                methodReturn.setTable(table);
+                methodReturn.setTables(table, methodTable);
                 methodReturn.eval();
+                //TODO: Add return value
 //                if (methodReturn.type != returnValue)
 //                    throw new SemanticsException("Return value expected to be " + returnValue + " found " + methodReturn.type);
                 break;

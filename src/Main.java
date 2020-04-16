@@ -15,7 +15,8 @@ public class Main {
 			if(parser.getNumErrors() < Parser.NUM_ERRORS)
 				throw new RuntimeException();
 			SymbolTable newTable = new SymbolTable();
-			node.setTable(newTable);
+			SymbolTable methodTable = new SymbolTable();
+			node.setTables(newTable, methodTable);
 			node.eval();
 			node.dump("");
 		}catch (ParseException | FileNotFoundException | SemanticsException e){

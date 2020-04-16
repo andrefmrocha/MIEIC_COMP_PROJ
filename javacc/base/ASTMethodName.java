@@ -28,14 +28,14 @@ class ASTMethodName extends SimpleNode {
         Symbol.Type type = VarNode.getType(typeNode.id);
 
         if (parameters != null) {
-            parameters.setTable(this.table);
+            parameters.setTables(table, methodTable);
             for (int i = 0; i < parameters.jjtGetNumChildren(); i += 2) {
                 VarNode parameter = new VarNode(i, parameters.jjtGetChild(i), parameters.jjtGetChild(i + 1), table);
                 parameter.eval();
                 parametersTypes.add(parameter.getType(parameters.jjtGetChild(i).getId()));
             }
         }
-        this.table.getParent().putSymbol(methodName, new MethodSymbol(type, parametersTypes));
+        this.methodTable.putSymbol(methodName, new MethodSymbol(type, parametersTypes));
         this.returnType = type;
     }
 

@@ -20,7 +20,7 @@ public abstract class ConditionalNode extends TypeNode {
 
         for(int i = 1; i < this.jjtGetNumChildren(); i++) {
             SimpleNode child = (SimpleNode) this.jjtGetChild(i);
-            child.setTable(table);
+            child.setTables(table, methodTable);
             child.eval();
         }
     }

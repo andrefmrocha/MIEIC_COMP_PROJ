@@ -1,5 +1,6 @@
 package base;
 
+import base.semantics.MethodSymbol;
 import base.semantics.Symbol;
 import base.semantics.Symbol.Type;
 
@@ -20,12 +21,12 @@ public abstract class TypeNode extends SimpleNode {
             String name = temp.identifierName;
             if (table.checkSymbol(name)) { //And check if the identifier already has a symbol declared
                 Symbol sym = table.getSymbol(name);
-                if (expectedType != sym.getType())
-                    throw new SemanticsException("Identifier '" + name + "' is not of type: " + expectedType.toString());
+                if (!this.checkType(expectedType, sym))
+                    throw new SemanticsException("Identifier '" + name + "' is not of type: " + expectedType.toString() + " in line" + getLine());
             }
         } else if (child.id == ParserTreeConstants.JJTMETHODCALL) {
             final ASTMethodCall call = (ASTMethodCall) child;
-            call.setTable(table);
+            call.setTables(table, methodTable);
             call.eval(); //set table before eval
 
 //            if(call.type != expectedType)
@@ -33,12 +34,17 @@ public abstract class TypeNode extends SimpleNode {
 //TODO: after return value
 
         } else if (child instanceof TypeNode) {
-            child.setTable(table);
+            child.setTables(table, methodTable);
             child.eval();
             TypeNode temp = (TypeNode) child;
             if (expectedType != temp.type)
                 throw new SemanticsException("Expression is not of type: " + expectedType.toString());
         } else
             throw new SemanticsException("Invalid expression");
+    }
+
+    boolean checkType(Type type, Symbol symbol){
+        return symbol.getType() == type ||
+                (symbol.getType() == Type.METHOD && ((MethodSymbol)symbol).getReturnType() == type);
     }
 }

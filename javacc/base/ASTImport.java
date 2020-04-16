@@ -29,7 +29,7 @@ class ASTImport extends SimpleNode {
     List<Type> params = new ArrayList<>();
     for(int i = 0; i < this.jjtGetNumChildren(); i++){
       SimpleNode currNode = (SimpleNode) this.jjtGetChild(i);
-      currNode.setTable(table);
+      currNode.setTables(table, methodTable);
       currNode.eval();
 
       if(currNode.id == ParserTreeConstants.JJTIMPORTPARAMS) {
@@ -45,7 +45,7 @@ class ASTImport extends SimpleNode {
 
     String fullImportName = String.join(".", identifiers);
     Symbol importSymbol = fullImportName.length() == 1 ? new Symbol(Type.CLASS) : new MethodSymbol(returnValue, params);
-    table.putSymbol(fullImportName, importSymbol);
+    methodTable.putSymbol(fullImportName, importSymbol);
 
   }
 

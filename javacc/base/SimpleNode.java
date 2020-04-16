@@ -13,6 +13,11 @@ class SimpleNode implements Node {
   protected Object value;
   protected Parser parser;
   protected SymbolTable table;
+  protected SymbolTable methodTable;
+  private int line = 0;
+
+  public void setLine( int line ) { this.line = line ; }
+  public int getLine() { return line ; }
 
   public SimpleNode(int i) {
     id = i;
@@ -23,8 +28,9 @@ class SimpleNode implements Node {
     parser = p;
   }
 
-  public void setTable(SymbolTable table){
+  public void setTables(SymbolTable table, SymbolTable methodTable){
     this.table = table;
+    this.methodTable = methodTable;
   }
 
   public void jjtOpen() {
@@ -33,7 +39,7 @@ class SimpleNode implements Node {
   public void eval() throws SemanticsException {
     for(int i = 0; i< this.jjtGetNumChildren(); i++) {
       SimpleNode node = (SimpleNode) this.jjtGetChild(i);
-      node.setTable(this.table);
+      node.setTables(this.table, this.methodTable);
       node.eval();
     }
   }
@@ -81,6 +87,8 @@ class SimpleNode implements Node {
     return ParserTreeConstants.jjtNodeName[id];
   }
   public String toString(String prefix) { return prefix + toString(); }
+
+
 
   /* Override this method if you want to customize how the node dumps
      out its children. */

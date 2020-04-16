@@ -19,7 +19,7 @@ class ASTReturn extends TypeNode {
   @Override
   public void eval() throws SemanticsException {
     SimpleNode child = (SimpleNode) this.jjtGetChild(0);
-    child.setTable(table);
+    child.setTables(table, methodTable);
     child.eval();
     this.returnType = Symbol.getNodeSymbolType(child); //TODO does not support statements
   }

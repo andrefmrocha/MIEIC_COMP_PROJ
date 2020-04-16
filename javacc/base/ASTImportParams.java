@@ -23,7 +23,7 @@ class ASTImportParams extends SimpleNode {
 
         for(int i = 0; i < this.jjtGetNumChildren(); i++){
             SimpleNode currNode = (SimpleNode) this.jjtGetChild(i);
-            currNode.setTable(table);
+            currNode.setTables(table, methodTable);
             currNode.eval();
             paramTypes.add(Symbol.getNodeSymbolType(currNode));
         }

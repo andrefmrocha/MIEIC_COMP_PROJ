@@ -31,7 +31,7 @@ class ASTAssignVar extends TypeNode {
 
     Type type;
     if(!this.table.checkSymbol(name))
-      throw new SemanticsException("Variable " + name + " has not been initialized");
+      throw new SemanticsException("Variable " + name + " does not exist in line" + getLine());
 
     Symbol symbol = this.table.getSymbol(name);
     type = symbol.getType();

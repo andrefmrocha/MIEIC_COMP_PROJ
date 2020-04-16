@@ -21,7 +21,7 @@ class ASTMethodReturn extends SimpleNode {
       throw new SemanticsException("Unknown return type!");
 
     final TypeNode node = (TypeNode) this.jjtGetChild(0);
-    node.setTable(table);
+    node.setTables(table, methodTable);
     node.eval();
     type = node.type;
   }

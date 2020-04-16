@@ -17,7 +17,7 @@ class ASTClass extends SimpleNode {
 
   @Override
   public void eval() throws SemanticsException {
-    final SymbolTable newTable = new SymbolTable();
+    final SymbolTable newTable = new SymbolTable(methodTable);
 
     for(int i = 0; i < this.jjtGetNumChildren(); i++)
     {
@@ -26,11 +26,11 @@ class ASTClass extends SimpleNode {
       switch(child.id)
       {
         case ParserTreeConstants.JJTVAR:
-          child.setTable(newTable);
+          child.setTables(table, newTable);
           child.eval();
           break;
         case ParserTreeConstants.JJTEXTEND:
-          child.setTable(newTable);
+          child.setTables(table, newTable);
           //child.eval();
           //TODO: solve problem in imports
           break;
@@ -39,12 +39,11 @@ class ASTClass extends SimpleNode {
           String name = temp.identifierName;
           Symbol identifier = new Symbol(Symbol.Type.OBJ);
           this.table.putSymbol(name,identifier);
-          child.setTable(newTable);
+          child.setTables(table, newTable);
           child.eval();
           break;
         case ParserTreeConstants.JJTMETHOD:
-          SymbolTable MethodTable = new SymbolTable(newTable);
-          child.setTable(MethodTable);
+          child.setTables(new SymbolTable(table), newTable);
           child.eval();
           break;
         default:
