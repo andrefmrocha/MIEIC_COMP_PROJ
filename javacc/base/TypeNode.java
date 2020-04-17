@@ -20,11 +20,15 @@ public abstract class TypeNode extends SimpleNode {
         if (child.id == ParserTreeConstants.JJTIDENTIFIER) {  //Check if the node is a variable
             ASTIdentifier temp = (ASTIdentifier) child;
             String name = temp.identifierName;
-            if (table.checkSymbol(name)) { //And check if the identifier already has a symbol declared
-                Symbol sym = table.getSymbol(name);
-                if (!this.checkType(expectedType, sym))
-                    throw new SemanticsException("Identifier '" + name + "' is not of type: " + expectedType.toString() + " in line" + getLine());
-            }
+            if (!table.checkSymbol(name)) //And check if the identifier already has a symbol declared
+                throw new SemanticsException("Did not find variable named  " + name);
+
+            Symbol sym = table.getSymbol(name);
+            if (!this.checkType(expectedType, sym))
+                throw new SemanticsException("Variable '" + name + "' is not of type: " + expectedType.toString() + " in line" + getLine());
+
+            if(!sym.isInitialized())
+                throw new SemanticsException("Variable " + name + " is not initialized");
         } else if (child instanceof TypeNode) {
             child.setTables(table, methodTable);
             child.eval();

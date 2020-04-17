@@ -46,4 +46,8 @@ public class Symbol {
         }
         return null;
     }
+
+    public boolean isInitialized() {
+        return isInitialized;
+    }
 }
