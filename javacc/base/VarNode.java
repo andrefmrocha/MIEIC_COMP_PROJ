@@ -1,5 +1,6 @@
 package base;
 
+import base.semantics.ClassSymbol;
 import base.semantics.Symbol;
 import base.semantics.Symbol.Type;
 import base.semantics.SymbolTable;
@@ -37,24 +38,33 @@ public class VarNode extends SimpleNode {
 
         if(table.checkSymbolWithinScope(name)) throw new SemanticsException("Variable " + name + " has been defined previously");
 
-        Type type = getType(typeNode.id);
+        Type type = getType(typeNode, table);
 
-        Symbol varSym = new Symbol(type);
+        Symbol varSym;
+        if(type != Type.CLASS)
+             varSym = new Symbol(type);
+        else {
+            ClassSymbol symbol = (ClassSymbol) table.getSymbol(((ASTIdentifier) typeNode).identifierName);
+            varSym = new ClassSymbol(symbol.getSymbolTable());
+        }
         table.putSymbol(name, varSym);
     }
 
-    public static Symbol.Type getType(int id) throws SemanticsException {
-        switch (id) {
+    public static Type getType(SimpleNode node, SymbolTable table) throws SemanticsException {
+        switch (node.id) {
             case ParserTreeConstants.JJTINTARRAY:
-                return Symbol.Type.INT_ARRAY;
+                return Type.INT_ARRAY;
             case ParserTreeConstants.JJTINT:
-                return Symbol.Type.INT;
+                return Type.INT;
             case ParserTreeConstants.JJTBOOLEAN:
-                return Symbol.Type.BOOL;
+                return Type.BOOL;
             case ParserTreeConstants.JJTVOID:
-                return Symbol.Type.VOID;
+                return Type.VOID;
             case ParserTreeConstants.JJTIDENTIFIER:
-                return Symbol.Type.OBJ;
+                final ASTIdentifier identifier = (ASTIdentifier) node;
+                if(!table.checkSymbol(identifier.identifierName))
+                    throw new SemanticsException("Could not find " + identifier.identifierName);
+                return table.getSymbol(identifier.identifierName).getType();
             default:
                 throw new SemanticsException("Found invalid type");
         }

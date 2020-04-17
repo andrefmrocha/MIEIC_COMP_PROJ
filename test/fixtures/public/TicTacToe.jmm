@@ -2,6 +2,9 @@ import static BoardBase.sameArray(int[]) boolean;
 import static BoardBase.sameArray(int[]) boolean;
 import static BoardBase.printBoard(int[],int[],int[]) void; 
 import static BoardBase.printWinner(int) void;
+import static BoardBase.wrongMove() void;
+import static BoardBase.placeTaken() void;
+import static BoardBase.playerTurn(int) int[];
 
 class TicTacToe {
 

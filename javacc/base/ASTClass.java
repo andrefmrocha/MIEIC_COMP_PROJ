@@ -1,5 +1,7 @@
 package base;
 
+import base.semantics.ClassSymbol;
+import base.semantics.MethodSymbolTable;
 import base.semantics.SymbolTable;
 import base.semantics.Symbol;
 
@@ -17,7 +19,8 @@ class ASTClass extends SimpleNode {
 
   @Override
   public void eval() throws SemanticsException {
-    final SymbolTable newTable = new SymbolTable(methodTable);
+    final MethodSymbolTable newTable = new MethodSymbolTable(methodTable);
+    String className = null;
 
     for(int i = 0; i < this.jjtGetNumChildren(); i++)
     {
@@ -26,21 +29,13 @@ class ASTClass extends SimpleNode {
       switch(child.id)
       {
         case ParserTreeConstants.JJTVAR:
-          child.setTables(table, newTable);
-          child.eval();
-          break;
         case ParserTreeConstants.JJTEXTEND:
           child.setTables(table, newTable);
           child.eval();
-          //TODO: solve problem in imports
           break;
         case ParserTreeConstants.JJTIDENTIFIER:
           ASTIdentifier temp = (ASTIdentifier) child;
-          String name = temp.identifierName;
-          Symbol identifier = new Symbol(Symbol.Type.OBJ);
-          this.table.putSymbol(name,identifier);
-          child.setTables(table, newTable);
-          child.eval();
+          className = temp.identifierName;
           break;
         case ParserTreeConstants.JJTMETHOD:
           child.setTables(new SymbolTable(table), newTable);
@@ -50,6 +45,9 @@ class ASTClass extends SimpleNode {
           throw new SemanticsException("Incorrect child node.");
       }
     }
+
+    table.putSymbol(className, new ClassSymbol(newTable));
+
     for(int i = 0; i < this.jjtGetNumChildren(); i++) {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
       if (child.id == ParserTreeConstants.JJTMETHOD) {

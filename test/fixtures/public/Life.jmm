@@ -223,7 +223,7 @@ class Life {
                 j = 0;
             }
             else {}
-            io.print(field[i]);
+            io.println(field[i]);
 
             i = i + 1;
             j = j + 1;

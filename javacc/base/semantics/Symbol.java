@@ -6,7 +6,7 @@ import base.SimpleNode;
 
 public class Symbol {
     public enum Type{
-        INT, BOOL, OBJ, INT_ARRAY, VOID, MAIN, METHOD, CLASS
+        INT, BOOL, INT_ARRAY, VOID, MAIN, METHOD, CLASS
     }
 
     final protected Type type;
@@ -42,7 +42,7 @@ public class Symbol {
             case ParserTreeConstants.JJTINTARRAY:
                 return Type.INT_ARRAY;
             case ParserTreeConstants.JJTIDENTIFIER:
-                return Type.OBJ;
+                return Type.CLASS;
         }
         return null;
     }

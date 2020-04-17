@@ -2,6 +2,7 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package base;
 
+import base.semantics.MethodIdentifier;
 import base.semantics.MethodSymbol;
 import base.semantics.Symbol;
 
@@ -11,6 +12,7 @@ import java.util.List;
 public
 class ASTMethodName extends SimpleNode {
     public Symbol.Type returnType = null;
+
     public ASTMethodName(int id) {
         super(id);
     }
@@ -24,18 +26,18 @@ class ASTMethodName extends SimpleNode {
 
         ASTIdentifier nameNode = (ASTIdentifier) this.jjtGetChild(1);
         SimpleNode typeNode = (SimpleNode) this.jjtGetChild(0);
-        String methodName  = nameNode.identifierName;
-        Symbol.Type type = VarNode.getType(typeNode.id);
+        String methodName = nameNode.identifierName;
+        Symbol.Type type = VarNode.getType(typeNode, table);
 
         if (parameters != null) {
             parameters.setTables(table, methodTable);
             for (int i = 0; i < parameters.jjtGetNumChildren(); i += 2) {
                 VarNode parameter = new VarNode(i, parameters.jjtGetChild(i), parameters.jjtGetChild(i + 1), table);
                 parameter.eval();
-                parametersTypes.add(parameter.getType(parameters.jjtGetChild(i).getId()));
+                parametersTypes.add(VarNode.getType((SimpleNode) parameters.jjtGetChild(i), table));
             }
         }
-        this.methodTable.putSymbol(methodName, new MethodSymbol(type, parametersTypes));
+        this.methodTable.putSymbol(new MethodIdentifier(methodName, parametersTypes), new MethodSymbol(type, parametersTypes));
         this.returnType = type;
     }
 
