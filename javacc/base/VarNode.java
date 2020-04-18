@@ -45,7 +45,7 @@ public class VarNode extends SimpleNode {
              varSym = new Symbol(type);
         else {
             ClassSymbol symbol = (ClassSymbol) table.getSymbol(((ASTIdentifier) typeNode).identifierName);
-            varSym = new ClassSymbol(symbol.getSymbolTable());
+            varSym = new ClassSymbol(name, symbol.getSymbolTable());
         }
         table.putSymbol(name, varSym);
     }

@@ -1,5 +1,6 @@
 package base;
 
+import base.semantics.Symbol;
 import base.semantics.Symbol.Type;
 
 public abstract class BinaryOperatorNode extends TypeNode {
@@ -26,7 +27,7 @@ public abstract class BinaryOperatorNode extends TypeNode {
         SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
         SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
 
-        this.evaluateChild(leftOperand, operandType);
-        this.evaluateChild(rightOperand, operandType);
+        this.evaluateChild(leftOperand, new Symbol(operandType));
+        this.evaluateChild(rightOperand, new Symbol(operandType));
     }
 }

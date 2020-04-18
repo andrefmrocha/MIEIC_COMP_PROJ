@@ -72,7 +72,7 @@ class ASTCall extends TypeNode {
 
     public void evalWithThis() throws SemanticsException {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
-        final var methodId = getMethodIdentifier(methodIdentifier.identifierName);
+        final MethodIdentifier methodId = getMethodIdentifier(methodIdentifier.identifierName);
         if(!methodTable.checkSymbol(methodId))
             throw new SemanticsException("Method " + methodIdentifier.identifierName + " not found in line " + getLine());
         final Symbol symbol = methodTable.getSymbol(methodId);

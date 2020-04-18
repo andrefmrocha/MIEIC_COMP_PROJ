@@ -45,7 +45,7 @@ class ASTImport extends SimpleNode {
 
         String fullImportName = String.join(".", identifiers);
         if (identifiers.size() == 1)
-            table.putSymbol(fullImportName, new ClassSymbol());
+            table.putSymbol(fullImportName, new ClassSymbol(fullImportName));
         else if (this.isStatic)
             methodTable.putSymbol(new MethodIdentifier(fullImportName, params), new MethodSymbol(returnValue, params));
         else {

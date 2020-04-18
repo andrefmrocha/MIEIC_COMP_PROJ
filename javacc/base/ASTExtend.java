@@ -7,6 +7,7 @@ import base.semantics.Symbol;
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTExtend extends SimpleNode {
+  public ClassSymbol extendedClass;
   public ASTExtend(int id) {
     super(id);
   }
@@ -38,8 +39,8 @@ class ASTExtend extends SimpleNode {
       throw new SemanticsException(name + " is not a class, got " + identifier.getType() + " in line " + getLine());
     }
 
-    ClassSymbol classSymbol = (ClassSymbol) identifier;
-    methodTable.getTable().putAll(classSymbol.getSymbolTable().getTable());
+    extendedClass = (ClassSymbol) identifier;
+    methodTable.getTable().putAll(extendedClass.getSymbolTable().getTable());
   }
 
 }

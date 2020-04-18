@@ -16,7 +16,8 @@ public abstract class TypeNode extends SimpleNode {
         super(p, i);
     }
 
-    public void evaluateChild(SimpleNode child, Type expectedType) throws SemanticsException {
+    public void evaluateChild(SimpleNode child, Symbol symbol) throws SemanticsException {
+        Type expectedType = symbol.getType();
         if (child.id == ParserTreeConstants.JJTIDENTIFIER) {  //Check if the node is a variable
             ASTIdentifier temp = (ASTIdentifier) child;
             String name = temp.identifierName;
@@ -32,9 +33,16 @@ public abstract class TypeNode extends SimpleNode {
         } else if (child instanceof TypeNode) {
             child.setTables(table, methodTable);
             child.eval();
-            TypeNode temp = (TypeNode) child;
-            if (expectedType != temp.type)
-                throw new SemanticsException("Expression is not of type: " + expectedType.toString() + " in line " + getLine() + " got " + temp.type);
+            Type childType = ((TypeNode) child).type;
+            if (expectedType != childType)
+                throw new SemanticsException("Expression is not of type: " + expectedType.toString() + " in line " + getLine() + " got " + childType.toString());
+            else if (expectedType == Type.CLASS) {
+                // compare classes and check if extends
+                ClassSymbol expectedClass = (ClassSymbol) symbol;
+                ClassSymbol childClassSymbol = ((ASTClass) child).classSymbol;
+                if (!childClassSymbol.derivesFrom(expectedClass))
+                    throw new SemanticsException("Class " + childClassSymbol.getClassName() + " does not derive from " + expectedClass.getClassName());
+            }
         } else
             throw new SemanticsException("Invalid expression");
     }

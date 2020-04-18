@@ -37,9 +37,8 @@ class ASTAssignVar extends TypeNode {
     Symbol symbol = this.table.getSymbol(name);
     type = symbol.getType();
 
-
     SimpleNode expression = (SimpleNode) this.jjtGetChild(1);
-    this.evaluateChild(expression, type);
+    this.evaluateChild(expression, new Symbol(type));
   }
 }
 /* JavaCC - OriginalChecksum=661756e145ed220ec46575b3a8adecd3 (do not edit this line) */

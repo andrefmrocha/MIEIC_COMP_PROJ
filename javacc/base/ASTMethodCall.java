@@ -34,8 +34,6 @@ public class ASTMethodCall extends TypeNode {
                 ASTNew astNew = (ASTNew) methodName;
                 astNew.setTables(table, methodTable);
                 astNew.eval();
-                if(getLine() == 49)
-                    System.out.println("Found class called " + astNew.identifier);
                 call.evalWithIdentifier(astNew.identifier);
                 break;
             default:

@@ -9,6 +9,8 @@ import base.semantics.Symbol;
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTClass extends SimpleNode {
+  public ClassSymbol classSymbol;
+
   public ASTClass(int id) {
     super(id);
   }
@@ -21,6 +23,7 @@ class ASTClass extends SimpleNode {
   public void eval() throws SemanticsException {
     final MethodSymbolTable newTable = new MethodSymbolTable(methodTable);
     String className = null;
+    ClassSymbol extendedClass = null;
 
     for(int i = 0; i < this.jjtGetNumChildren(); i++)
     {
@@ -29,9 +32,13 @@ class ASTClass extends SimpleNode {
       switch(child.id)
       {
         case ParserTreeConstants.JJTVAR:
+          child.setTables(table, newTable);
+          child.eval();
+          break;
         case ParserTreeConstants.JJTEXTEND:
           child.setTables(table, newTable);
           child.eval();
+          extendedClass = ((ASTExtend) child).extendedClass;
           break;
         case ParserTreeConstants.JJTIDENTIFIER:
           ASTIdentifier temp = (ASTIdentifier) child;
@@ -46,7 +53,8 @@ class ASTClass extends SimpleNode {
       }
     }
 
-    table.putSymbol(className, new ClassSymbol(newTable));
+    classSymbol = new ClassSymbol(className, newTable, extendedClass);
+    table.putSymbol(className, classSymbol);
 
     for(int i = 0; i < this.jjtGetNumChildren(); i++) {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);

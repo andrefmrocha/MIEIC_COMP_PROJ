@@ -32,7 +32,7 @@ class ASTMain extends SimpleNode {
     else
     {
       ASTIdentifier identifier = (ASTIdentifier) child;
-      this.table.putSymbol(identifier.identifierName, new ClassSymbol());
+      this.table.putSymbol(identifier.identifierName, new ClassSymbol(identifier.identifierName));
     }
 
     parametersTypes.add(Symbol.Type.CLASS);
