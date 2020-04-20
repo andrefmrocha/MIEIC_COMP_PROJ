@@ -11,7 +11,7 @@ public class Symbol {
 
     final protected Type type;
     final protected String val;
-    final protected boolean isInitialized;
+    protected boolean isInitialized;
 
     public Type getType() {
         return type;
@@ -50,4 +50,6 @@ public class Symbol {
     public boolean isInitialized() {
         return isInitialized;
     }
+
+    public void setInitialized() { isInitialized = true;}
 }
