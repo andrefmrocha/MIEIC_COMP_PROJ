@@ -32,7 +32,7 @@ class ASTMethodName extends SimpleNode {
         if (parameters != null) {
             parameters.setTables(table, methodTable);
             for (int i = 0; i < parameters.jjtGetNumChildren(); i += 2) {
-                VarNode parameter = new VarNode(i, parameters.jjtGetChild(i), parameters.jjtGetChild(i + 1), table);
+                VarNode parameter = new VarNode(i, parameters.jjtGetChild(i), parameters.jjtGetChild(i + 1), table,true);
                 parameter.eval();
                 parametersTypes.add(VarNode.getType((SimpleNode) parameters.jjtGetChild(i), table));
             }

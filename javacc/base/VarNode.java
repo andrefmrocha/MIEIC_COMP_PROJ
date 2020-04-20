@@ -6,19 +6,23 @@ import base.semantics.Symbol.Type;
 import base.semantics.SymbolTable;
 
 public class VarNode extends SimpleNode {
-    public VarNode(int i) {
+    private final boolean isInitialized;
+    public VarNode(int i, boolean isInitialized) {
         super(i);
+        this.isInitialized = isInitialized;
     }
 
-    public VarNode(Parser p, int i) {
+    public VarNode(Parser p, int i, boolean isInitialized) {
         super(p, i);
+        this.isInitialized = isInitialized;
     }
 
-    public VarNode(int i, Node type, Node identifier, SymbolTable table) {
+    public VarNode(int i, Node type, Node identifier, SymbolTable table, boolean isInitialized) {
         super(i);
         this.jjtAddChild(type,0);
         this.jjtAddChild(identifier,1);
         this.setTables(table, methodTable);
+        this.isInitialized = isInitialized;
     }
 
     @Override
@@ -42,7 +46,7 @@ public class VarNode extends SimpleNode {
 
         Symbol varSym;
         if(type != Type.CLASS)
-             varSym = new Symbol(type);
+             varSym = new Symbol(type,"",isInitialized);
         else {
             ClassSymbol symbol = (ClassSymbol) table.getSymbol(((ASTIdentifier) typeNode).identifierName);
             varSym = new ClassSymbol(name, symbol.getSymbolTable());

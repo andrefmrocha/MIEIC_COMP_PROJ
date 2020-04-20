@@ -6,18 +6,18 @@ public class ClassSymbol extends Symbol {
     String className;
 
     public ClassSymbol(String className) {
-        super(Type.CLASS);
+        super(Type.CLASS,"",true);
         this.className = className;
     }
 
     public ClassSymbol(String className, MethodSymbolTable symbolTable) {
-        super(Type.CLASS);
+        super(Type.CLASS,"",true);
         this.className = className;
         this.symbolTable = symbolTable;
     }
 
     public ClassSymbol(String className, MethodSymbolTable symbolTable, ClassSymbol extension) {
-        super(Type.CLASS);
+        super(Type.CLASS,"",true);
         this.className = className;
         this.symbolTable = symbolTable;
         this.extension = extension;
