@@ -95,7 +95,7 @@ void ImportDeclaration() #void : {}
 
 void ImportStatement() #void : {}
 {
-    (  [ <STATIC> #Static {jjtThis.isStatic=true;}] Identifier()  [<DOT> Identifier()] [((<LFTBRCKT> ImportParamList() <RGHTBRCKT>) | "()") Type() #Return ] ) #Import
+    (  [ <STATIC> #Static {jjtThis.isStatic=true;}] Identifier()  [<DOT> Identifier()] [((<LFTBRCKT> ImportParamList() <RGHTBRCKT>) | "()") [Type() #Return ]] ) #Import
 }
 
 void ImportParamList() #void : {}
@@ -272,8 +272,7 @@ void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #
     System.out.println("> Skipped '" + skipped + "'\n");
 }
 
-void MethodCall() #Call
-: {} {
+void MethodCall() #Call : {} {
     Identifier() (<LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> | "()")
 }
 

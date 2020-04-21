@@ -38,9 +38,15 @@ public abstract class TypeNode extends SimpleNode {
                 throw new SemanticsException("Expression is not of type: " + expectedType.toString() + " in line " + getLine() + " got " + childType.toString());
             else if (expectedType == Type.CLASS) {
                 // compare classes and check if extends
-                System.out.println("Found class in line " + getLine());
                 ClassSymbol expectedClass = (ClassSymbol) symbol;
-                ClassSymbol childClassSymbol = ((ASTClass) child).classSymbol;
+                ClassSymbol childClassSymbol = null;
+                if (child instanceof ASTClass)
+                    childClassSymbol = ((ASTClass) child).classSymbol;
+                else if (child instanceof ASTNew)
+                    childClassSymbol = ((ASTNew) child).classSymbol;
+                else
+                    throw new SemanticsException("Unknown node with type CLASS");
+
                 if (!childClassSymbol.derivesFrom(expectedClass))
                     throw new SemanticsException("Class " + childClassSymbol.getClassName() + " does not derive from " + expectedClass.getClassName());
             }

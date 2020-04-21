@@ -26,7 +26,7 @@ class ASTImport extends SimpleNode {
 
     public void eval() throws SemanticsException {
 
-        Type returnValue = null;
+        Type returnValue = Type.VOID;
         List<String> identifiers = new ArrayList<>();
         List<Type> params = new ArrayList<>();
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {
