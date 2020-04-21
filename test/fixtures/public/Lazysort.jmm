@@ -1,6 +1,5 @@
 import static MathUtils.random(int,int) int; //lowerLimit,upperLimit
 import Quicksort;
-import Quicksort.quicksort(int[]) void; //array
 import Quicksort.quicksort(int[],int,int) boolean; //array, begin, size
 import Quicksort.printL(int[]) boolean;
 
@@ -9,7 +8,7 @@ class Lazysort extends Quicksort {
         int[] L;
         int i;
 		boolean d;
-        Quicksort q;
+        Lazysort q;
 
         L = new int[10];
 

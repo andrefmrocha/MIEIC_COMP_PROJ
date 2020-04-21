@@ -28,7 +28,7 @@ public abstract class TypeNode extends SimpleNode {
             if (!this.checkType(expectedType, sym))
                 throw new SemanticsException("Variable '" + name + "' is not of type: " + expectedType.toString() + " in line" + getLine());
 
-            if(!sym.isInitialized())
+            if (!sym.isInitialized())
                 throw new SemanticsException("Variable " + name + " is not initialized");
         } else if (child instanceof TypeNode) {
             child.setTables(table, methodTable);
@@ -38,6 +38,7 @@ public abstract class TypeNode extends SimpleNode {
                 throw new SemanticsException("Expression is not of type: " + expectedType.toString() + " in line " + getLine() + " got " + childType.toString());
             else if (expectedType == Type.CLASS) {
                 // compare classes and check if extends
+                System.out.println("Found class in line " + getLine());
                 ClassSymbol expectedClass = (ClassSymbol) symbol;
                 ClassSymbol childClassSymbol = ((ASTClass) child).classSymbol;
                 if (!childClassSymbol.derivesFrom(expectedClass))

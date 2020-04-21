@@ -272,7 +272,8 @@ void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #
     System.out.println("> Skipped '" + skipped + "'\n");
 }
 
-void MethodCall() #Call : {} {
+void MethodCall() #Call
+: {} {
     Identifier() (<LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> | "()")
 }
 
