@@ -6,7 +6,7 @@ import javamm.parser.SimpleNode;
 
 public class Symbol {
     public enum Type{
-        INT, BOOL, INT_ARRAY, VOID, MAIN, METHOD, CLASS
+        INT, BOOL, INT_ARRAY, VOID, MAIN, METHOD, CLASS, CLASSVAR
     }
 
     final protected Type type;
