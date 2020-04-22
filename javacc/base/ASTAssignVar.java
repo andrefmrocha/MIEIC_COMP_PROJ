@@ -1,5 +1,6 @@
 package base;
 
+import base.semantics.ClassSymbol;
 import base.semantics.Symbol;
 import base.semantics.Symbol.Type;
 
@@ -31,15 +32,14 @@ class ASTAssignVar extends TypeNode {
 
     Type type;
     if(!this.table.checkSymbol(name))
-      throw new SemanticsException("Variable " + name + " has not been initialized");
+      throw new SemanticsException("Variable " + name + " does not exist in line" + getLine());
 
     Symbol symbol = this.table.getSymbol(name);
-    type = symbol.getType();
-
 
     SimpleNode expression = (SimpleNode) this.jjtGetChild(1);
-    this.evaluateChild(expression, type);
+    this.evaluateChild(expression, symbol);
 
+    symbol.setInitialized();
   }
 }
 /* JavaCC - OriginalChecksum=661756e145ed220ec46575b3a8adecd3 (do not edit this line) */

@@ -6,12 +6,12 @@ import base.SimpleNode;
 
 public class Symbol {
     public enum Type{
-        INT, BOOL, OBJ, INT_ARRAY, VOID, MAIN,METHOD
+        INT, BOOL, INT_ARRAY, VOID, MAIN, METHOD, CLASS
     }
 
     final protected Type type;
     final protected String val;
-    final protected boolean isInitialized;
+    protected boolean isInitialized;
 
     public Type getType() {
         return type;
@@ -42,8 +42,14 @@ public class Symbol {
             case ParserTreeConstants.JJTINTARRAY:
                 return Type.INT_ARRAY;
             case ParserTreeConstants.JJTIDENTIFIER:
-                return Type.OBJ;
+                return Type.CLASS;
         }
         return null;
     }
+
+    public boolean isInitialized() {
+        return isInitialized;
+    }
+
+    public void setInitialized() { isInitialized = true;}
 }

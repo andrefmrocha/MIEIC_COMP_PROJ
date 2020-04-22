@@ -2,6 +2,7 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package base;
 
+import base.semantics.MethodIdentifier;
 import base.semantics.MethodSymbol;
 import base.semantics.Symbol;
 
@@ -10,34 +11,35 @@ import java.util.List;
 
 public
 class ASTMethodName extends SimpleNode {
-  public ASTMethodName(int id) {
-    super(id);
-  }
+    public Symbol.Type returnType = null;
 
-  public ASTMethodName(Parser p, int id) {
-    super(p, id);
-  }
-
-  public void eval(SimpleNode parameters) throws SemanticsException {
-    String methodName = null;
-    Symbol.Type type = null;
-    List<Symbol.Type> parametersTypes =  new ArrayList<>();
-
-    ASTIdentifier nameNode = (ASTIdentifier) this.jjtGetChild(1);
-    SimpleNode typeNode = (SimpleNode) this.jjtGetChild(0);
-    methodName = nameNode.identifierName;
-    type = VarNode.getType(typeNode.id);
-
-    if(parameters != null) {
-      parameters.setTable(this.table);
-      for(int i = 0; i < parameters.jjtGetNumChildren(); i+=2) {
-        VarNode parameter = new VarNode(i,parameters.jjtGetChild(i),parameters.jjtGetChild(i+1),table);
-        parameter.eval();
-        parametersTypes.add(parameter.getType(parameters.jjtGetChild(i).getId()));
-      }
+    public ASTMethodName(int id) {
+        super(id);
     }
-    this.table.getParent().putSymbol(methodName,new MethodSymbol(type,parametersTypes));
-  }
+
+    public ASTMethodName(Parser p, int id) {
+        super(p, id);
+    }
+
+    public void eval(SimpleNode parameters) throws SemanticsException {
+        List<Symbol.Type> parametersTypes = new ArrayList<>();
+
+        ASTIdentifier nameNode = (ASTIdentifier) this.jjtGetChild(1);
+        SimpleNode typeNode = (SimpleNode) this.jjtGetChild(0);
+        String methodName = nameNode.identifierName;
+        Symbol.Type type = VarNode.getType(typeNode, table);
+
+        if (parameters != null) {
+            parameters.setTables(table, methodTable);
+            for (int i = 0; i < parameters.jjtGetNumChildren(); i += 2) {
+                VarNode parameter = new VarNode(i, parameters.jjtGetChild(i), parameters.jjtGetChild(i + 1), table,true);
+                parameter.eval();
+                parametersTypes.add(VarNode.getType((SimpleNode) parameters.jjtGetChild(i), table));
+            }
+        }
+        this.methodTable.putSymbol(new MethodIdentifier(methodName, parametersTypes), new MethodSymbol(type, parametersTypes));
+        this.returnType = type;
+    }
 
 }
 /* JavaCC - OriginalChecksum=4573a3da8b3ef87c2c4dda84d8669778 (do not edit this line) */

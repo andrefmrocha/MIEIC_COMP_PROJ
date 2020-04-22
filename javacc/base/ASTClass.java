@@ -1,5 +1,7 @@
 package base;
 
+import base.semantics.ClassSymbol;
+import base.semantics.MethodSymbolTable;
 import base.semantics.SymbolTable;
 import base.semantics.Symbol;
 
@@ -7,6 +9,8 @@ import base.semantics.Symbol;
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTClass extends SimpleNode {
+  public ClassSymbol classSymbol;
+
   public ASTClass(int id) {
     super(id);
   }
@@ -17,7 +21,9 @@ class ASTClass extends SimpleNode {
 
   @Override
   public void eval() throws SemanticsException {
-    final SymbolTable newTable = new SymbolTable();
+    final MethodSymbolTable newTable = new MethodSymbolTable(methodTable);
+    String className = null;
+    ClassSymbol extendedClass = null;
 
     for(int i = 0; i < this.jjtGetNumChildren(); i++)
     {
@@ -26,31 +32,30 @@ class ASTClass extends SimpleNode {
       switch(child.id)
       {
         case ParserTreeConstants.JJTVAR:
-          child.setTable(newTable);
+          child.setTables(table, newTable);
           child.eval();
           break;
         case ParserTreeConstants.JJTEXTEND:
-          child.setTable(newTable);
-          //child.eval();
-          //TODO: solve problem in imports
+          child.setTables(table, newTable);
+          child.eval();
+          extendedClass = ((ASTExtend) child).extendedClass;
           break;
         case ParserTreeConstants.JJTIDENTIFIER:
           ASTIdentifier temp = (ASTIdentifier) child;
-          String name = temp.identifierName;
-          Symbol identifier = new Symbol(Symbol.Type.OBJ);
-          this.table.putSymbol(name,identifier);
-          child.setTable(newTable);
-          child.eval();
+          className = temp.identifierName;
           break;
         case ParserTreeConstants.JJTMETHOD:
-          SymbolTable MethodTable = new SymbolTable(newTable);
-          child.setTable(MethodTable);
+          child.setTables(new SymbolTable(table), newTable);
           child.eval();
           break;
         default:
           throw new SemanticsException("Incorrect child node.");
       }
     }
+
+    classSymbol = new ClassSymbol(className, newTable, extendedClass);
+    table.putSymbol(className, classSymbol);
+
     for(int i = 0; i < this.jjtGetNumChildren(); i++) {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
       if (child.id == ParserTreeConstants.JJTMETHOD) {

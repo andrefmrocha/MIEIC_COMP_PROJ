@@ -16,11 +16,11 @@ public abstract class ConditionalNode extends TypeNode {
         if(this.jjtGetNumChildren() < 1) throw new SemanticsException("Conditional statement must have at least the condition expression");
 
         SimpleNode condition = (SimpleNode) this.jjtGetChild(0);
-        this.evaluateChild(condition, Symbol.Type.BOOL);
+        this.evaluateChild(condition, new Symbol(Symbol.Type.BOOL));
 
         for(int i = 1; i < this.jjtGetNumChildren(); i++) {
             SimpleNode child = (SimpleNode) this.jjtGetChild(i);
-            child.setTable(table);
+            child.setTables(table, methodTable);
             child.eval();
         }
     }

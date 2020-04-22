@@ -1,6 +1,7 @@
 options {
     LOOKAHEAD =  1;
     MULTI = true;
+    NODE_SCOPE_HOOK=true;
 }
 
 PARSER_BEGIN(Parser)
@@ -17,6 +18,13 @@ public class Parser {
 
     public int getNumErrors(){
         return this.nErrors;
+    }
+
+    void jjtreeOpenNodeScope(Node n) {
+        ((SimpleNode)n).setLine(getToken(1).beginLine);
+    }
+
+    void jjtreeCloseNodeScope(Node n) {
     }
 }
 PARSER_END(Parser)
@@ -85,9 +93,14 @@ void ImportDeclaration() #void : {}
     (<IMPORT> ImportStatement() <SEMICOLON> )*
 }
 
-void ImportStatement() #void : {  }
+void ImportStatement() #void : {}
 {
-    (  [ <STATIC> #Static ] Identifier()  (<DOT> Identifier() )* [(<LFTBRCKT>  Type() (<COMMA> Type())* <RGHTBRCKT> | "()") #ImportParams Type() #Return ] ) #Import
+    (  [ <STATIC> #Static {jjtThis.isStatic=true;}] Identifier()  [<DOT> Identifier()] [((<LFTBRCKT> ImportParamList() <RGHTBRCKT>) | "()") [Type() #Return ]] ) #Import
+}
+
+void ImportParamList() #void : {}
+{
+    [Type() (<COMMA> Type())*] #ImportParams
 }
 
 void Identifier() #void : {Token t;}
@@ -131,7 +144,7 @@ void MethodBody() #void : {} {
 void MethodDeclaration() #void : {}
 {
     (<PUBLIC>
-    (MethodName() (<LFTBRCKT> [Parameters()] <RGHTBRCKT> | "()" )  <LFTCRLBRCKT> (MethodBody() (<RETURN> Expression()) #Return <SEMICOLON>)#MethodBody <RGHTCRLBRCKT>
+    (MethodName() (<LFTBRCKT> [Parameters()] <RGHTBRCKT> | "()" )  <LFTCRLBRCKT> (MethodBody() (<RETURN> Expression()) #MethodReturn <SEMICOLON>)#MethodBody <RGHTCRLBRCKT>
     | ((<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") Identifier()  <RGHTBRCKT> ) #Main <LFTCRLBRCKT> MethodBody() #MethodBody <RGHTCRLBRCKT>  ))
     )#Method //TODO: check if newly added production is correct
 

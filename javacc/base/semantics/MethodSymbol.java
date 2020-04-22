@@ -5,18 +5,17 @@ import java.util.List;
 
 public class MethodSymbol extends Symbol {
     final private List<Type> parameters;
-
-    public MethodSymbol(Type returnType) {
-        super(returnType);
-        this.parameters = new ArrayList<>();
-    }
+    final private Type returnType;
 
     public MethodSymbol(Type returnType, List<Type> parameters) {
-        super(returnType);
+        super(Type.METHOD);
+        this.returnType = returnType;
         this.parameters = parameters;
     }
 
     public List<Type> getParameters() {
         return parameters;
     }
+
+    public Type getReturnType() { return returnType; }
 }

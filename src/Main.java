@@ -1,5 +1,6 @@
 import java.io.FileNotFoundException;
 import base.semantics.SymbolTable;
+import base.semantics.MethodSymbolTable;
 import base.Parser;
 import base.SimpleNode;
 import base.SemanticsException;
@@ -15,7 +16,8 @@ public class Main {
 			if(parser.getNumErrors() < Parser.NUM_ERRORS)
 				throw new RuntimeException();
 			SymbolTable newTable = new SymbolTable();
-			node.setTable(newTable);
+			MethodSymbolTable methodTable = new MethodSymbolTable();
+			node.setTables(newTable, methodTable);
 			node.eval();
 			node.dump("");
 		}catch (ParseException | FileNotFoundException | SemanticsException e){

@@ -1,6 +1,9 @@
 package base;
 
+import base.semantics.ClassSymbol;
+import base.semantics.MethodIdentifier;
 import base.semantics.MethodSymbol;
+import base.semantics.Symbol;
 import base.semantics.Symbol.Type;
 
 import java.util.ArrayList;
@@ -11,39 +14,54 @@ import java.util.List;
 public
 class ASTImport extends SimpleNode {
 
-  public ASTImport(int id) {
-    super(id);
-  }
+    public boolean isStatic;
 
-  public ASTImport(Parser p, int id) {
-    super(p, id);
-  }
-
-  public void eval() throws SemanticsException {
-
-    Type returnValue = null;
-    List<String> identifiers = new ArrayList<>();
-    List<Type> params = new ArrayList<>();
-    for(int i = 0; i < this.jjtGetNumChildren(); i++){
-      SimpleNode currNode = (SimpleNode) this.jjtGetChild(i);
-      currNode.setTable(table);
-      currNode.eval();
-
-      if(currNode.id == ParserTreeConstants.JJTIMPORTPARAMS) {
-        params = ((ASTImportParams) currNode).paramTypes;
-      }
-      else if (currNode.id == ParserTreeConstants.JJTRETURN) {
-        returnValue = ((ASTReturn) currNode).returnType;
-      }
-      else if (currNode.id == ParserTreeConstants.JJTIDENTIFIER) {
-        identifiers.add(((ASTIdentifier) currNode).identifierName);
-      }
+    public ASTImport(int id) {
+        super(id);
     }
 
-    String fullImportName = String.join(".", identifiers);
-    table.putSymbol(fullImportName, new MethodSymbol(returnValue, params));
+    public ASTImport(Parser p, int id) {
+        super(p, id);
+    }
 
-  }
+    public void eval() throws SemanticsException {
+
+        Type returnValue = Type.VOID;
+        List<String> identifiers = new ArrayList<>();
+        List<Type> params = new ArrayList<>();
+        for (int i = 0; i < this.jjtGetNumChildren(); i++) {
+            SimpleNode currNode = (SimpleNode) this.jjtGetChild(i);
+            currNode.setTables(table, methodTable);
+            currNode.eval();
+
+            if (currNode.id == ParserTreeConstants.JJTIMPORTPARAMS) {
+                params = ((ASTImportParams) currNode).paramTypes;
+            } else if (currNode.id == ParserTreeConstants.JJTRETURN) {
+                returnValue = ((ASTReturn) currNode).returnType;
+            } else if (currNode.id == ParserTreeConstants.JJTIDENTIFIER) {
+                identifiers.add(((ASTIdentifier) currNode).identifierName);
+            }
+        }
+
+        String fullImportName = String.join(".", identifiers);
+        if (identifiers.size() == 1)
+            table.putSymbol(fullImportName, new ClassSymbol(fullImportName));
+        else if (this.isStatic)
+            methodTable.putSymbol(new MethodIdentifier(fullImportName, params), new MethodSymbol(returnValue, params));
+        else {
+            String methodName = identifiers.get(1);
+            String className = identifiers.get(0);
+            if (!table.checkSymbol(className))
+                throw new SemanticsException("Class " + className + " has not been imported");
+
+            Symbol symbol = table.getSymbol(className);
+            if (symbol.getType() != Type.CLASS)
+                throw new SemanticsException(className + " is not a class");
+
+            ClassSymbol classSymbol = (ClassSymbol) symbol;
+            classSymbol.getSymbolTable().putSymbol(new MethodIdentifier(methodName, params), new MethodSymbol(returnValue, params));
+        }
+    }
 
 }
 /* JavaCC - OriginalChecksum=102b8623e78d8554f34992788a15d8e1 (do not edit this line) */

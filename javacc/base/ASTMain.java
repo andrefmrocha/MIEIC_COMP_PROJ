@@ -2,6 +2,7 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package base;
 
+import base.semantics.ClassSymbol;
 import base.semantics.MethodSymbol;
 import base.semantics.Symbol;
 
@@ -28,11 +29,13 @@ class ASTMain extends SimpleNode {
     SimpleNode child = (SimpleNode) this.jjtGetChild(0);
     if(child.id != ParserTreeConstants.JJTIDENTIFIER)
       throw new SemanticsException("Invalid child to body!");
+    else
+    {
+      ASTIdentifier identifier = (ASTIdentifier) child;
+      this.table.putSymbol(identifier.identifierName, new ClassSymbol(identifier.identifierName));
+    }
 
-    ASTIdentifier identifier = (ASTIdentifier) child;
-    this.table.putSymbol(identifier.identifierName, new Symbol(Symbol.Type.OBJ));
-
-    parametersTypes.add(Symbol.Type.OBJ);
+    parametersTypes.add(Symbol.Type.CLASS);
     this.table.getParent().putSymbol("main",new MethodSymbol(Symbol.Type.MAIN,parametersTypes));
   }
 

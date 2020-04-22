@@ -2,8 +2,15 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package base;
 
+import base.semantics.ClassSymbol;
+import base.semantics.MethodIdentifier;
 import base.semantics.MethodSymbol;
 import base.semantics.Symbol;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public
 class ASTCall extends TypeNode {
@@ -17,27 +24,65 @@ class ASTCall extends TypeNode {
 
     public void evalWithIdentifier(String identifier) throws SemanticsException {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
+        final MethodIdentifier importMethodId = getMethodIdentifier(identifier + "." + methodIdentifier.identifierName);
+
         if (table.checkSymbol(identifier)) {
             final Symbol symbol = table.getSymbol(identifier);
-            if (symbol.getType() != Symbol.Type.OBJ)
+            if (symbol.getType() != Symbol.Type.CLASS)
                 throw new SemanticsException(identifier + " is not an object");
-            //TODO: Check if class has that method and the respective call
-        } else if (table.checkSymbol(identifier + "." + methodIdentifier)) {
-            final MethodSymbol symbol = (MethodSymbol) table.getSymbol(identifier + "." + methodIdentifier);
+            final MethodIdentifier methodId = getMethodIdentifier(methodIdentifier.identifierName);
+            final ClassSymbol classSymbol = (ClassSymbol) symbol;
+
+            if(!classSymbol.getSymbolTable().checkSymbol(methodId))
+                throw new SemanticsException("Method " + methodIdentifier.identifierName + " not found in class " + identifier);
+            this.type = classSymbol.getSymbolTable().getSymbol(methodId).getReturnType();
+        } else if (methodTable.checkSymbol(importMethodId)) {
+            final MethodSymbol symbol = methodTable.getSymbol(importMethodId);
             if (symbol.getParameters().size() != this.jjtGetNumChildren() - 1)
-                throw new SemanticsException("Method expected " +
+                throw new SemanticsException("Method " + methodIdentifier.identifierName + " expected " +
                         symbol.getParameters().size() + " parameters, got " + (this.jjtGetNumChildren() - 1));
-
-            for(int i = 0; i < symbol.getParameters().size(); i++)
-                this.evaluateChild((SimpleNode) this.jjtGetChild(i + 1), symbol.getParameters().get(i));
-
-            this.type = symbol.getType();
+            this.type = symbol.getReturnType();
         } else
-            throw new SemanticsException(identifier + " was not found");
+            throw new SemanticsException(identifier + " was not found in line " + getLine());
+
+    }
+
+    private MethodIdentifier getMethodIdentifier(String identifier) throws SemanticsException {
+        final List<Symbol.Type> params = new ArrayList<>();
+        for(int i = 1; i < this.jjtGetNumChildren(); i++){
+            SimpleNode node = (SimpleNode) this.jjtGetChild(i);
+            if(node.id == ParserTreeConstants.JJTIDENTIFIER){
+                final ASTIdentifier identifierNode = (ASTIdentifier) node;
+                if(!table.checkSymbol(identifierNode.identifierName))
+                    throw new SemanticsException("No variable named " + identifierNode.identifierName + " found");
+                Symbol symbol = table.getSymbol(identifierNode.identifierName);
+                params.add(symbol.getType());
+
+            } else if (node instanceof TypeNode){
+                TypeNode typeNode = (TypeNode) node;
+                typeNode.setTables(table, methodTable);
+                typeNode.eval();
+                params.add(typeNode.type);
+            } else
+                params.add(VarNode.getType(node, table));
+
+        }
+        return new MethodIdentifier(identifier, params);
     }
 
     public void evalWithThis() throws SemanticsException {
-        //TODO: Get from the symbol table the method name
+        final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
+        final MethodIdentifier methodId = getMethodIdentifier(methodIdentifier.identifierName);
+        if(!methodTable.checkSymbol(methodId))
+            throw new SemanticsException("Method " + methodIdentifier.identifierName + " not found in line " + getLine());
+        final Symbol symbol = methodTable.getSymbol(methodId);
+
+        if(symbol.getType() != Symbol.Type.METHOD)
+            throw new SemanticsException(methodIdentifier.identifierName + " is not a method");
+
+        final MethodSymbol methodSymbol =(MethodSymbol) symbol;
+
+        this.type = methodSymbol.getReturnType();
     }
 
 }
