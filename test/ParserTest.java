@@ -45,9 +45,9 @@ public class ParserTest {
 
         if (!success) {
             if (mustFail) {
-                System.out.println("Expected parser to throw exception");
+                System.out.println("Expected Parser to throw exception");
             } else {
-                System.out.println("Expected parser to complete successfully");
+                System.out.println("Expected Parser to complete successfully");
             }
             fail();
         }

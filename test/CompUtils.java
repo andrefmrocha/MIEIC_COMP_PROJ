@@ -242,7 +242,7 @@ public class CompUtils {
 
 
 
-    public static void testParser(String jmmResource, boolean mustFail, String classWithMain) {
+    public static void testJavamm(String jmmResource, boolean mustFail, String classWithMain) {
         // Copy contents of resource to a temporary file
         File tempFolder = CompUtils.getTempFolder("comp_jmm_test");
         File testFile = CompUtils.resourceCopy(jmmResource, tempFolder);
@@ -278,9 +278,9 @@ public class CompUtils {
 
         if (!success) {
             if (mustFail) {
-                System.out.println("Expected parser to throw exception");
+                System.out.println("Expected Javamm to throw exception");
             } else {
-                System.out.println("Expected parser to complete successfully");
+                System.out.println("Expected Javamm to complete successfully");
             }
             fail();
         }
