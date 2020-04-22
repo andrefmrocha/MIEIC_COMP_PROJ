@@ -1,10 +1,10 @@
 import java.io.FileNotFoundException;
-import base.semantics.SymbolTable;
-import base.semantics.MethodSymbolTable;
-import base.Parser;
-import base.SimpleNode;
-import base.SemanticsException;
-import base.ParseException;
+import javamm.semantics.SymbolTable;
+import javamm.semantics.MethodSymbolTable;
+import javamm.parser.Parser;
+import javamm.parser.SimpleNode;
+import javamm.SemanticsException;
+import javamm.parser.ParseException;
 
 public class Main {
 	

@@ -1,0 +1,435 @@
+options {
+    LOOKAHEAD =  1;
+    MULTI = true;
+    NODE_SCOPE_HOOK=true;
+}
+
+PARSER_BEGIN(Parser)
+package javamm.parser;
+
+public class Parser {
+    public static final int NUM_ERRORS = 10;
+    int nErrors = 1;
+
+    public static void main(String[] args) throws ParseException {
+            Parser parser = new Parser(System.in);
+            parser.Program();
+    }
+
+    public int getNumErrors(){
+        return this.nErrors;
+    }
+
+    void jjtreeOpenNodeScope(Node n) {
+        ((SimpleNode)n).setLine(getToken(1).beginLine);
+    }
+
+    void jjtreeCloseNodeScope(Node n) {
+    }
+}
+PARSER_END(Parser)
+
+SKIP :
+{
+    " " | "\t" | "\r" | "\n"
+}
+
+SKIP :
+{
+  < "//" (~["\r", "\n"])* >
+| "/*" : ML_COMMENT_STATE
+}
+
+<ML_COMMENT_STATE> SKIP :
+{
+  "*/" : DEFAULT
+| < ~[] >
+}
+
+TOKEN:
+{
+    < INTEGER: (["0"-"9"])+ >
+    | <IMPORT: "import">
+    | <CLASS: "class">
+    | <EXTENDS: "extends">
+    | <PUBLIC: "public">
+    | <STATIC: "static">
+    | <VOID: "void">
+    | <MAIN: "main">
+    | <STRING: "String">
+    | <RETURN: "return">
+    | <IF: "if">
+    | <ELSE: "else">
+    | <WHILE: "while">
+    | <TRUE: "true">
+    | <FALSE: "false">
+    | <THIS: "this">
+    | <NEW: "new">
+    | <LENGTH: "length">
+    | <INT: "int">
+    | <BOOLEAN: "boolean">
+    | <IDENTIFIER: ["A"-"Z", "a"-"z", "_", "$"](["0"-"9", "A"-"Z", "a" - "z", "_"])* >
+    | <LFTSQRBRCKT : "[">
+    | <RGHTSQRBRCKT : "]">
+    | <RGHTBRCKT : ")">
+    | <LFTBRCKT : "(">
+    | <LFTCRLBRCKT : "{">
+    | <RGHTCRLBRCKT : "}">
+    | <SEMICOLON : ";">
+    | <DOT : ".">
+    | <COMMA : ",">
+    | <EXCLAMATION: "!">
+    | <EQUALS : "=">
+}
+
+SimpleNode Program() : { this.nErrors =  Parser.NUM_ERRORS;}
+{
+    ImportDeclaration() ClassDeclaration() <EOF> { return jjtThis; }
+}
+
+
+void ImportDeclaration() #void : {}
+{
+    (<IMPORT> ImportStatement() <SEMICOLON> )*
+}
+
+void ImportStatement() #void : {}
+{
+    (  [ <STATIC> #Static {jjtThis.isStatic=true;}] Identifier()  [<DOT> Identifier()] [((<LFTBRCKT> ImportParamList() <RGHTBRCKT>) | "()") [Type() #Return ]] ) #Import
+}
+
+void ImportParamList() #void : {}
+{
+    [Type() (<COMMA> Type())*] #ImportParams
+}
+
+void Identifier() #void : {Token t;}
+{
+    t = <IDENTIFIER> {jjtThis.identifierName = t.image;} #Identifier
+
+}
+
+void ClassDeclaration() #void : {}
+{
+    (<CLASS> Identifier()   [<EXTENDS> Identifier() #Extend ]  <LFTCRLBRCKT> (VarDeclaration())* (MethodDeclaration())* <RGHTCRLBRCKT>) #Class
+}
+
+void DeclarationFragment() #void : {}
+{
+   Identifier() <SEMICOLON> #Var(2)
+}
+
+
+void VarDeclaration() #void : {}
+{
+   Type() DeclarationFragment()
+}
+
+void NonTypeVarDeclaration() #void : {}
+{
+   NonIdentifierType() DeclarationFragment()
+}
+
+void MethodBody() #void : {} {
+
+    NonTypeVarDeclaration() MethodBody()
+    |
+    Identifier() ( DeclarationFragment() MethodBody() | IdentifierStatementFragment() ( Statement() )* )
+    |
+    NonIdentifierStatement() (Statement())*
+    |
+    {}
+}
+
+void MethodDeclaration() #void : {}
+{
+    (<PUBLIC>
+    (MethodName() (<LFTBRCKT> [Parameters()] <RGHTBRCKT> | "()" )  <LFTCRLBRCKT> (MethodBody() (<RETURN> Expression()) #MethodReturn <SEMICOLON>)#MethodBody <RGHTCRLBRCKT>
+    | ((<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") Identifier()  <RGHTBRCKT> ) #Main <LFTCRLBRCKT> MethodBody() #MethodBody <RGHTCRLBRCKT>  ))
+    )#Method //TODO: check if newly added production is correct
+
+}
+
+void MethodName() #void : {}
+{
+    (Type() Identifier()) #MethodName
+}
+
+void Parameters() #void : {}
+{
+    (Parameter() (<COMMA> Parameter())*) #Parameters
+}
+
+void Parameter() #void : {}
+{
+    Type() Identifier()
+}
+
+
+void NonIdentifierStatement() #void : {}
+
+{
+    <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
+    | (<IF>  <LFTBRCKT> Expression()  <RGHTBRCKT> Statement() <ELSE> Statement() ) #If
+    | (WhileStatement()) #While
+    | NonIdentifierExpression() <SEMICOLON>
+}
+
+void Statement() #void : {}
+{
+     NonIdentifierStatement()
+    |
+     IdentifierStatement()
+}
+
+void IdentifierStatement() #void : {Token t;}
+{
+    Identifier() IdentifierStatementFragment()
+}
+
+void IdentifierStatementFragment() #void : {} {
+    (
+        (<EQUALS> Expression()) #AssignVar(2)
+        | <LFTSQRBRCKT> Expression() #ArrayAccess(2) <RGHTSQRBRCKT>
+            (<EQUALS> Expression() #AssignVarArray(2) | ComplementaryExpression() )
+        | FragmentExpression()
+    ) <SEMICOLON>
+}
+
+
+void WhileStatement() #void : {}
+{
+    <WHILE>
+    (<LFTBRCKT> | recoverFromError(new int[]{INTEGER,
+                                      TRUE,
+                                      FALSE,
+                                      THIS,
+                                      NEW,
+                                      EXCLAMATION,
+                                      LFTBRCKT,
+                                      IDENTIFIER
+                                      }, "Got '" + getToken(1) + "', expected '('", false))// all possible tokens to start an expression
+
+    try {
+        Expression()
+    }
+    catch (ParseException e) {
+        recoverFromError(new int[]{RGHTBRCKT}, "Invalid Expression '" + e.currentToken + "'", false); // invalid expression
+    }
+
+    (<RGHTBRCKT> | recoverFromError(new int[]{LFTCRLBRCKT,
+                                      IF,
+                                      WHILE,
+                                      INTEGER,
+                                      TRUE,
+                                      FALSE,
+                                      THIS,
+                                      NEW,
+                                      EXCLAMATION,
+                                      LFTBRCKT,
+                                      IDENTIFIER
+                                      }, "Got '" + getToken(1) + "', expected ')'", false)) // all possible tokens to start a statement
+
+    try {
+        Statement()
+    }
+    catch (ParseException e) {
+        recoverFromError(new int[]{RGHTCRLBRCKT}, "Invalid Statement '" + e.currentToken + "'", true); // invalid statement
+    }
+}
+
+JAVACODE
+void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #RecoverFromError {
+
+    if(nErrors <= 0) throw new ParseException();
+    nErrors--;
+
+    ParseException e = generateParseException();  // generate the exception object.
+    System.out.println("Error in line " + e.currentToken.beginLine + ", column " + e.currentToken.beginColumn + ":");
+    System.out.println("> " + errorMsg);
+
+    Token t = getToken(1);
+    String skipped = "";
+    boolean found = false;
+    while(!found) {
+        for (int i = 0; i < skipTo.length; i++) {
+            if (skipTo[i] == getToken(1).kind) {
+                found = true;
+                break;
+            }
+        }
+        if(!found) {
+            skipped += getToken(1).toString();
+            t = getNextToken();
+       }
+    }
+
+    if (advanceWhenFound) {
+        skipped += getToken(1).toString();
+        getNextToken();
+    }
+
+    System.out.println("> Skipped '" + skipped + "'\n");
+}
+
+void MethodCall() #Call : {} {
+    Identifier() (<LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> | "()")
+}
+
+void Type() #void : {}
+{
+    NonIdentifierType() | Identifier()
+}
+
+void NonIdentifierType() #void : {}
+{
+       (<INT>("[]" #IntArray|{}#Int))  | <BOOLEAN> #Boolean | <VOID> #Void
+}
+
+void Expression() #void:{} {
+    Level1Operators() AndFragment()
+}
+
+void NonIdentifierExpression() #void:{} {
+    NonIdLevel1Operators() AndFragment()
+}
+
+void FragmentExpression() #void:{} {
+    FragmentLevel1Operators() AndFragment()
+}
+
+void ComplementaryExpression() #void:{} {
+    ComplementaryLevel1Operators() AndFragment()
+}
+
+void AndFragment() #void : {} {
+    ("&&"  Level1Operators()) #And(2) AndFragment()  | {}
+}
+
+void Level1Operators() #void : {} {
+    Level2Operators() LessThanFragment()
+}
+
+void NonIdLevel1Operators() #void : {} {
+    NonIdLevel2Operators() LessThanFragment()
+}
+
+void FragmentLevel1Operators() #void : {} {
+    FragmentLevel2Operators() LessThanFragment()
+}
+
+void ComplementaryLevel1Operators() #void : {} {
+    ComplementaryLevel2Operators() LessThanFragment()
+}
+
+void LessThanFragment() #void : {} {
+    ("<"  Level2Operators()) #LessThan(2) LessThanFragment()  | {}
+}
+
+void Level2Operators() #void : {} {
+    Level3Operators() PlusMinusFragments()
+}
+
+void NonIdLevel2Operators() #void : {} {
+    NonIdLevel3Operators() PlusMinusFragments()
+}
+
+void FragmentLevel2Operators() #void : {} {
+    FragmentLevel3Operators() PlusMinusFragments()
+}
+
+void ComplementaryLevel2Operators() #void : {} {
+    ComplementaryExpressionLevel3Operators() PlusMinusFragments()
+}
+
+void PlusMinusFragments() #void : {} {
+    ("-"  Level3Operators()) #Sub(2) PlusMinusFragments() | ("+" Level3Operators()) #Sum(2) PlusMinusFragments() | {}
+}
+
+void Level3Operators() #void : {} {
+    Level4Operators() MulDivFragment()
+}
+
+void NonIdLevel3Operators() #void : {} {
+    NonIdLevel4Operators() MulDivFragment()
+}
+
+void FragmentLevel3Operators() #void : {} {
+    FragmentLevel4Operators() MulDivFragment()
+}
+
+void ComplementaryExpressionLevel3Operators() #void : {} {
+    ComplementaryExpressionExp4() MulDivFragment()
+}
+
+void MulDivFragment() #void : {} {
+    ("*" Level4Operators() )#Mul(2) MulDivFragment() | ("/" Level4Operators()) #Div(2) MulDivFragment() | {}
+}
+
+void Level4Operators() #void : {} {
+    Level5Operators() OneAryFragments() | (<EXCLAMATION> Level4Operators() )#Negation
+}
+
+void NonIdLevel4Operators() #void : {} {
+    NonIdLevel5Operators() OneAryFragments() | (<EXCLAMATION> Level4Operators()) #Negation
+}
+
+void FragmentLevel4Operators() #void : {} {
+    FragmentExpLevel4() | (<EXCLAMATION> ComplementaryExpressionExp4() ) #Negation
+}
+
+void ComplementaryExpressionExp4() #void : {} {
+    OneAryFragments() | (<EXCLAMATION> ComplementaryExpressionExp4() ) #Negation
+}
+
+void OneAryFragments() #void : {} {
+    AllExpressions() OneAryFragments() | {}
+}
+
+void FragmentExpLevel4() #void : {} {
+    ComplementExpressions() OneAryFragments() | {}
+}
+
+void Level5Operators() #void : {} {
+    AllTerminals()
+}
+
+void NonIdLevel5Operators() #void : {} {
+    Terminals()
+}
+
+void AllTerminals() #void :{} {
+    Identifier() | Terminals()
+}
+
+
+void AllExpressions() #void : {} {
+    ArrayExpression() | ComplementExpressions()
+}
+
+void ArrayExpression() #void : {} {
+   <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT> #ArrayAccess(2)
+}
+
+void ComplementExpressions() #void : {} {
+
+    <DOT>
+            (
+            <LENGTH> #Length(1)
+            |
+             MethodCall() #MethodCall(2)
+    )
+}
+
+void Terminals() # void : { Token t; } {
+    t=<INTEGER>{ jjtThis.number = Integer.parseInt(t.image); } #Numeric
+    | <TRUE> { jjtThis.bool = true; } #BooleanValue
+    | <FALSE> { jjtThis.bool = false; } #BooleanValue
+    | <THIS> #This
+    | <NEW> (
+              (Identifier() ("()" | <LFTBRCKT> <RGHTBRCKT> )) #New
+             |
+              (<INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>) #NewArray
+             )
+    | <LFTBRCKT> Expression() <RGHTBRCKT>
+}
