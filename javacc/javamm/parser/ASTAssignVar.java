@@ -35,7 +35,6 @@ class ASTAssignVar extends TypeNode {
       throw new SemanticsException("Variable " + name + " does not exist in line" + getLine());
 
     Symbol symbol = this.table.getSymbol(name);
-    System.out.println(name + " " + symbol.getType());
 
     SimpleNode expression = (SimpleNode) this.jjtGetChild(1);
     this.evaluateChild(expression, symbol);

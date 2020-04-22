@@ -21,13 +21,14 @@ class ASTCall extends TypeNode {
         super(p, id);
     }
 
-    public void evalWithIdentifier(String identifier) throws SemanticsException {
+    public void evalWithIdentifier(String identifier, boolean newIdentifier ) throws SemanticsException {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
         final MethodIdentifier importMethodId = getMethodIdentifier(identifier + "." + methodIdentifier.identifierName);
 
         if (table.checkSymbol(identifier)) {
             final Symbol symbol = table.getSymbol(identifier);
-            if (symbol.getType() != Symbol.Type.CLASSVAR)
+
+            if( (newIdentifier && symbol.getType() != Symbol.Type.CLASS) || ( !newIdentifier && symbol.getType() != Symbol.Type.CLASSVAR))
                 throw new SemanticsException(identifier + " is not an object");
             final MethodIdentifier methodId = getMethodIdentifier(methodIdentifier.identifierName);
             final ClassSymbol classSymbol = (ClassSymbol) symbol;
