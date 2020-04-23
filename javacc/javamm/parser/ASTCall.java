@@ -28,7 +28,7 @@ class ASTCall extends TypeNode {
         if (table.checkSymbol(identifier)) {
             final Symbol symbol = table.getSymbol(identifier);
 
-            if( (newIdentifier && symbol.getType() != Symbol.Type.CLASS) || ( !newIdentifier && symbol.getType() != Symbol.Type.CLASSVAR))
+            if(( !newIdentifier && symbol.getType() != Symbol.Type.OBJ))
                 throw new SemanticsException(identifier + " is not an object");
             final MethodIdentifier methodId = getMethodIdentifier(methodIdentifier.identifierName);
             final ClassSymbol classSymbol = (ClassSymbol) symbol;
