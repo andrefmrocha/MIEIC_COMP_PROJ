@@ -8,21 +8,24 @@ public abstract class ConditionalNode extends TypeNode {
         super(i);
     }
 
-    public ConditionalNode(Parser p, int i) {
+    public ConditionalNode(Javamm p, int i) {
         super(p, i);
     }
 
     @Override
-    public void eval() throws SemanticsException {
-        if(this.jjtGetNumChildren() < 1) throw new SemanticsException("Conditional statement must have at least the condition expression");
+    public void eval(Javamm parser) {
+        if (this.jjtGetNumChildren() < 1){
+            parser.semanticErrors.add(new SemanticsException("Conditional statement must have at least the condition expression", this));
+            return;
+        }
 
         SimpleNode condition = (SimpleNode) this.jjtGetChild(0);
-        this.evaluateChild(condition, new Symbol(Symbol.Type.BOOL));
+        this.evaluateChild(condition, new Symbol(Symbol.Type.BOOL), parser);
 
-        for(int i = 1; i < this.jjtGetNumChildren(); i++) {
+        for (int i = 1; i < this.jjtGetNumChildren(); i++) {
             SimpleNode child = (SimpleNode) this.jjtGetChild(i);
             child.setTables(table, methodTable);
-            child.eval();
+            child.eval(parser);
         }
     }
 }

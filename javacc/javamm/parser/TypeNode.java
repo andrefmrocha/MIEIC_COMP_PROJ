@@ -6,6 +6,7 @@ import javamm.semantics.MethodSymbol;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
+
 public abstract class TypeNode extends SimpleNode {
     protected Type type = Type.VOID;
 
@@ -13,30 +14,35 @@ public abstract class TypeNode extends SimpleNode {
         super(i);
     }
 
-    public TypeNode(Parser p, int i) {
+    public TypeNode(Javamm p, int i) {
         super(p, i);
     }
 
-    public void evaluateChild(SimpleNode child, Symbol symbol) throws SemanticsException {
+    public void evaluateChild(SimpleNode child, Symbol symbol, Javamm parser) {
         Type expectedType = symbol.getType();
-        if (child.id == ParserTreeConstants.JJTIDENTIFIER) {  //Check if the node is a variable
+        if (child.id == JavammTreeConstants.JJTIDENTIFIER) {  //Check if the node is a variable
             ASTIdentifier temp = (ASTIdentifier) child;
             String name = temp.identifierName;
-            if (!table.checkSymbol(name)) //And check if the identifier already has a symbol declared
-                throw new SemanticsException("Did not find variable named  " + name);
+            if (!table.checkSymbol(name)) { //And check if the identifier already has a symbol declared
+                parser.semanticErrors.add(new SemanticsException("Did not find variable named  " + name, child));
+                return;
+            }
 
             Symbol sym = table.getSymbol(name);
-            if (!this.checkType(expectedType, sym))
-                throw new SemanticsException("Variable '" + name + "' is not of type: " + expectedType.toString() + " in line" + getLine());
+            if (!this.checkType(expectedType, sym)) {
+                parser.semanticErrors.add(new SemanticsException("Variable '" + name + "' is not of type: " + expectedType.toString(), child));
+                return;
+            }
 
-            if (!sym.isInitialized())
-                throw new SemanticsException("Variable " + name + " is not initialized");
+            if (!sym.isInitialized()) {
+                parser.semanticErrors.add(new SemanticsException("Variable " + name + " is not initialized", child));
+            }
         } else if (child instanceof TypeNode) {
             child.setTables(table, methodTable);
-            child.eval();
+            child.eval(parser);
             Type childType = ((TypeNode) child).type;
             if( !(childType == Type.CLASS && expectedType == Type.OBJ) && expectedType != childType)
-                throw new SemanticsException("Expression is not of type: " + expectedType.toString() + " in line " + getLine() + " got " + childType.toString());
+                parser.semanticErrors.add(new SemanticsException("Expression is not of type: " + expectedType.toString() + " got " + childType.toString(), child));
             else if (expectedType == Type.OBJ ) {
                 // compare classes and check if extends
                 ClassSymbol expectedClass = (ClassSymbol) symbol;
@@ -45,14 +51,18 @@ public abstract class TypeNode extends SimpleNode {
                     childClassSymbol = ((ASTClass) child).classSymbol;
                 else if (child instanceof ASTNew)
                     childClassSymbol = ((ASTNew) child).classSymbol;
-                else
-                    throw new SemanticsException("Unknown node with type CLASS");
+                else {
+                    parser.semanticErrors.add(new SemanticsException("Unknown node with type CLASS", child));
+                    return;
+                }
 
-                if (!childClassSymbol.derivesFrom(expectedClass))
-                    throw new SemanticsException("Class " + childClassSymbol.getClassName() + " does not derive from " + expectedClass.getClassName());
+                if (!childClassSymbol.derivesFrom(expectedClass)) {
+                    parser.semanticErrors.add(new SemanticsException("Class " + childClassSymbol.getClassName() + " does not derive from " + expectedClass.getClassName(), child));
+                    return;
+                }
             }
         } else
-            throw new SemanticsException("Invalid expression");
+            parser.semanticErrors.add(new SemanticsException("Invalid expression", child));
     }
 
     boolean checkType(Type type, Symbol symbol) {
