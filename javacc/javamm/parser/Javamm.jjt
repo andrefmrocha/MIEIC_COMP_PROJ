@@ -4,15 +4,19 @@ options {
     NODE_SCOPE_HOOK=true;
 }
 
-PARSER_BEGIN(Parser)
+PARSER_BEGIN(Javamm)
 package javamm.parser;
+import javamm.SemanticsException;
+import java.util.List;
+import java.util.ArrayList;
 
-public class Parser {
+public class Javamm {
+    public final List<SemanticsException> semanticErrors = new ArrayList();
     public static final int NUM_ERRORS = 10;
     int nErrors = 1;
 
     public static void main(String[] args) throws ParseException {
-            Parser parser = new Parser(System.in);
+            Javamm parser = new Javamm(System.in);
             parser.Program();
     }
 
@@ -27,7 +31,8 @@ public class Parser {
     void jjtreeCloseNodeScope(Node n) {
     }
 }
-PARSER_END(Parser)
+
+PARSER_END(Javamm)
 
 SKIP :
 {
@@ -82,7 +87,7 @@ TOKEN:
     | <EQUALS : "=">
 }
 
-SimpleNode Program() : { this.nErrors =  Parser.NUM_ERRORS;}
+SimpleNode Program() : { this.nErrors =  Javamm.NUM_ERRORS;}
 {
     ImportDeclaration() ClassDeclaration() <EOF> { return jjtThis; }
 }

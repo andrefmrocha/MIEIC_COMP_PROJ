@@ -36,7 +36,7 @@ class CustomTest extends Test{
         }
 
         new int[5];
-        new Parser();
+        new Javamm();
 
         ioPlus.length;
 

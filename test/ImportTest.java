@@ -12,7 +12,7 @@ public class ImportTest {
 
 //    @Test
 //    public void testImports() {
-//        CompUtils.testParser("fixtures/public/ImportStressTest.jmm", false, CLASS_WITH_MAIN);
+//        CompUtils.testJavamm("fixtures/public/ImportStressTest.jmm", false, CLASS_WITH_MAIN);
 //    }
 
 

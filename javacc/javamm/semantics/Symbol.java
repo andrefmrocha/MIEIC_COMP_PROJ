@@ -1,12 +1,12 @@
 package javamm.semantics;
 
 
-import javamm.parser.ParserTreeConstants;
+import javamm.parser.JavammTreeConstants;
 import javamm.parser.SimpleNode;
 
 public class Symbol {
     public enum Type{
-        INT, BOOL, INT_ARRAY, VOID, MAIN, METHOD, CLASS
+        INT, BOOL, INT_ARRAY, VOID, MAIN, METHOD, CLASS, OBJ
     }
 
     final protected Type type;
@@ -33,15 +33,15 @@ public class Symbol {
 
     public static Type getNodeSymbolType(SimpleNode node) {
         switch (node.getId()){
-            case ParserTreeConstants.JJTVOID:
+            case JavammTreeConstants.JJTVOID:
                 return Type.VOID;
-            case ParserTreeConstants.JJTINT:
+            case JavammTreeConstants.JJTINT:
                 return Type.INT;
-            case ParserTreeConstants.JJTBOOLEAN:
+            case JavammTreeConstants.JJTBOOLEAN:
                 return Type.BOOL;
-            case ParserTreeConstants.JJTINTARRAY:
+            case JavammTreeConstants.JJTINTARRAY:
                 return Type.INT_ARRAY;
-            case ParserTreeConstants.JJTIDENTIFIER:
+            case JavammTreeConstants.JJTIDENTIFIER:
                 return Type.CLASS;
         }
         return null;

@@ -15,20 +15,23 @@ public abstract class BinaryOperatorNode extends TypeNode {
         this.operandType = op;
     }
 
-    public BinaryOperatorNode(Parser p, int i, Type type, Type op) {
+    public BinaryOperatorNode(Javamm p, int i, Type type, Type op) {
         super(p, i);
         this.type = type;
         this.operandType = op;
     }
 
     @Override
-    public void eval() throws SemanticsException {
-        if (this.jjtGetNumChildren() != 2) throw new SemanticsException("Operator requires two operands");
+    public void eval(Javamm parser) {
+        if (this.jjtGetNumChildren() != 2){
+            parser.semanticErrors.add(new SemanticsException("Operator requires two operands", this));
+            return;
+        }
 
         SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
         SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
 
-        this.evaluateChild(leftOperand, new Symbol(operandType));
-        this.evaluateChild(rightOperand, new Symbol(operandType));
+        this.evaluateChild(leftOperand, new Symbol(operandType), parser);
+        this.evaluateChild(rightOperand, new Symbol(operandType), parser);
     }
 }
