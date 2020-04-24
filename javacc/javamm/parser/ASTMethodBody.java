@@ -17,17 +17,16 @@ class ASTMethodBody extends SimpleNode {
         super(p, id);
     }
 
-    @Override
-    public void eval(Javamm parser) {
+    public void eval(Javamm parser, int stackPointer) {
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {
             SimpleNode methodNode = (SimpleNode) this.jjtGetChild(i);
+            if (methodNode.id == JavammTreeConstants.JJTVAR){
+                ASTVar var = (ASTVar) methodNode;
+                var.stackPos = stackPointer++;
+            }
             methodNode.setTables(table, methodTable);
             methodNode.eval(parser);
             if (methodNode.id == JavammTreeConstants.JJTMETHODRETURN) {
-                ASTMethodReturn methodReturn = (ASTMethodReturn) methodNode;
-                methodReturn.setTables(table, methodTable);
-                methodReturn.eval(parser);
-
                 break;
             }
         }

@@ -119,27 +119,27 @@ void ClassDeclaration() #void : {}
     (<CLASS> Identifier()   [<EXTENDS> Identifier() #Extend ]  <LFTCRLBRCKT> (VarDeclaration())* (MethodDeclaration())* <RGHTCRLBRCKT>) #Class
 }
 
-void DeclarationFragment() #void : {}
+void DeclarationFragment(boolean isClassVar) #void : {}
 {
-   Identifier() <SEMICOLON> #Var(2)
+   Identifier() <SEMICOLON> {jjtThis.classVar = isClassVar;} #Var(2)
 }
 
 
 void VarDeclaration() #void : {}
 {
-   Type() DeclarationFragment()
+   Type() DeclarationFragment(true)
 }
 
 void NonTypeVarDeclaration() #void : {}
 {
-   NonIdentifierType() DeclarationFragment()
+   NonIdentifierType() DeclarationFragment(false)
 }
 
 void MethodBody() #void : {} {
 
     NonTypeVarDeclaration() MethodBody()
     |
-    Identifier() ( DeclarationFragment() MethodBody() | IdentifierStatementFragment() ( Statement() )* )
+    Identifier() ( DeclarationFragment(false) MethodBody() | IdentifierStatementFragment() ( Statement() )* )
     |
     NonIdentifierStatement() (Statement())*
     |
@@ -151,7 +151,7 @@ void MethodDeclaration() #void : {}
     (<PUBLIC>
     (MethodName() (<LFTBRCKT> [Parameters()] <RGHTBRCKT> | "()" )  <LFTCRLBRCKT> (MethodBody() (<RETURN> Expression()) #MethodReturn <SEMICOLON>)#MethodBody <RGHTCRLBRCKT>
     | ((<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") Identifier()  <RGHTBRCKT> ) #Main <LFTCRLBRCKT> MethodBody() #MethodBody <RGHTCRLBRCKT>  ))
-    )#Method //TODO: check if newly added production is correct
+    )#Method
 
 }
 
