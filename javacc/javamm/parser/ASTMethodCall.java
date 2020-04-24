@@ -29,7 +29,7 @@ public class ASTMethodCall extends TypeNode {
         switch (methodName.id) {
             case JavammTreeConstants.JJTIDENTIFIER:
                 final String methodIdentifier = ((ASTIdentifier) methodName).identifierName;
-                call.evalWithIdentifier(methodIdentifier);
+                call.evalWithIdentifier(methodIdentifier, false, parser);
                 break;
             case JavammTreeConstants.JJTTHIS:
                 call.evalWithThis();
@@ -38,7 +38,7 @@ public class ASTMethodCall extends TypeNode {
                 ASTNew astNew = (ASTNew) methodName;
                 astNew.setTables(table, methodTable);
                 astNew.eval(parser);
-                call.evalWithIdentifier(astNew.identifier);
+                call.evalWithIdentifier(astNew.identifier, true, parser);
                 break;
             default:
                 parser.semanticErrors.add(new SemanticsException("Found type " + methodName.id + ", not supported", call));

@@ -41,10 +41,9 @@ public abstract class TypeNode extends SimpleNode {
             child.setTables(table, methodTable);
             child.eval(parser);
             Type childType = ((TypeNode) child).type;
-            if (expectedType != childType) {
+            if( !(childType == Type.CLASS && expectedType == Type.OBJ) && expectedType != childType)
                 parser.semanticErrors.add(new SemanticsException("Expression is not of type: " + expectedType.toString() + " got " + childType.toString(), child));
-                return;
-            } else if (expectedType == Type.CLASS) {
+            else if (expectedType == Type.OBJ ) {
                 // compare classes and check if extends
                 ClassSymbol expectedClass = (ClassSymbol) symbol;
                 ClassSymbol childClassSymbol = null;

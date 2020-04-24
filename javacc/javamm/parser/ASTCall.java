@@ -21,7 +21,7 @@ class ASTCall extends TypeNode {
         super(p, id);
     }
 
-    public void evalWithIdentifier(String identifier) {
+    public void evalWithIdentifier(String identifier, boolean newIdentifier, Javamm parser ) {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
         final MethodIdentifier importMethodId = getMethodIdentifier(identifier + "." + methodIdentifier.identifierName);
         if(importMethodId == null)
@@ -29,7 +29,8 @@ class ASTCall extends TypeNode {
 
         if (table.checkSymbol(identifier)) {
             final Symbol symbol = table.getSymbol(identifier);
-            if (symbol.getType() != Symbol.Type.CLASS) {
+
+            if(( !newIdentifier && symbol.getType() != Symbol.Type.OBJ)){
                 parser.semanticErrors.add(new SemanticsException(identifier + " is not an object", methodIdentifier));
                 return;
             }
