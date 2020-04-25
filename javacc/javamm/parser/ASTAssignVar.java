@@ -56,19 +56,24 @@ class ASTAssignVar extends TypeNode {
         Symbol leftSymbol = this.table.getSymbol(((ASTIdentifier) this.jjtGetChild(0)).identifierName);
         SimpleNode right = (SimpleNode) this.jjtGetChild(1);
 
-        switch(right.id) {
-            case JJTNEW:
-                // TODO do stuff
-                break;
-            default:
-                // result will be on stack
-                right.write(writer);
+        // result will be on stack
+        right.write(writer);
 
-                String loadInstr = Symbol.getJVMPrefix(leftSymbol.getType()) + "store";
-                int varNum = leftSymbol.getStackPos();
-                String separator = varNum > 3 ? " " : "_";
-                writer.println(loadInstr + separator + Integer.toString(varNum));
-        }
+        String loadInstr = Symbol.getJVMPrefix(leftSymbol.getType()) + "store";
+        int varNum = leftSymbol.getStackPos();
+        String separator = varNum > 3 ? " " : "_";
+        writer.println(loadInstr + separator + Integer.toString(varNum));
     }
+
+    /*
+        TODO
+        boolean
+        new
+        length
+        this
+        identifier
+        numeric array
+
+     */
 }
 /* JavaCC - OriginalChecksum=661756e145ed220ec46575b3a8adecd3 (do not edit this line) */
