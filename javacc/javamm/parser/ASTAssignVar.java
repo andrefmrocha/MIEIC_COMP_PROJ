@@ -59,20 +59,19 @@ class ASTAssignVar extends TypeNode {
         // result will be on stack
         right.write(writer);
 
-        String loadInstr = Symbol.getJVMPrefix(leftSymbol.getType()) + "store";
+        String storeInstr = Symbol.getJVMPrefix(leftSymbol.getType()) + "store";
         int varNum = leftSymbol.getStackPos();
         String separator = varNum > 3 ? " " : "_";
-        writer.println(loadInstr + separator + Integer.toString(varNum));
+        writer.println(storeInstr + separator + Integer.toString(varNum));
     }
 
     /*
         TODO
-        boolean
         new
         length
         this
-        identifier
-        numeric array
+
+        optimize bipush 3 -> iconst_3
 
      */
 }
