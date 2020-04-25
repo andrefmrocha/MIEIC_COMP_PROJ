@@ -64,15 +64,5 @@ class ASTAssignVar extends TypeNode {
         String separator = varNum > 3 ? " " : "_";
         writer.println(storeInstr + separator + Integer.toString(varNum));
     }
-
-    /*
-        TODO
-        new
-        length
-        this
-
-        optimize bipush 3 -> iconst_3
-
-     */
 }
 /* JavaCC - OriginalChecksum=661756e145ed220ec46575b3a8adecd3 (do not edit this line) */

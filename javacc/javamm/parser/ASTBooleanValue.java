@@ -24,7 +24,7 @@ class ASTBooleanValue extends TypeNode {
 
   @Override
   public void write(PrintWriter writer) {
-    writer.println("bipush " + (bool ? 1 : 0));
+    writer.println("iconst_" + (bool ? 1 : 0));
   }
 }
 /* JavaCC - OriginalChecksum=3a15dd3418ff85dee49e992d4b407151 (do not edit this line) */

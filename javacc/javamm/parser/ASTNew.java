@@ -36,5 +36,12 @@ class ASTNew extends TypeNode {
         classSymbol = (ClassSymbol) table.getSymbol(identifier.identifierName);
         this.identifier = identifier.identifierName;
     }
+
+    @Override
+    public void write(PrintWriter writer) {
+        writer.println("new " + identifier); // create new reference
+        writer.println("dup"); //duplicate object on top of stack, need 2 references (1 constructor + 1 assign)
+        writer.println("invokespecial " + identifier + "/<init>()V"); // call constructor
+    }
 }
 /* JavaCC - OriginalChecksum=c6d588009442d8c81f835326710afcd3 (do not edit this line) */

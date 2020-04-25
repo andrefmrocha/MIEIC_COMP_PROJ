@@ -31,5 +31,21 @@ class ASTAssignVarArray extends TypeNode {
         this.evaluateChild(array_access, new Symbol(Type.INT), parser);
         this.evaluateChild(assign_arr, new Symbol(Type.INT), parser);
     }
+
+    @Override
+    public void write(PrintWriter writer) {
+        Symbol arrayID = this.table.getSymbol(arrayIdentifier);
+        SimpleNode arrayOffset = (SimpleNode) this.jjtGetChild(0);
+        SimpleNode value = (SimpleNode) this.jjtGetChild(1);
+
+        String loadInstr = Symbol.getJVMPrefix(arrayID.getType()) + "load";
+        int varNum = arrayID.getStackPos();
+        String separator = varNum > 3 ? " " : "_";
+
+        writer.println(loadInstr + separator + Integer.toString(varNum)); // push array identifier
+        arrayOffset.write(writer); // push offset to access
+        value.write(writer); // push value to assign
+        writer.println("iastore"); // store value
+    }
 }
 /* JavaCC - OriginalChecksum=0fabe93ca61357985801f024c411ccd1 (do not edit this line) */
