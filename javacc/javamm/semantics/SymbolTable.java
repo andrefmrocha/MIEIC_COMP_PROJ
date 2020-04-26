@@ -5,6 +5,7 @@ import java.util.HashMap;
 public class SymbolTable {
     final private HashMap<String, Symbol> table = new HashMap<>();
     private SymbolTable parent = null;
+    private String className = null;
 
     public SymbolTable(){}
 
@@ -40,5 +41,16 @@ public class SymbolTable {
 
     public void putSymbol(String name, Symbol symbol) {
         table.put(name, symbol);
+    }
+
+    public String getClassName() {
+        if(this.className != null)
+          return this.className;
+        else
+          return this.parent != null ? this.parent.getClassName() : null;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 }

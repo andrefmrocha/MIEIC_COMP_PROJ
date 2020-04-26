@@ -41,15 +41,10 @@ class ASTAssignVarArray extends TypeNode {
     @Override
     public void write(PrintWriter writer) {
         Symbol arrayID = this.table.getSymbol(arrayIdentifier);
-        SimpleNode arrayOffset = (SimpleNode) this.jjtGetChild(0);
+        ASTArrayAccess arrayOffset = (ASTArrayAccess) this.jjtGetChild(0);
         SimpleNode value = (SimpleNode) this.jjtGetChild(1);
 
-        String loadInstr = Symbol.getJVMPrefix(arrayID.getType()) + "load";
-        int varNum = arrayID.getStackPos();
-        String separator = varNum > 3 ? " " : "_";
-
-        writer.println("  " + loadInstr + separator + Integer.toString(varNum)); // push array identifier
-        arrayOffset.write(writer); // push offset to access
+        arrayOffset.writeBody(writer); // push offset to access
         value.write(writer); // push value to assign
         writer.println("  iastore\n"); // store value
     }
