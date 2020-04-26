@@ -6,12 +6,16 @@ import javamm.semantics.MethodIdentifier;
 import javamm.semantics.MethodSymbol;
 import javamm.semantics.Symbol;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 public
 class ASTMethodName extends SimpleNode {
     public Symbol.Type returnType = null;
+    public String methodName;
+    public List<Symbol.Type> parametersTypes = new ArrayList<>();
+    public List<Symbol> parameters = new ArrayList<>();
 
     public ASTMethodName(int id) {
         super(id);
@@ -21,19 +25,20 @@ class ASTMethodName extends SimpleNode {
         super(p, id);
     }
 
-    public void eval(SimpleNode parameters)  {
-        List<Symbol.Type> parametersTypes = new ArrayList<>();
-
+    public void eval(SimpleNode parameters) {
         ASTIdentifier nameNode = (ASTIdentifier) this.jjtGetChild(1);
         SimpleNode typeNode = (SimpleNode) this.jjtGetChild(0);
-        String methodName = nameNode.identifierName;
+        methodName = nameNode.identifierName;
         Symbol.Type type = VarNode.getType(typeNode, table, parser);
 
         if (parameters != null) {
             parameters.setTables(table, methodTable);
             for (int i = 0; i < parameters.jjtGetNumChildren(); i += 2) {
-                VarNode parameter = new VarNode(i, parameters.jjtGetChild(i), parameters.jjtGetChild(i + 1), table,true);
+
+                VarNode parameter = new VarNode(i, parameters.jjtGetChild(i), parameters.jjtGetChild(i + 1),
+                        table, true, i / 2);
                 parameter.eval(parser);
+                this.parameters.add(parameter.getSymbol());
                 parametersTypes.add(VarNode.getType((SimpleNode) parameters.jjtGetChild(i), table, parser));
             }
         }
@@ -41,5 +46,13 @@ class ASTMethodName extends SimpleNode {
         this.returnType = type;
     }
 
+    @Override
+    public void write(PrintWriter writer) {
+        writer.print(".method public " + methodName + "(");
+        for (Symbol.Type type : parametersTypes) {
+            writer.print(Symbol.getJVMTypeByType(type) + ",");
+        }
+        writer.println(")" + Symbol.getJVMTypeByType(returnType));
+    }
 }
 /* JavaCC - OriginalChecksum=4573a3da8b3ef87c2c4dda84d8669778 (do not edit this line) */

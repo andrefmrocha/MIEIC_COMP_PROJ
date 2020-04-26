@@ -5,7 +5,9 @@ import javamm.parser.JavammTreeConstants;
 import javamm.parser.SimpleNode;
 
 public class Symbol {
-    public enum Type{
+    private int stackPos = -1;
+
+    public enum Type {
         INT, BOOL, INT_ARRAY, VOID, MAIN, METHOD, CLASS, OBJ
     }
 
@@ -31,8 +33,13 @@ public class Symbol {
         this.isInitialized = isInitialized;
     }
 
+    public Symbol(Type type, String s, boolean isInitialized, int stackPos) {
+        this(type, s, isInitialized);
+        this.stackPos = stackPos;
+    }
+
     public static Type getNodeSymbolType(SimpleNode node) {
-        switch (node.getId()){
+        switch (node.getId()) {
             case JavammTreeConstants.JJTVOID:
                 return Type.VOID;
             case JavammTreeConstants.JJTINT:
@@ -47,9 +54,38 @@ public class Symbol {
         return null;
     }
 
+    public static String getJVMTypeByType(Type type) {
+        switch (type) {
+            case INT:
+                return "I";
+            case BOOL:
+                return "Z";
+            case INT_ARRAY:
+                return "[I";
+            case VOID:
+                return "V";
+        }
+        return null;
+    }
+
+    public String getJVMType() {
+        return getJVMTypeByType(type);
+    }
+
     public boolean isInitialized() {
         return isInitialized;
     }
 
-    public void setInitialized() { isInitialized = true;}
+    public void setInitialized() {
+        isInitialized = true;
+    }
+
+    public int getStackPos() {
+        return stackPos;
+    }
+
+    public void setStackPos(int stackPos) {
+        if(stackPos != -1)
+            this.stackPos = stackPos;
+    }
 }

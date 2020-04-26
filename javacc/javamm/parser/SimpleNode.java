@@ -124,6 +124,18 @@ class SimpleNode implements Node {
   public int getId() {
     return id;
   }
+
+  protected boolean checkForThis() {
+    if (id == JavammTreeConstants.JJTTHIS)
+      return true;
+
+    for(int i = 0; i< this.jjtGetNumChildren(); i++) {
+      SimpleNode node = (SimpleNode) this.jjtGetChild(i);
+      if (node.checkForThis())
+        return true;
+    }
+    return false;
+  }
 }
 
 /* JavaCC - OriginalChecksum=221dbcb2c3eee918f7ff2d2eecd7686d (do not edit this line) */

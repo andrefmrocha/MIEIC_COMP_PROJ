@@ -6,9 +6,15 @@ import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 import javamm.semantics.SymbolTable;
 
+import java.io.PrintWriter;
+
 
 public class VarNode extends SimpleNode {
     private final boolean isInitialized;
+    private Symbol symbol;
+    private String name;
+    public boolean classVar = false;
+    public int stackPos = -1;
 
     public VarNode(int i, boolean isInitialized) {
         super(i);
@@ -26,6 +32,11 @@ public class VarNode extends SimpleNode {
         this.jjtAddChild(identifier, 1);
         this.setTables(table, methodTable);
         this.isInitialized = isInitialized;
+    }
+
+    public VarNode(int i, Node jjtGetChild, Node jjtGetChild1, SymbolTable table, boolean b, int stackPos) {
+        this(i, jjtGetChild, jjtGetChild1, table, b);
+        this.stackPos = stackPos;
     }
 
     @Override
@@ -56,12 +67,14 @@ public class VarNode extends SimpleNode {
 
         Symbol varSym;
         if (type != Type.CLASS)
-            varSym = new Symbol(type, "", isInitialized);
+            varSym = new Symbol(type, "", isInitialized, stackPos);
         else {
             ClassSymbol symbol = (ClassSymbol) table.getSymbol(((ASTIdentifier) typeNode).identifierName);
-            varSym = new ClassSymbol(Type.OBJ,symbol.getClassName(), symbol.getSymbolTable(), symbol.getExtension());
+            varSym = new ClassSymbol(Type.OBJ,symbol.getClassName(), symbol.getSymbolTable(), symbol.getExtension(), stackPos);
         }
         table.putSymbol(name, varSym);
+        this.symbol = varSym;
+        this.name = name;
     }
 
     public static Type getType(SimpleNode node, SymbolTable table, Javamm parser) {
@@ -85,5 +98,15 @@ public class VarNode extends SimpleNode {
                 parser.semanticErrors.add(new SemanticsException("Found invalid type", node));
                 return Type.VOID;
         }
+    }
+
+    public Symbol getSymbol() {
+        return symbol;
+    }
+
+    @Override
+    public void write(PrintWriter writer) {
+        if(classVar)
+            writer.println(".field " + name + " " + symbol.getJVMType());
     }
 }
