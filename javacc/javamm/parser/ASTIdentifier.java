@@ -25,7 +25,6 @@ class ASTIdentifier extends TypeNode {
   @Override
   public void write(PrintWriter writer) {
     Symbol s = this.table.getSymbol(identifierName);
-    System.out.println(identifierName + " " + getLine());
     String loadInstr = Symbol.getJVMPrefix(s.getType()) + "load";
     int varNum = s.getStackPos();
 

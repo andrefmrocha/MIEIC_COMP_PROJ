@@ -78,6 +78,9 @@ public class Symbol {
             case CLASS:
             case OBJ:
                 return "a";
+            case VOID:
+                return "";
+
         }
         return null;
     }
