@@ -23,17 +23,15 @@ class ASTClass extends SimpleNode {
   }
 
   @Override
-  public void eval(Javamm parser)  {
+  public void eval(Javamm parser) {
     final MethodSymbolTable newTable = new MethodSymbolTable(methodTable);
     String className = null;
     ClassSymbol extendedClass = null;
 
-    for(int i = 0; i < this.jjtGetNumChildren(); i++)
-    {
+    for (int i = 0; i < this.jjtGetNumChildren(); i++) {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
 
-      switch(child.id)
-      {
+      switch (child.id) {
         case JavammTreeConstants.JJTVAR:
           child.setTables(table, newTable);
           child.eval(parser);
@@ -57,16 +55,16 @@ class ASTClass extends SimpleNode {
       }
     }
 
-    classSymbol = new ClassSymbol(Symbol.Type.CLASS,className, newTable, extendedClass);
+    classSymbol = new ClassSymbol(Symbol.Type.CLASS, className, newTable, extendedClass);
     table.putSymbol(className, classSymbol);
 
-    for(int i = 0; i < this.jjtGetNumChildren(); i++) {
+    for (int i = 0; i < this.jjtGetNumChildren(); i++) {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
       if (child.id == JavammTreeConstants.JJTMETHOD) {
         ASTMethod method = (ASTMethod) child;
         boolean hasThis = child.checkForThis();
-        if(hasThis)
-          for(Symbol symbol: method.getParameters())
+        if (hasThis)
+          for (Symbol symbol : method.getParameters())
             symbol.setStackPos(symbol.getStackPos() + 1);
         method.processBody(parser, method.getParameters().size() + (hasThis ? 1 : 0));
       }
@@ -78,14 +76,16 @@ class ASTClass extends SimpleNode {
   public void write(PrintWriter writer) {
     writer.println(".class public " + classSymbol.getClassName());
     writer.println(".super " + (classSymbol.getExtension() == null ? "java/lang/Object" : classSymbol.getExtension().getClassName()));
-    writer.println(".method public <init>()V\n" +
-            "aload_0\n" +
-            "invokenonvirtual java/lang/Object/<init>()V\n" +
-            "return\n" +
-            ".end method");
+    writer.println("\n.method public <init>()V\n" +
+        "  aload_0\n" +
+        "  invokenonvirtual java/lang/Object/<init>()V\n" +
+        "  return\n" +
+        ".end method\n");
 
-    for(int i = 0; i < this.jjtGetNumChildren(); i++) {
+    for (int i = 0; i < this.jjtGetNumChildren(); i++) {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
+      if (child.id == JavammTreeConstants.JJTMETHOD && i != (classSymbol.getExtension() == null ? 1 : 2))
+        writer.println();
       if (child.id == JavammTreeConstants.JJTMETHOD || child.id == JavammTreeConstants.JJTVAR)
         child.write(writer);
     }

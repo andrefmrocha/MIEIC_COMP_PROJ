@@ -71,8 +71,8 @@ class ASTMethod extends TypeNode {
         } else if (methodType.id == JavammTreeConstants.JJTMAIN) {
             writer.println(".method public static main([Ljava/lang/String;)V");
         }
-        writer.println(".limit stack 255");//TODO Check for these limits actual values
-        writer.println(".limit locals 255");
+        writer.println("  .limit stack 255");//TODO Check for these limits actual values
+        writer.println("  .limit locals 255\n");
         SimpleNode methodBody;
         if (this.jjtGetNumChildren() == 2) {
             methodBody = (ASTMethodBody) this.jjtGetChild(1);
