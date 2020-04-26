@@ -39,6 +39,12 @@ public abstract class BinaryOperatorNode extends TypeNode {
 
     @Override
     public void write(PrintWriter writer) {
-        //TODO implement this or leave blank to not call the default one
+        SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
+        SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
+
+        leftOperand.write(writer);
+        rightOperand.write(writer);
+
+        //then each operation will use this part and add its own action
     }
 }

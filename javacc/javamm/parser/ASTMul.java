@@ -22,7 +22,8 @@ class ASTMul extends BinaryOperatorNode {
 
   @Override
   public void write(PrintWriter writer) {
-    //TODO implement this or leave blank to not call the default one
+    super.write(writer);
+    writer.println("  imul");
   }
 }
 /* JavaCC - OriginalChecksum=e5abe143d74eea8d5312703bd5001c7a (do not edit this line) */
