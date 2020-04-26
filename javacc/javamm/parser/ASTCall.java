@@ -14,6 +14,9 @@ import java.io.PrintWriter;
 
 public
 class ASTCall extends TypeNode {
+    private String methodInvokation;
+    public boolean isStatic = false;
+
     public ASTCall(int id) {
         super(id);
     }
@@ -22,16 +25,16 @@ class ASTCall extends TypeNode {
         super(p, id);
     }
 
-    public void evalWithIdentifier(String identifier, boolean newIdentifier, Javamm parser ) {
+    public void evalWithIdentifier(String identifier, boolean newIdentifier, Javamm parser) {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
         final MethodIdentifier importMethodId = getMethodIdentifier(identifier + "." + methodIdentifier.identifierName);
-        if(importMethodId == null)
+        if (importMethodId == null)
             return;
 
         if (table.checkSymbol(identifier)) {
             final Symbol symbol = table.getSymbol(identifier);
 
-            if(( !newIdentifier && symbol.getType() != Symbol.Type.OBJ)){
+            if ((!newIdentifier && symbol.getType() != Symbol.Type.OBJ)) {
                 parser.semanticErrors.add(new SemanticsException(identifier + " is not an object", methodIdentifier));
                 return;
             }
@@ -46,6 +49,13 @@ class ASTCall extends TypeNode {
                 return;
             }
             this.type = classSymbol.getSymbolTable().getSymbol(methodId).getReturnType();
+            //TODO: check if needed to write parent class in cases where we have extensions
+            methodInvokation = "invokevirtual " + classSymbol.getClassName() + "/" + methodIdentifier.identifierName + "(";
+            for (Symbol.Type type : methodId.getParameters()) {
+                methodInvokation += Symbol.getJVMTypeByType(type);
+            }
+            methodInvokation += ")" + Symbol.getJVMTypeByType(this.type);
+
         } else if (methodTable.checkSymbol(importMethodId)) {
             final MethodSymbol symbol = methodTable.getSymbol(importMethodId);
             if (symbol.getParameters().size() != this.jjtGetNumChildren() - 1) {
@@ -54,6 +64,12 @@ class ASTCall extends TypeNode {
                 return;
             }
             this.type = symbol.getReturnType();
+            methodInvokation = "invokestatic " + identifier + "/" + methodIdentifier.identifierName + "(";
+            for (Symbol.Type type : importMethodId.getParameters()) {
+                methodInvokation += Symbol.getJVMTypeByType(type);
+            }
+            methodInvokation += ")" + Symbol.getJVMTypeByType(this.type);
+            isStatic =  true;
         } else
             parser.semanticErrors.add(new SemanticsException(identifier + " was not found", methodIdentifier));
 
@@ -65,7 +81,7 @@ class ASTCall extends TypeNode {
             SimpleNode node = (SimpleNode) this.jjtGetChild(i);
             if (node.id == JavammTreeConstants.JJTIDENTIFIER) {
                 final ASTIdentifier identifierNode = (ASTIdentifier) node;
-                if (!table.checkSymbol(identifierNode.identifierName)){
+                if (!table.checkSymbol(identifierNode.identifierName)) {
                     parser.semanticErrors.add(new SemanticsException("No variable named " + identifierNode.identifierName + " found", node));
                     return null;
                 }
@@ -97,11 +113,20 @@ class ASTCall extends TypeNode {
         final MethodSymbol methodSymbol = (MethodSymbol) symbol;
 
         this.type = methodSymbol.getReturnType();
+        methodInvokation = "invokevirtual " + methodIdentifier.identifierName + "("; //TODO:add the method class (what 'this' represents)
+        for (Symbol.Type type : methodId.getParameters()) {
+            methodInvokation += Symbol.getJVMTypeByType(type);
+        }
+        methodInvokation += ")" + Symbol.getJVMTypeByType(this.type);
     }
 
     @Override
     public void write(PrintWriter writer) {
-        //TODO implement this or leave blank to not call the default one
+        for (int i = 1; i < this.jjtGetNumChildren(); i++) {
+            ((SimpleNode) this.jjtGetChild(i)).setTables(table, methodTable);
+            ((SimpleNode) this.jjtGetChild(i)).write(writer);
+        }
+        writer.println(methodInvokation);
     }
 
 }
