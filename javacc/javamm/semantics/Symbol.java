@@ -68,6 +68,20 @@ public class Symbol {
         return null;
     }
 
+    public static String getJVMPrefix(Type type) {
+        switch (type) {
+            case INT:
+            case INT_ARRAY:
+                return "i";
+            case BOOL:
+                return "b";
+            case CLASS:
+            case OBJ:
+                return "a";
+        }
+        return null;
+    }
+
     public String getJVMType() {
         return getJVMTypeByType(type);
     }

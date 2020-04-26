@@ -4,6 +4,7 @@ package javamm.parser;
 
 import javamm.SemanticsException;
 import javamm.semantics.Symbol;
+import java.io.PrintWriter;
 
 public
 class ASTMethodReturn extends SimpleNode {
@@ -28,6 +29,11 @@ class ASTMethodReturn extends SimpleNode {
         node.setTables(table, methodTable);
         node.eval(parser);
         type = node.type;
+    }
+
+    @Override
+    public void write(PrintWriter writer) {
+        //TODO implement this or leave blank to not call the default one
     }
 }
 /* JavaCC - OriginalChecksum=f35d6e18a29162cb6c0e550634450721 (do not edit this line) */

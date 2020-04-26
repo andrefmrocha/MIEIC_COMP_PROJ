@@ -10,6 +10,7 @@ import javamm.semantics.Symbol;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.PrintWriter;
 
 public
 class ASTCall extends TypeNode {
@@ -96,6 +97,11 @@ class ASTCall extends TypeNode {
         final MethodSymbol methodSymbol = (MethodSymbol) symbol;
 
         this.type = methodSymbol.getReturnType();
+    }
+
+    @Override
+    public void write(PrintWriter writer) {
+        //TODO implement this or leave blank to not call the default one
     }
 
 }

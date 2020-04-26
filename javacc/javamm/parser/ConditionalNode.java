@@ -3,6 +3,8 @@ package javamm.parser;
 import javamm.SemanticsException;
 import javamm.semantics.Symbol;
 
+import java.io.PrintWriter;
+
 public abstract class ConditionalNode extends TypeNode {
     public ConditionalNode(int i) {
         super(i);
@@ -27,5 +29,10 @@ public abstract class ConditionalNode extends TypeNode {
             child.setTables(table, methodTable);
             child.eval(parser);
         }
+    }
+
+    @Override
+    public void write(PrintWriter writer) {
+        //TODO implement this or leave blank to not call the default one
     }
 }

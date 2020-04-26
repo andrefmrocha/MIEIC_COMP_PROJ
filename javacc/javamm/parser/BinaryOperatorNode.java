@@ -4,6 +4,8 @@ import javamm.SemanticsException;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
+import java.io.PrintWriter;
+
 public abstract class BinaryOperatorNode extends TypeNode {
     private Type operandType;
 
@@ -33,5 +35,10 @@ public abstract class BinaryOperatorNode extends TypeNode {
 
         this.evaluateChild(leftOperand, new Symbol(operandType), parser);
         this.evaluateChild(rightOperand, new Symbol(operandType), parser);
+    }
+
+    @Override
+    public void write(PrintWriter writer) {
+        //TODO implement this or leave blank to not call the default one
     }
 }
