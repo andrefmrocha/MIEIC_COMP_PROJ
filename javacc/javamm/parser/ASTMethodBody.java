@@ -33,10 +33,5 @@ class ASTMethodBody extends SimpleNode {
         }
     }
 
-    @Override
-    public void write(PrintWriter writer) {
-        //TODO implement this or leave blank to not call the default one
-    }
-
 }
 /* JavaCC - OriginalChecksum=5c687ef179ba60ab5c8f745d7c137cbc (do not edit this line) */
