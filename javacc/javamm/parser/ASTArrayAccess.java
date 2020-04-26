@@ -53,7 +53,7 @@ class ASTArrayAccess extends TypeNode {
         SimpleNode offset = (SimpleNode) this.jjtGetChild(1);
         identifier.write(writer);
         offset.write(writer);
-        writer.println("iaload");
+        writer.println("  iaload");
     }
 }
 /* JavaCC - OriginalChecksum=07823d6065ca9b37f085148b14d167b9 (do not edit this line) */

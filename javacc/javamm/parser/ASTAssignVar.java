@@ -61,7 +61,7 @@ class ASTAssignVar extends TypeNode {
         String storeInstr = Symbol.getJVMPrefix(leftSymbol.getType()) + "store";
         int varNum = leftSymbol.getStackPos();
         String separator = varNum > 3 ? " " : "_";
-        writer.println(storeInstr + separator + Integer.toString(varNum));
+        writer.println("  " + storeInstr + separator + Integer.toString(varNum) + "\n");
     }
 }
 /* JavaCC - OriginalChecksum=661756e145ed220ec46575b3a8adecd3 (do not edit this line) */

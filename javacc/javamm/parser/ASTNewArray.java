@@ -35,7 +35,7 @@ class ASTNewArray extends TypeNode {
     public void write(PrintWriter writer) {
         SimpleNode offset = (SimpleNode) this.jjtGetChild(0);
         offset.write(writer);
-        writer.println("newarray int");
+        writer.println("  newarray int");
     }
 }
 /* JavaCC - OriginalChecksum=3a631d25cbdc4e13263745a21c4cb259 (do not edit this line) */

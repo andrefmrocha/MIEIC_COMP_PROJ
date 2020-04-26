@@ -48,10 +48,10 @@ class ASTAssignVarArray extends TypeNode {
         int varNum = arrayID.getStackPos();
         String separator = varNum > 3 ? " " : "_";
 
-        writer.println(loadInstr + separator + Integer.toString(varNum)); // push array identifier
+        writer.println("  " + loadInstr + separator + Integer.toString(varNum)); // push array identifier
         arrayOffset.write(writer); // push offset to access
         value.write(writer); // push value to assign
-        writer.println("iastore"); // store value
+        writer.println("  iastore\n"); // store value
     }
 }
 /* JavaCC - OriginalChecksum=0fabe93ca61357985801f024c411ccd1 (do not edit this line) */

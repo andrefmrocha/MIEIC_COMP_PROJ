@@ -25,7 +25,7 @@ class ASTNumeric extends TypeNode {
 
   @Override
   public void write(PrintWriter writer) {
-    writer.println(number > 5 ? "bipush " + number : "iconst_" + number);
+    writer.println(number > 5 ? "  bipush " + number : "  iconst_" + number);
   }
 
 }

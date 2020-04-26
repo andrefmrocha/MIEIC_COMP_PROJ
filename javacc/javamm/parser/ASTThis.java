@@ -16,7 +16,7 @@ class ASTThis extends SimpleNode {
 
     @Override
     public void write(PrintWriter writer) {
-        writer.println("aload_0");
+        writer.println("  aload_0");
     }
 
 }
