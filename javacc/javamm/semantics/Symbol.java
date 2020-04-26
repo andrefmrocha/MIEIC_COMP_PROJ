@@ -76,6 +76,7 @@ public class Symbol {
             case BOOL:
                 return "b";
             case CLASS:
+            case OBJ:
                 return "a";
         }
         return null;

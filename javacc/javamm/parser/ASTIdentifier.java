@@ -29,6 +29,7 @@ class ASTIdentifier extends TypeNode {
     int varNum = s.getStackPos();
     String separator = varNum > 3 ? " " : "_";
     writer.println(loadInstr + separator + Integer.toString(varNum));
+    // TODO handle when accesses class member, stackpos will be -1
   }
 
 }

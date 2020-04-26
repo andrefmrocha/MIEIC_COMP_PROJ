@@ -9,6 +9,7 @@ import javamm.semantics.Symbol;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.PrintWriter;
 
 public
 class ASTMain extends SimpleNode {
@@ -42,6 +43,11 @@ class ASTMain extends SimpleNode {
 
     parametersTypes.add(Symbol.Type.CLASS);
     this.table.getParent().putSymbol("main",new MethodSymbol(Symbol.Type.MAIN,parametersTypes));
+  }
+
+  @Override
+  public void write(PrintWriter writer) {
+    //TODO implement this or leave blank to not call the default one
   }
 
 }

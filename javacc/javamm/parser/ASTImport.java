@@ -7,6 +7,7 @@ import javamm.semantics.MethodSymbol;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +67,10 @@ class ASTImport extends SimpleNode {
             ClassSymbol classSymbol = (ClassSymbol) symbol;
             classSymbol.getSymbolTable().putSymbol(new MethodIdentifier(methodName, params), new MethodSymbol(returnValue, params));
         }
+    }
+
+    @Override
+    public void write(PrintWriter writer) {
     }
 
 }
