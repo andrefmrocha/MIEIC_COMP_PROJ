@@ -52,16 +52,25 @@ class ASTAssignVar extends TypeNode {
 
     @Override
     public void write(PrintWriter writer) {
-        Symbol leftSymbol = this.table.getSymbol(((ASTIdentifier) this.jjtGetChild(0)).identifierName);
+        String varName = ((ASTIdentifier) this.jjtGetChild(0)).identifierName;
+        Symbol leftSymbol = this.table.getSymbol(varName);
         SimpleNode right = (SimpleNode) this.jjtGetChild(1);
 
+        int varNum = leftSymbol.getStackPos();
+        if(varNum == -1)
+            writer.println("  aload_0");
         // result will be on stack
         right.write(writer);
 
-        String storeInstr = Symbol.getJVMPrefix(leftSymbol.getType()) + "store";
-        int varNum = leftSymbol.getStackPos();
-        String separator = varNum > 3 ? " " : "_";
-        writer.println("  " + storeInstr + separator + Integer.toString(varNum) + "\n");
+        if(varNum == -1) {
+            String className = this.table.getClassName();
+            String jvmType = Symbol.getJVMTypeByType(leftSymbol.getType());
+            writer.println("  putfield " + className + "/" + varName + " " + jvmType + "\n");
+        } else {
+            String storeInstr = Symbol.getJVMPrefix(leftSymbol.getType()) + "store";
+            String separator = varNum > 3 ? " " : "_";
+            writer.println("  " + storeInstr + separator + Integer.toString(varNum) + "\n");
+        }
     }
 }
 /* JavaCC - OriginalChecksum=661756e145ed220ec46575b3a8adecd3 (do not edit this line) */

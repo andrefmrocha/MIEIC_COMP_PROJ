@@ -25,11 +25,20 @@ class ASTIdentifier extends TypeNode {
   @Override
   public void write(PrintWriter writer) {
     Symbol s = this.table.getSymbol(identifierName);
-    String loadInstr = Symbol.getJVMPrefix(s.getType()) + "load";
     int varNum = s.getStackPos();
-    String separator = varNum > 3 ? " " : "_";
-    writer.println("  " + loadInstr + separator + Integer.toString(varNum));
-    // TODO handle when accesses class member, stackpos will be -1
+
+    if(varNum == -1) {
+      writer.println("  aload_0");
+      String className = this.table.getClassName();
+      String jvmType = Symbol.getJVMTypeByType(s.getType());
+      writer.println("  getfield " + className + "/" + identifierName + " " + jvmType);
+    } else {
+      String loadInstr = Symbol.getJVMPrefix(s.getType()) + "load";
+      String separator = varNum > 3 ? " " : "_";
+      writer.println("  " + loadInstr + separator + Integer.toString(varNum));
+    }
+
+
   }
 
 }

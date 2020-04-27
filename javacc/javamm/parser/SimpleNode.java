@@ -2,6 +2,7 @@ package javamm.parser;
 
 import javamm.SemanticsException;
 import javamm.semantics.MethodSymbolTable;
+import javamm.semantics.Symbol;
 import javamm.semantics.SymbolTable;
 
 import java.io.PrintWriter;
@@ -125,13 +126,17 @@ class SimpleNode implements Node {
     return id;
   }
 
-  protected boolean checkForThis() {
+  protected boolean checkForThis(SymbolTable classTable) {
     if (id == JavammTreeConstants.JJTTHIS)
       return true;
-
-    for(int i = 0; i< this.jjtGetNumChildren(); i++) {
+    if(id == JavammTreeConstants.JJTIDENTIFIER) {
+      String identifier = ((ASTIdentifier)this).identifierName;
+      if(classTable.checkSymbol(identifier))
+        return  true;
+    }
+   for(int i = 0; i< this.jjtGetNumChildren(); i++) {
       SimpleNode node = (SimpleNode) this.jjtGetChild(i);
-      if (node.checkForThis())
+      if (node.checkForThis(classTable))
         return true;
     }
     return false;

@@ -44,6 +44,7 @@ class ASTClass extends SimpleNode {
         case JavammTreeConstants.JJTIDENTIFIER:
           ASTIdentifier temp = (ASTIdentifier) child;
           className = temp.identifierName;
+          this.table.setClassName(className);
           break;
         case JavammTreeConstants.JJTMETHOD:
           child.setTables(new SymbolTable(table), newTable);
@@ -62,9 +63,9 @@ class ASTClass extends SimpleNode {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
       if (child.id == JavammTreeConstants.JJTMETHOD) {
         ASTMethod method = (ASTMethod) child;
-        boolean hasThis = child.checkForThis();
-        if (hasThis)
-          for (Symbol symbol : method.getParameters())
+        boolean hasThis = child.checkForThis(this.table);
+        if(hasThis)
+          for(Symbol symbol: method.getParameters())
             symbol.setStackPos(symbol.getStackPos() + 1);
         method.processBody(parser, method.getParameters().size() + (hasThis ? 1 : 0));
       }

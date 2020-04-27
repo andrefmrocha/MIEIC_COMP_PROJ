@@ -22,7 +22,10 @@ class ASTSub extends BinaryOperatorNode {
 
   @Override
   public void write(PrintWriter writer) {
-    //TODO implement this or leave blank to not call the default one
+    super.write(writer);
+    writer.println("  isub");
   }
+
+
 }
 /* JavaCC - OriginalChecksum=b7fc14f4941a1c938c1b03e9740f85d8 (do not edit this line) */

@@ -71,10 +71,10 @@ public class Symbol {
     public static String getJVMPrefix(Type type) {
         switch (type) {
             case INT:
-            case INT_ARRAY:
                 return "i";
             case BOOL:
                 return "b";
+            case INT_ARRAY:
             case CLASS:
             case OBJ:
                 return "a";

@@ -21,7 +21,8 @@ class ASTSum extends BinaryOperatorNode {
 
   @Override
   public void write(PrintWriter writer) {
-    //TODO implement this or leave blank to not call the default one
+    super.write(writer);
+    writer.println("  iadd");
   }
 }
 /* JavaCC - OriginalChecksum=4ff6a21ad754b297da0cfd725ff9d094 (do not edit this line) */
