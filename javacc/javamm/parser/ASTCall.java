@@ -8,6 +8,7 @@ import javamm.semantics.MethodIdentifier;
 import javamm.semantics.MethodSymbol;
 import javamm.semantics.Symbol;
 
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.PrintWriter;
@@ -25,6 +26,14 @@ class ASTCall extends TypeNode {
         super(p, id);
     }
 
+    public void setMethodInvokation(String invokationIdent, String classIdent, String methodIdent, List<Symbol.Type> types, Symbol.Type returnType)
+    {
+        methodInvokation = invokationIdent + classIdent + "/" + methodIdent + "(";
+        for (Symbol.Type type : types) {
+            methodInvokation += Symbol.getJVMTypeByType(type);
+        }
+        methodInvokation += ")" + Symbol.getJVMTypeByType(returnType);
+    }
     public void evalWithIdentifier(String identifier, boolean newIdentifier, Javamm parser) {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
         final MethodIdentifier importMethodId = getMethodIdentifier(identifier + "." + methodIdentifier.identifierName);
@@ -50,11 +59,7 @@ class ASTCall extends TypeNode {
             }
             this.type = classSymbol.getSymbolTable().getSymbol(methodId).getReturnType();
             //TODO: check if needed to write parent class in cases where we have extensions
-            methodInvokation = "invokevirtual " + classSymbol.getClassName() + "/" + methodIdentifier.identifierName + "(";
-            for (Symbol.Type type : methodId.getParameters()) {
-                methodInvokation += Symbol.getJVMTypeByType(type);
-            }
-            methodInvokation += ")" + Symbol.getJVMTypeByType(this.type);
+            setMethodInvokation("invokevirtual ",classSymbol.getClassName(),  methodIdentifier.identifierName ,methodId.getParameters(),this.type);
 
         } else if (methodTable.checkSymbol(importMethodId)) {
             final MethodSymbol symbol = methodTable.getSymbol(importMethodId);
@@ -64,11 +69,7 @@ class ASTCall extends TypeNode {
                 return;
             }
             this.type = symbol.getReturnType();
-            methodInvokation = "invokestatic " + identifier + "/" + methodIdentifier.identifierName + "(";
-            for (Symbol.Type type : importMethodId.getParameters()) {
-                methodInvokation += Symbol.getJVMTypeByType(type);
-            }
-            methodInvokation += ")" + Symbol.getJVMTypeByType(this.type);
+            setMethodInvokation("invokestatic ",identifier,  methodIdentifier.identifierName ,importMethodId.getParameters(),this.type);
             isStatic =  true;
         } else
             parser.semanticErrors.add(new SemanticsException(identifier + " was not found", methodIdentifier));
@@ -113,11 +114,7 @@ class ASTCall extends TypeNode {
         final MethodSymbol methodSymbol = (MethodSymbol) symbol;
 
         this.type = methodSymbol.getReturnType();
-        methodInvokation = "invokevirtual " + methodIdentifier.identifierName + "("; //TODO:add the method class (what 'this' represents)
-        for (Symbol.Type type : methodId.getParameters()) {
-            methodInvokation += Symbol.getJVMTypeByType(type);
-        }
-        methodInvokation += ")" + Symbol.getJVMTypeByType(this.type);
+        setMethodInvokation("invokevirtual ","this",  methodIdentifier.identifierName ,methodId.getParameters(),this.type);
     }
 
     @Override
