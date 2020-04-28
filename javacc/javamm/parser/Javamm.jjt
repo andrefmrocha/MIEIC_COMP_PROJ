@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 public class Javamm {
     public final List<SemanticsException> semanticErrors = new ArrayList();
+    public final List<SemanticsException> semanticWarnings = new ArrayList();
     public static final int NUM_ERRORS = 10;
     int nErrors = 1;
 
