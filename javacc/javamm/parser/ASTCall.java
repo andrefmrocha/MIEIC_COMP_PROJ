@@ -37,7 +37,7 @@ class ASTCall extends TypeNode {
 
     public void evalWithIdentifier(String identifier, boolean newIdentifier, Javamm parser) {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
-        final MethodIdentifier importMethodId = getMethodIdentifier(identifier + "." + methodIdentifier.identifierName);
+        final MethodIdentifier importMethodId = getMethodIdentifier(identifier + "." + methodIdentifier.identifierName, parser);
         if (importMethodId == null)
             return;
 
@@ -48,7 +48,7 @@ class ASTCall extends TypeNode {
                 parser.semanticErrors.add(new SemanticsException(identifier + " is not an object", methodIdentifier));
                 return;
             }
-            final MethodIdentifier methodId = getMethodIdentifier(methodIdentifier.identifierName);
+            final MethodIdentifier methodId = getMethodIdentifier(methodIdentifier.identifierName, parser);
             if (methodId == null)
                 return;
 
@@ -76,7 +76,7 @@ class ASTCall extends TypeNode {
 
     }
 
-    private MethodIdentifier getMethodIdentifier(String identifier) {
+    private MethodIdentifier getMethodIdentifier(String identifier, Javamm parser) {
         final List<Symbol.Type> params = new ArrayList<>();
         for (int i = 1; i < this.jjtGetNumChildren(); i++) {
             SimpleNode node = (SimpleNode) this.jjtGetChild(i);
@@ -91,6 +91,7 @@ class ASTCall extends TypeNode {
 
             } else if (node instanceof TypeNode) {
                 TypeNode typeNode = (TypeNode) node;
+                System.out.println(parser);
                 typeNode.setTables(table, methodTable);
                 typeNode.eval(parser);
                 params.add(typeNode.type);
@@ -101,9 +102,9 @@ class ASTCall extends TypeNode {
         return new MethodIdentifier(identifier, params);
     }
 
-    public void evalWithThis() {
+    public void evalWithThis(Javamm parser) {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
-        final MethodIdentifier methodId = getMethodIdentifier(methodIdentifier.identifierName);
+        final MethodIdentifier methodId = getMethodIdentifier(methodIdentifier.identifierName, parser);
         if (!methodTable.checkSymbol(methodId))
             parser.semanticErrors.add(new SemanticsException("Method " + methodIdentifier.identifierName + " not found in line " + getLine(), methodIdentifier));
         final Symbol symbol = methodTable.getSymbol(methodId);

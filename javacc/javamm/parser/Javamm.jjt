@@ -176,7 +176,7 @@ void NonIdentifierStatement() #void : {}
 
 {
     <LFTCRLBRCKT> (Statement())* <RGHTCRLBRCKT>
-    | (<IF>  <LFTBRCKT> Expression()  <RGHTBRCKT> Statement() <ELSE> Statement() ) #If
+    | (<IF>  <LFTBRCKT> Expression()  <RGHTBRCKT> ( Statement() ) #Then <ELSE> ( Statement()) #Else ) #If
     | (WhileStatement()) #While
     | NonIdentifierExpression() <SEMICOLON>
 }

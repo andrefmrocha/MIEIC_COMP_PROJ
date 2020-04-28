@@ -33,7 +33,7 @@ public class ASTMethodCall extends TypeNode {
                 call.evalWithIdentifier(methodIdentifier, false, parser);
                 break;
             case JavammTreeConstants.JJTTHIS:
-                call.evalWithThis();
+                call.evalWithThis(parser);
                 break;
             case JavammTreeConstants.JJTNEW:
                 ASTNew astNew = (ASTNew) methodName;
