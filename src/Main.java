@@ -25,11 +25,17 @@ public class Main {
 			MethodSymbolTable methodTable = new MethodSymbolTable();
 			node.setTables(newTable, methodTable);
 			node.eval(javamm);
+			System.out.println("Errors: ");
 			for(SemanticsException e: javamm.semanticErrors){
 				System.out.println(e.getError() + " in line " + e.getNode().getLine());
 			}
 
-			if (javamm.semanticErrors.size() > 0)
+			System.out.println("Warnings: ");
+			for(SemanticsException e: javamm.semanticWarnings){
+				System.out.println(e.getError() + " in line " + e.getNode().getLine());
+			}
+
+			if (javamm.semanticErrors.size() > 0 || javamm.semanticWarnings.size() > 0)
 				throw new RuntimeException();
 
 			node.dump("");
