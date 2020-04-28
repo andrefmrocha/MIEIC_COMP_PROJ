@@ -35,7 +35,7 @@ public class Main {
 				System.out.println(e.getError() + " in line " + e.getNode().getLine());
 			}
 
-			if (javamm.semanticErrors.size() > 0 || javamm.semanticWarnings.size() > 0)
+			if (javamm.semanticErrors.size() > 0)
 				throw new RuntimeException();
 
 			node.dump("");

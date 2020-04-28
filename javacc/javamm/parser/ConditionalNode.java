@@ -23,12 +23,6 @@ public abstract class ConditionalNode extends TypeNode {
 
         SimpleNode condition = (SimpleNode) this.jjtGetChild(0);
         this.evaluateChild(condition, new Symbol(Symbol.Type.BOOL), parser);
-
-        for (int i = 1; i < this.jjtGetNumChildren(); i++) {
-            SimpleNode child = (SimpleNode) this.jjtGetChild(i);
-            child.setTables(table, methodTable);
-            child.eval(parser);
-        }
     }
 
     @Override

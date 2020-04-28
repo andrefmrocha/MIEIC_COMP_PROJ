@@ -43,6 +43,8 @@ public interface JavammTreeConstants
     public int JJTNEW = 37;
     public int JJTNEWARRAY = 38;
     public int JJTMETHODRETURN = 39;
+    public int JJTTHEN = 40;
+    public int JJTELSE = 41;
 
 
     public String[] jjtNodeName = {

@@ -28,21 +28,20 @@ class ASTAssignVar extends TypeNode {
 
         SimpleNode identifier = (SimpleNode) this.jjtGetChild(0);
 
-        String name;
         if (identifier.id != JavammTreeConstants.JJTIDENTIFIER){
             parser.semanticErrors.add(new SemanticsException("Variable has not a valid identifier", identifier));
             return;
         }
 
         ASTIdentifier temp = (ASTIdentifier) identifier;
-        name = temp.identifierName;
+        varIdentifier = temp.identifierName;
 
-        if (!this.table.checkSymbol(name)){
-            parser.semanticErrors.add(new SemanticsException("Variable " + name + " does not exist", identifier));
+        if (!this.table.checkSymbol(varIdentifier)){
+            parser.semanticErrors.add(new SemanticsException("Variable " + varIdentifier + " does not exist", identifier));
             return;
         }
 
-        Symbol symbol = this.table.getSymbol(name);
+        Symbol symbol = this.table.getSymbol(varIdentifier);
 
         SimpleNode expression = (SimpleNode) this.jjtGetChild(1);
         this.evaluateChild(expression, symbol, parser);
