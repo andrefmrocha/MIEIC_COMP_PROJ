@@ -61,6 +61,6 @@ public class ClassSymbol extends Symbol {
 
     @Override
     public String getJVMType() {
-        return "L" + className;
+        return "L" + className + ";";
     }
 }

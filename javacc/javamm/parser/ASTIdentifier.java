@@ -25,6 +25,7 @@ class ASTIdentifier extends TypeNode {
   @Override
   public void write(PrintWriter writer) {
     Symbol s = this.table.getSymbol(identifierName);
+    String loadInstr = Symbol.getJVMPrefix(s.getType()) + "load";
     int varNum = s.getStackPos();
 
     if(varNum == -1) {
@@ -33,7 +34,6 @@ class ASTIdentifier extends TypeNode {
       String jvmType = Symbol.getJVMTypeByType(s.getType());
       writer.println("  getfield " + className + "/" + identifierName + " " + jvmType);
     } else {
-      String loadInstr = Symbol.getJVMPrefix(s.getType()) + "load";
       String separator = varNum > 3 ? " " : "_";
       writer.println("  " + loadInstr + separator + Integer.toString(varNum));
     }
