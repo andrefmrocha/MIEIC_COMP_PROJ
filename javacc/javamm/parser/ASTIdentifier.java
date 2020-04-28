@@ -34,7 +34,6 @@ class ASTIdentifier extends TypeNode {
       String jvmType = Symbol.getJVMTypeByType(s.getType());
       writer.println("  getfield " + className + "/" + identifierName + " " + jvmType);
     } else {
-      String loadInstr = Symbol.getJVMPrefix(s.getType()) + "load";
       String separator = varNum > 3 ? " " : "_";
       writer.println("  " + loadInstr + separator + Integer.toString(varNum));
     }

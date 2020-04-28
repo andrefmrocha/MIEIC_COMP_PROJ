@@ -33,6 +33,7 @@ class ASTMethodReturn extends SimpleNode {
 
     @Override
     public void write(PrintWriter writer) {
+        ((SimpleNode) this.jjtGetChild(0)).write(writer);
         writer.println("  "  + Symbol.getJVMPrefix(type) + "return");
     }
 }
