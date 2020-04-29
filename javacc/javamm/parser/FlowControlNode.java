@@ -2,8 +2,7 @@ package javamm.parser;
 
 import javamm.semantics.Symbol;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.TreeSet;
 
 public class FlowControlNode extends SimpleNode {
     public FlowControlNode (int i) {
@@ -14,8 +13,8 @@ public class FlowControlNode extends SimpleNode {
         super(p, i);
     }
 
-    public List<String> evaluate(Javamm parser) {
-        final List<String> initializedVars = new ArrayList<>();
+    public TreeSet<String> evaluate(Javamm parser) {
+        final TreeSet<String> initializedVars = new TreeSet<String>();
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {
             SimpleNode child = (SimpleNode) this.jjtGetChild(i);
             child.setTables(table, methodTable);
@@ -25,6 +24,10 @@ public class FlowControlNode extends SimpleNode {
                     initializedVars.add(identifier);
             }
             child.eval(parser);
+        }
+
+        for (String str : initializedVars) {
+            this.table.getSymbol(str).setInitialized(false);
         }
 
         return initializedVars;

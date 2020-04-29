@@ -50,7 +50,6 @@ public class ClassSymbol extends Symbol {
         if (className.equals(targetParent.getClassName())) return true;
 
         ClassSymbol parent = this.extension;
-        System.out.println(parent);
         while (parent != null) {
             String parentName = parent.getClassName();
             if (parentName.equals(targetParent.getClassName())) return true;

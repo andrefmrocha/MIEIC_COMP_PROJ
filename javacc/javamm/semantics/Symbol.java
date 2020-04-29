@@ -91,6 +91,10 @@ public class Symbol {
         isInitialized = true;
     }
 
+    public void setInitialized(boolean init) {
+        isInitialized = init;
+    }
+
     public int getStackPos() {
         return stackPos;
     }

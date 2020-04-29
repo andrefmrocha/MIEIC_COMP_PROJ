@@ -90,7 +90,6 @@ class ASTCall extends TypeNode {
 
             } else if (node instanceof TypeNode) {
                 TypeNode typeNode = (TypeNode) node;
-                System.out.println(parser);
                 typeNode.setTables(table, methodTable);
                 typeNode.eval(parser);
                 params.add(typeNode.type);
