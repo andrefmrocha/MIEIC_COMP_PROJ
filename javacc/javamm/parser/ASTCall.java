@@ -91,7 +91,6 @@ class ASTCall extends TypeNode {
 
             } else if (node instanceof TypeNode) {
                 TypeNode typeNode = (TypeNode) node;
-                System.out.println(parser);
                 typeNode.setTables(table, methodTable);
                 typeNode.eval(parser);
                 params.add(typeNode.type);
@@ -105,12 +104,16 @@ class ASTCall extends TypeNode {
     public void evalWithThis(Javamm parser) {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
         final MethodIdentifier methodId = getMethodIdentifier(methodIdentifier.identifierName, parser);
-        if (!methodTable.checkSymbol(methodId))
+        if (!methodTable.checkSymbol(methodId)) {
             parser.semanticErrors.add(new SemanticsException("Method " + methodIdentifier.identifierName + " not found in line " + getLine(), methodIdentifier));
+            return;
+        }
         final Symbol symbol = methodTable.getSymbol(methodId);
 
-        if (symbol.getType() != Symbol.Type.METHOD)
+        if (symbol.getType() != Symbol.Type.METHOD){
             parser.semanticErrors.add(new SemanticsException(methodIdentifier.identifierName + " is not a method", methodIdentifier));
+            return;
+        }
 
         final MethodSymbol methodSymbol = (MethodSymbol) symbol;
 

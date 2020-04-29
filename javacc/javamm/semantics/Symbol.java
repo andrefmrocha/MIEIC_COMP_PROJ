@@ -65,9 +65,8 @@ public class Symbol {
     public static String getJVMPrefix(Type type) {
         switch (type) {
             case INT:
-                return "i";
             case BOOL:
-                return "b";
+                return "i";
             case INT_ARRAY:
             case CLASS:
             case OBJ:
@@ -89,6 +88,10 @@ public class Symbol {
 
     public void setInitialized() {
         isInitialized = true;
+    }
+
+    public void setInitialized(boolean init) {
+        isInitialized = init;
     }
 
     public int getStackPos() {

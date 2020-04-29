@@ -10,6 +10,8 @@ import java.util.*;
 /* JavaCCOptions:MULTI=true,NODE_USES_Javamm=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTIf extends ConditionalNode {
+    public TreeSet<String> initializedVars = new TreeSet<>();
+
     public ASTIf(int id) {
         super(id);
     }
@@ -25,25 +27,27 @@ class ASTIf extends ConditionalNode {
         thenNode.setTables(table, methodTable);
         ASTElse elseNode = ((ASTElse) this.jjtGetChild(2));
         elseNode.setTables(table, methodTable);
-        final List<String> thenInitializedVars = thenNode.evaluate(parser);
-        final List<String> elseInitializedVars = elseNode.evaluate(parser);
+        final TreeSet<String> thenInitializedVars = thenNode.evaluate(parser);
+        final TreeSet<String> elseInitializedVars = elseNode.evaluate(parser);
 
-        final Set<String> uninitializedElseVars = new HashSet<>(thenInitializedVars);
-        uninitializedElseVars.removeAll(elseInitializedVars);
-        if (uninitializedElseVars.size() > 0) {
-            for (String identifier : uninitializedElseVars) {
+        final TreeSet<String> allInitializedVars = new TreeSet<String>() {{
+            addAll(thenInitializedVars);
+            addAll(elseInitializedVars);
+        }};
+
+        for (String identifier : allInitializedVars) {
+            boolean inThen = thenInitializedVars.contains(identifier);
+            boolean inElse = elseInitializedVars.contains(identifier);
+
+            if(inThen && inElse) {
+                this.table.getSymbol(identifier).setInitialized();
+                this.initializedVars.add(identifier);
+            }
+            else if (inThen && !inElse)
                 parser.semanticWarnings.add(new SemanticsException(identifier + " is not initialized in else", elseNode));
-            }
-        }
-
-        final Set<String> uninitializedThenVars = new HashSet<>(elseInitializedVars);
-        uninitializedThenVars.removeAll(thenInitializedVars);
-        if (uninitializedThenVars.size() > 0) {
-            for (String identifier : uninitializedThenVars) {
+            else if (!inThen && inElse)
                 parser.semanticWarnings.add(new SemanticsException(identifier + " is not initialized in then", elseNode));
-            }
         }
-
     }
 
     @Override
