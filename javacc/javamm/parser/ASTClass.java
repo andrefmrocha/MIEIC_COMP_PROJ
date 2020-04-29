@@ -77,17 +77,28 @@ class ASTClass extends SimpleNode {
   public void write(PrintWriter writer) {
     writer.println(".class public " + classSymbol.getClassName());
     writer.println(".super " + (classSymbol.getExtension() == null ? "java/lang/Object" : classSymbol.getExtension().getClassName()));
-    writer.println("\n.method public <init>()V\n" +
+    writer.println();
+
+    int i = 1;
+    for(; i <this.jjtGetNumChildren();i++) {
+      SimpleNode child = (SimpleNode) this.jjtGetChild(i);
+      if (child.id == JavammTreeConstants.JJTVAR)
+        child.write(writer);
+      else
+        break;
+    }
+    if(i != 1)
+      writer.println();
+
+    writer.println(".method public <init>()V\n" +
         "  aload_0\n" +
         "  invokenonvirtual java/lang/Object/<init>()V\n" +
         "  return\n" +
         ".end method\n");
 
-    for (int i = 0; i < this.jjtGetNumChildren(); i++) {
+    for (; i < this.jjtGetNumChildren(); i++) {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
-      if (child.id == JavammTreeConstants.JJTMETHOD && i != (classSymbol.getExtension() == null ? 1 : 2))
-        writer.println();
-      if (child.id == JavammTreeConstants.JJTMETHOD || child.id == JavammTreeConstants.JJTVAR)
+      if (child.id == JavammTreeConstants.JJTMETHOD)
         child.write(writer);
     }
   }
