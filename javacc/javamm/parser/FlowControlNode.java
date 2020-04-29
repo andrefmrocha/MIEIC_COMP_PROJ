@@ -16,7 +16,7 @@ public class FlowControlNode extends SimpleNode {
 
     public List<String> evaluate(Javamm parser) {
         final List<String> initializedVars = new ArrayList<>();
-        for (int i = 1; i < this.jjtGetNumChildren(); i++) {
+        for (int i = 0; i < this.jjtGetNumChildren(); i++) {
             SimpleNode child = (SimpleNode) this.jjtGetChild(i);
             child.setTables(table, methodTable);
             if(child.id == JavammTreeConstants.JJTASSIGNVAR) {
