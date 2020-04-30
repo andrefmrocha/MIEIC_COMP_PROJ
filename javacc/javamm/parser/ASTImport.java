@@ -46,9 +46,21 @@ class ASTImport extends SimpleNode {
         }
 
         String fullImportName = String.join(".", identifiers);
-        if (identifiers.size() == 1)
-            table.putSymbol(fullImportName, new ClassSymbol(fullImportName));
-        else if (this.isStatic)
+        if (identifiers.size() == 1) {
+
+            if (table.checkSymbol(fullImportName)) {
+                Symbol symbol = table.getSymbol(fullImportName);
+                if (symbol.getType() != Type.CLASS) {
+                    parser.semanticErrors.add(new SemanticsException("Expected to find class, found " + symbol.getType(), this));
+                    return;
+                }
+                ((ClassSymbol) symbol).getConstructors().putSymbol(
+                        new MethodIdentifier(ClassSymbol.init, params), new MethodSymbol(returnValue, params));
+            } else
+                table.putSymbol(fullImportName, new ClassSymbol(fullImportName, params));
+
+
+        } else if (this.isStatic)
             methodTable.putSymbol(new MethodIdentifier(fullImportName, params), new MethodSymbol(returnValue, params));
         else {
             String methodName = identifiers.get(1);
@@ -65,7 +77,7 @@ class ASTImport extends SimpleNode {
             }
 
             ClassSymbol classSymbol = (ClassSymbol) symbol;
-            classSymbol.getSymbolTable().putSymbol(new MethodIdentifier(methodName, params), new MethodSymbol(returnValue, params));
+            classSymbol.getMethods().putSymbol(new MethodIdentifier(methodName, params), new MethodSymbol(returnValue, params));
         }
     }
 

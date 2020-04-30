@@ -25,5 +25,10 @@ import static io.println(int,int) void;
 import static io.readln() int;
 
 class ImportStressTest {
+    	public static void main(String[] args) {
+    		List l;
+
+    		l = new List();
+    	}
 
 }

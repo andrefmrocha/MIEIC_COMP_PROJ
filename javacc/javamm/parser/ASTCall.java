@@ -37,7 +37,10 @@ class ASTCall extends TypeNode {
 
     public void evalWithIdentifier(String identifier, boolean newIdentifier, Javamm parser) {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
-        final MethodIdentifier importMethodId = getMethodIdentifier(identifier + "." + methodIdentifier.identifierName, parser);
+        final ASTCallParams staticCallParams =  ((ASTCallParams) this.jjtGetChild(1));
+        staticCallParams.setTables(table, methodTable);
+        final MethodIdentifier importMethodId = staticCallParams
+                .getMethodIdentifier(identifier + "." + methodIdentifier.identifierName, parser);
         if (importMethodId == null)
             return;
 
@@ -48,26 +51,25 @@ class ASTCall extends TypeNode {
                 parser.semanticErrors.add(new SemanticsException(identifier + " is not an object", methodIdentifier));
                 return;
             }
-            final MethodIdentifier methodId = getMethodIdentifier(methodIdentifier.identifierName, parser);
+            final ASTCallParams callParams =  ((ASTCallParams) this.jjtGetChild(1));
+            callParams.setTables(table, methodTable);
+            final MethodIdentifier methodId = callParams
+                    .getMethodIdentifier(methodIdentifier.identifierName, parser);
             if (methodId == null)
                 return;
 
             final ClassSymbol classSymbol = (ClassSymbol) symbol;
 
-            if (!classSymbol.getSymbolTable().checkSymbol(methodId)) {
+            if (!classSymbol.getMethods().checkSymbol(methodId)) {
                 parser.semanticErrors.add(new SemanticsException("Method " + methodIdentifier.identifierName + " not found in class " + identifier, methodIdentifier));
                 return;
             }
-            this.type = classSymbol.getSymbolTable().getSymbol(methodId).getReturnType();
+            this.type = classSymbol.getMethods().getSymbol(methodId).getReturnType();
             setMethodInvokation("  " + invokevirtual + " ", classSymbol.getClassName(), methodIdentifier.identifierName, methodId.getParameters(), this.type);
 
         } else if (methodTable.checkSymbol(importMethodId)) {
             final MethodSymbol symbol = methodTable.getSymbol(importMethodId);
-            if (symbol.getParameters().size() != this.jjtGetNumChildren() - 1) {
-                parser.semanticErrors.add(new SemanticsException("Method " + methodIdentifier.identifierName + " expected " +
-                        symbol.getParameters().size() + " parameters, got " + (this.jjtGetNumChildren() - 1), methodIdentifier));
-                return;
-            }
+
             this.type = symbol.getReturnType();
             setMethodInvokation("  " + invokestatic + " ", identifier, methodIdentifier.identifierName, importMethodId.getParameters(), this.type);
             isStatic = true;
@@ -76,41 +78,19 @@ class ASTCall extends TypeNode {
 
     }
 
-    private MethodIdentifier getMethodIdentifier(String identifier, Javamm parser) {
-        final List<Symbol.Type> params = new ArrayList<>();
-        for (int i = 1; i < this.jjtGetNumChildren(); i++) {
-            SimpleNode node = (SimpleNode) this.jjtGetChild(i);
-            if (node.id == JavammTreeConstants.JJTIDENTIFIER) {
-                final ASTIdentifier identifierNode = (ASTIdentifier) node;
-                if (!table.checkSymbol(identifierNode.identifierName)) {
-                    parser.semanticErrors.add(new SemanticsException("No variable named " + identifierNode.identifierName + " found", node));
-                    return null;
-                }
-                Symbol symbol = table.getSymbol(identifierNode.identifierName);
-                params.add(symbol.getType());
-
-            } else if (node instanceof TypeNode) {
-                TypeNode typeNode = (TypeNode) node;
-                typeNode.setTables(table, methodTable);
-                typeNode.eval(parser);
-                params.add(typeNode.type);
-            } else
-                params.add(VarNode.getType(node, table, parser));
-
-        }
-        return new MethodIdentifier(identifier, params);
-    }
-
     public void evalWithThis(Javamm parser) {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
-        final MethodIdentifier methodId = getMethodIdentifier(methodIdentifier.identifierName, parser);
+        final ASTCallParams callParams =  ((ASTCallParams) this.jjtGetChild(1));
+        callParams.setTables(table, methodTable);
+        final MethodIdentifier methodId = callParams
+                .getMethodIdentifier(methodIdentifier.identifierName, parser);
         if (!methodTable.checkSymbol(methodId)) {
             parser.semanticErrors.add(new SemanticsException("Method " + methodIdentifier.identifierName + " not found in line " + getLine(), methodIdentifier));
             return;
         }
         final Symbol symbol = methodTable.getSymbol(methodId);
 
-        if (symbol.getType() != Symbol.Type.METHOD){
+        if (symbol.getType() != Symbol.Type.METHOD) {
             parser.semanticErrors.add(new SemanticsException(methodIdentifier.identifierName + " is not a method", methodIdentifier));
             return;
         }
@@ -124,7 +104,6 @@ class ASTCall extends TypeNode {
     @Override
     public void write(PrintWriter writer) {
         for (int i = 1; i < this.jjtGetNumChildren(); i++) {
-            ((SimpleNode) this.jjtGetChild(i)).setTables(table, methodTable);
             ((SimpleNode) this.jjtGetChild(i)).write(writer);
         }
         writer.println(methodInvokation);

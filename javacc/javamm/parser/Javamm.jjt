@@ -101,12 +101,17 @@ void ImportDeclaration() #void : {}
 
 void ImportStatement() #void : {}
 {
-    (  [ <STATIC> #Static {jjtThis.isStatic=true;}] Identifier()  [<DOT> Identifier()] [((<LFTBRCKT> ImportParamList() <RGHTBRCKT>) | "()") [Type() #Return ]] ) #Import
+    (  [ <STATIC> #Static {jjtThis.isStatic=true;}] Identifier()  [ ImportParams() | <DOT> Identifier() ( ImportParams() | "()") [Type() #Return ]] ) #Import
+}
+
+void ImportParams() #void :{}
+{
+    <LFTBRCKT> ImportParamList() <RGHTBRCKT>
 }
 
 void ImportParamList() #void : {}
 {
-    [Type() (<COMMA> Type())*] #ImportParams
+    (Type() (<COMMA> Type())*) #ImportParams
 }
 
 void Identifier() #void : {Token t;}
@@ -277,9 +282,12 @@ void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #
 
     System.out.println("> Skipped '" + skipped + "'\n");
 }
+void CallParams() #CallParams : {} {
+    <LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> | "()"
+}
 
 void MethodCall() #Call : {} {
-    Identifier() (<LFTBRCKT> [ Expression() (<COMMA> Expression() )* ] <RGHTBRCKT> | "()")
+    Identifier() CallParams()
 }
 
 void Type() #void : {}
@@ -433,7 +441,7 @@ void Terminals() # void : { Token t; } {
     | <FALSE> { jjtThis.bool = false; } #BooleanValue
     | <THIS> #This
     | <NEW> (
-              (Identifier() ("()" | <LFTBRCKT> <RGHTBRCKT> )) #New
+              (Identifier() CallParams() )#New
              |
               (<INT> <LFTSQRBRCKT> Expression() <RGHTSQRBRCKT>) #NewArray
              )

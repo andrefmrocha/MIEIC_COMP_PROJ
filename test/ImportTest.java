@@ -10,10 +10,10 @@ public class ImportTest {
     private static String CLASS_WITH_MAIN = "Main";
 
 
-//    @Test
-//    public void testImports() {
-//        CompUtils.testJavamm("fixtures/public/ImportStressTest.jmm", false, CLASS_WITH_MAIN);
-//    }
+    @Test
+    public void testImports() {
+        CompUtils.testJavamm("fixtures/public/ImportStressTest.jmm", false, CLASS_WITH_MAIN);
+    }
 
 
 }

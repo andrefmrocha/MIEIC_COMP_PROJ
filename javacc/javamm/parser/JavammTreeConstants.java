@@ -45,6 +45,7 @@ public interface JavammTreeConstants
     public int JJTMETHODRETURN = 39;
     public int JJTTHEN = 40;
     public int JJTELSE = 41;
+    public int JJTCALLPARAMS = 42;
 
 
     public String[] jjtNodeName = {
