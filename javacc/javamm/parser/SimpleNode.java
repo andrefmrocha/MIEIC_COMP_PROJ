@@ -56,6 +56,13 @@ class SimpleNode implements Node {
     }
   }
 
+  public void printTable()  {
+    for(int i = 0; i< this.jjtGetNumChildren(); i++) {
+      SimpleNode node = (SimpleNode) this.jjtGetChild(i);
+      node.printTable();
+    }
+  }
+
   public void jjtClose() {
   }
 
