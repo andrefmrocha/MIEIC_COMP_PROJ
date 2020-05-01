@@ -15,6 +15,16 @@ class ASTWhile extends ConditionalNode {
   }
 
   @Override
+  public void eval(Javamm parser) {
+    super.eval(parser);
+    for (int i = 1; i < this.jjtGetNumChildren(); i++) {
+      SimpleNode child = (SimpleNode) this.jjtGetChild(i);
+      child.setTables(table, methodTable);
+      child.eval(parser);
+    }
+  }
+
+  @Override
   public void write(PrintWriter writer) {
     //TODO implement this or leave blank to not call the default one
   }

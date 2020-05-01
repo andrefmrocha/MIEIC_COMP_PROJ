@@ -67,7 +67,7 @@ public class VarNode extends SimpleNode {
 
         Symbol varSym;
         if (type != Type.CLASS)
-            varSym = new Symbol(type, "", isInitialized, stackPos);
+            varSym = new Symbol(type, isInitialized, stackPos);
         else {
             ClassSymbol symbol = (ClassSymbol) table.getSymbol(((ASTIdentifier) typeNode).identifierName);
             varSym = new ClassSymbol(Type.OBJ,symbol.getClassName(), symbol.getSymbolTable(), symbol.getExtension(), stackPos);

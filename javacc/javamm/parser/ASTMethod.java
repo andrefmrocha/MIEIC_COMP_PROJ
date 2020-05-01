@@ -81,7 +81,7 @@ class ASTMethod extends TypeNode {
         }
 
         methodBody.write(writer);
-        writer.println(".end method");
+        writer.println(".end method\n");
     }
 
     public List<Symbol> getParameters() {

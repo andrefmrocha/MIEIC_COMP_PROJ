@@ -107,11 +107,6 @@ class SimpleNode implements Node {
   public void dump(String prefix) {
     System.out.println(toString(prefix));
 
-    // Test Symbol Table
-//    if( this.table != null) {
-//      System.out.println("print the method" + this.table.getTable().toString());
-//    }
-
     if (children != null) {
       for (int i = 0; i < children.length; ++i) {
         SimpleNode n = (SimpleNode)children[i];

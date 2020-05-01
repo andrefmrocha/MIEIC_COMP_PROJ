@@ -12,7 +12,6 @@ public class Symbol {
     }
 
     final protected Type type;
-    final protected String val;
     protected boolean isInitialized;
 
     public Type getType() {
@@ -20,21 +19,16 @@ public class Symbol {
     }
 
     public Symbol(Type type) {
-        this(type, "");
+        this(type, false);
     }
 
-    public Symbol(Type type, String val) {
-        this(type, val, false);
-    }
-
-    public Symbol(Type type, String val, boolean isInitialized) {
+    public Symbol(Type type, boolean isInitialized) {
         this.type = type;
-        this.val = val;
         this.isInitialized = isInitialized;
     }
 
-    public Symbol(Type type, String s, boolean isInitialized, int stackPos) {
-        this(type, s, isInitialized);
+    public Symbol(Type type, boolean isInitialized, int stackPos) {
+        this(type, isInitialized);
         this.stackPos = stackPos;
     }
 
@@ -71,9 +65,8 @@ public class Symbol {
     public static String getJVMPrefix(Type type) {
         switch (type) {
             case INT:
-                return "i";
             case BOOL:
-                return "b";
+                return "i";
             case INT_ARRAY:
             case CLASS:
             case OBJ:
@@ -95,6 +88,10 @@ public class Symbol {
 
     public void setInitialized() {
         isInitialized = true;
+    }
+
+    public void setInitialized(boolean init) {
+        isInitialized = init;
     }
 
     public int getStackPos() {

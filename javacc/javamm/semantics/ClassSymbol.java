@@ -6,25 +6,25 @@ public class ClassSymbol extends Symbol {
     String className;
 
     public ClassSymbol(String className) {
-        super(Type.CLASS, "", true);
+        super(Type.CLASS, true);
         this.className = className;
     }
 
     public ClassSymbol(Type type, String className, MethodSymbolTable symbolTable) {
-        super(type, "", true);
+        super(type, true);
         this.className = className;
         this.symbolTable = symbolTable;
     }
 
     public ClassSymbol(Type type, String className, MethodSymbolTable symbolTable, ClassSymbol extension) {
-        super(type, "", true);
+        super(type, true);
         this.className = className;
         this.symbolTable = symbolTable;
         this.extension = extension;
     }
 
     public ClassSymbol(Type type, String className, MethodSymbolTable symbolTable, ClassSymbol extension, int stackPos) {
-        super(type, "", true, stackPos);
+        super(type, true, stackPos);
         this.className = className;
         this.symbolTable = symbolTable;
         this.extension = extension;
@@ -50,7 +50,6 @@ public class ClassSymbol extends Symbol {
         if (className.equals(targetParent.getClassName())) return true;
 
         ClassSymbol parent = this.extension;
-        System.out.println(parent);
         while (parent != null) {
             String parentName = parent.getClassName();
             if (parentName.equals(targetParent.getClassName())) return true;

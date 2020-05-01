@@ -36,7 +36,7 @@ public abstract class TypeNode extends SimpleNode {
             }
 
             if (!sym.isInitialized()) {
-                parser.semanticErrors.add(new SemanticsException("Variable " + name + " is not initialized", child));
+                parser.semanticWarnings.add(new SemanticsException("Variable " + name + " may not be initialized", child));
             }
         } else if (child instanceof TypeNode) {
             child.setTables(table, methodTable);
@@ -59,7 +59,6 @@ public abstract class TypeNode extends SimpleNode {
 
                 if (!childClassSymbol.derivesFrom(expectedClass)) {
                     parser.semanticErrors.add(new SemanticsException("Class " + childClassSymbol.getClassName() + " does not derive from " + expectedClass.getClassName(), child));
-                    return;
                 }
             }
         } else

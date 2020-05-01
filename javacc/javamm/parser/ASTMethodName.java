@@ -50,7 +50,7 @@ class ASTMethodName extends SimpleNode {
     public void write(PrintWriter writer) {
         writer.print(".method public " + methodName + "(");
         for (Symbol.Type type : parametersTypes) {
-            writer.print(Symbol.getJVMTypeByType(type) + ",");
+            writer.print(Symbol.getJVMTypeByType(type));
         }
         writer.println(")" + Symbol.getJVMTypeByType(returnType));
     }
