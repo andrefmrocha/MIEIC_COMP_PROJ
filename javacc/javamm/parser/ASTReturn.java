@@ -27,6 +27,15 @@ class ASTReturn extends TypeNode {
     this.returnType = Symbol.getNodeSymbolType(child); //TODO does not support statements
   }
 
+  public void evalIdentifiers(Javamm parser) {
+    SimpleNode child = (SimpleNode) this.jjtGetChild(0);
+    if (!(child instanceof ASTIdentifier)) return;
+    String identifierName = ((ASTIdentifier) child).identifierName;
+    if(!this.table.checkSymbol(identifierName)) {
+      parser.semanticErrors.add(new SemanticsException("Unknown identifier type: " + identifierName, this));
+    }
+  }
+
   @Override
   public void write(PrintWriter writer) {
     //TODO implement this or leave blank to not call the default one
