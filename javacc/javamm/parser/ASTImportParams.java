@@ -26,11 +26,25 @@ class ASTImportParams extends SimpleNode {
             SimpleNode currNode = (SimpleNode) this.jjtGetChild(i);
             currNode.setTables(table, methodTable);
             currNode.eval(parser);
+
             Symbol.Type type = Symbol.getNodeSymbolType(currNode);
             if(type != Symbol.Type.VOID)
                 paramTypes.add(type);
         }
 
+    }
+
+    public void evalIdentifiers(Javamm parser) {
+        for(int i = 0; i < this.jjtGetNumChildren(); i++){
+            SimpleNode currNode = (SimpleNode) this.jjtGetChild(i);
+            if (!(currNode instanceof ASTIdentifier)) continue;
+
+            String identifierName = ((ASTIdentifier) currNode).identifierName;
+            if(!this.table.checkSymbol(identifierName)) {
+                parser.semanticErrors.add(new SemanticsException("Unknown identifier type: " + identifierName, this));
+                return;
+            }
+        }
     }
 
 }

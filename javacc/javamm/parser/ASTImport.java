@@ -60,7 +60,8 @@ class ASTImport extends SimpleNode {
                 table.putSymbol(fullImportName, new ClassSymbol(fullImportName, params));
 
 
-        } else if (this.isStatic)
+        }
+        else if (this.isStatic)
             methodTable.putSymbol(new MethodIdentifier(fullImportName, params), new MethodSymbol(returnValue, params));
         else {
             String methodName = identifiers.get(1);
@@ -79,6 +80,20 @@ class ASTImport extends SimpleNode {
             ClassSymbol classSymbol = (ClassSymbol) symbol;
             classSymbol.getMethods().putSymbol(new MethodIdentifier(methodName, params), new MethodSymbol(returnValue, params));
         }
+    }
+
+    public void evalIdentifiers(Javamm parser) {
+
+        for (int i = 0; i < this.jjtGetNumChildren(); i++) {
+            SimpleNode currNode = (SimpleNode) this.jjtGetChild(i);
+
+            if (currNode.id == JavammTreeConstants.JJTIMPORTPARAMS) {
+                ((ASTImportParams) currNode).evalIdentifiers(parser);
+            } else if (currNode.id == JavammTreeConstants.JJTRETURN) {
+                ((ASTReturn) currNode).evalIdentifiers(parser);
+            }
+        }
+
     }
 
     @Override
