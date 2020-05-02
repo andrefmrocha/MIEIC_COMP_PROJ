@@ -35,10 +35,10 @@ public class Main {
 				System.out.println(e.getError() + " in line " + e.getNode().getLine());
 			}
 
+			node.dump("");
 			if (javamm.semanticErrors.size() > 0)
 				throw new RuntimeException();
 
-			node.dump("");
 			Matcher fileMatch = Pattern.compile("(?<=/)?(\\w)+.jmm$").matcher(args[0]);
 			if(!fileMatch.find())
 				throw new IllegalArgumentException();

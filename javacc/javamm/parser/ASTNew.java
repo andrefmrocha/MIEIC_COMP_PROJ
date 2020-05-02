@@ -2,6 +2,7 @@ package javamm.parser;
 
 import javamm.SemanticsException;
 import javamm.semantics.ClassSymbol;
+import javamm.semantics.MethodIdentifier;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
@@ -13,6 +14,7 @@ public
 class ASTNew extends TypeNode {
     public ClassSymbol classSymbol;
     public String identifier;
+    private MethodIdentifier constructor;
 
     public ASTNew(int id) {
         super(id);
@@ -26,24 +28,32 @@ class ASTNew extends TypeNode {
 
     @Override
     public void eval(Javamm parser) {
-        if (this.jjtGetNumChildren() != 1) {
-            parser.semanticErrors.add(new SemanticsException("New operation is unary", this));
-            return;
-        }
-
         SimpleNode child = (SimpleNode) this.jjtGetChild(0);
         this.evaluateChild(child, new Symbol(type), parser);
 
         ASTIdentifier identifier = (ASTIdentifier) child;
         classSymbol = (ClassSymbol) table.getSymbol(identifier.identifierName);
+        final ASTCallParams callParams = ((ASTCallParams) this.jjtGetChild(1));
+        callParams.setTables(table, methodTable);
+        constructor = callParams.getMethodIdentifier(ClassSymbol.init, parser);
         this.identifier = identifier.identifierName;
+
+        if (!classSymbol.getConstructors().checkSymbol(constructor))
+            parser.semanticErrors.add(new SemanticsException("Can't find constructor with that signature", callParams));
+
+
     }
 
     @Override
     public void write(PrintWriter writer) {
         writer.println("  new " + identifier); // create new reference
         writer.println("  dup"); //duplicate object on top of stack, need 2 references (1 constructor + 1 assign)
-        writer.println("  invokespecial " + identifier + "/<init>()V"); // call constructor
+        ((SimpleNode) this.jjtGetChild(1)).write(writer);
+        writer.print("  invokespecial " + identifier + "/<init>("); // call constructor
+        for(Type type : constructor.getParameters()){
+            writer.print(Symbol.getJVMTypeByType(type));
+        }
+        writer.println(")V");
     }
 }
 /* JavaCC - OriginalChecksum=c6d588009442d8c81f835326710afcd3 (do not edit this line) */

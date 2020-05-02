@@ -48,7 +48,7 @@ class ASTExtend extends SimpleNode {
         }
 
         extendedClass = (ClassSymbol) identifier;
-        methodTable.getTable().putAll(extendedClass.getSymbolTable().getTable());
+        methodTable.getTable().putAll(extendedClass.getMethods().getTable());
     }
 
 }

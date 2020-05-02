@@ -1,32 +1,47 @@
 package javamm.semantics;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ClassSymbol extends Symbol {
-    MethodSymbolTable symbolTable = new MethodSymbolTable();
+    public static final String init = "<init>";
+    MethodSymbolTable methods = new MethodSymbolTable();
+    MethodSymbolTable constructors = new MethodSymbolTable();
     ClassSymbol extension = null;
     String className;
 
     public ClassSymbol(String className) {
         super(Type.CLASS, true);
+        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(Type.CLASS, new ArrayList<>()));
         this.className = className;
     }
 
-    public ClassSymbol(Type type, String className, MethodSymbolTable symbolTable) {
-        super(type, true);
+    public ClassSymbol(String className, List<Type> constructorParams) {
+        super(Type.CLASS, true);
+        constructors.putSymbol(new MethodIdentifier(init, constructorParams), new MethodSymbol(Type.CLASS, constructorParams));
         this.className = className;
-        this.symbolTable = symbolTable;
     }
 
-    public ClassSymbol(Type type, String className, MethodSymbolTable symbolTable, ClassSymbol extension) {
+    public ClassSymbol(Type type, String className, MethodSymbolTable methods) {
         super(type, true);
+        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(Type.CLASS, new ArrayList<>()));
         this.className = className;
-        this.symbolTable = symbolTable;
+        this.methods = methods;
+    }
+
+    public ClassSymbol(Type type, String className, MethodSymbolTable methods, ClassSymbol extension) {
+        super(type, true);
+        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(Type.CLASS, new ArrayList<>()));
+        this.className = className;
+        this.methods = methods;
         this.extension = extension;
     }
 
-    public ClassSymbol(Type type, String className, MethodSymbolTable symbolTable, ClassSymbol extension, int stackPos) {
+    public ClassSymbol(Type type, String className, MethodSymbolTable methods, ClassSymbol extension, int stackPos) {
         super(type, true, stackPos);
+        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(Type.CLASS, new ArrayList<>()));
         this.className = className;
-        this.symbolTable = symbolTable;
+        this.methods = methods;
         this.extension = extension;
     }
 
@@ -38,8 +53,12 @@ public class ClassSymbol extends Symbol {
         return extension;
     }
 
-    public MethodSymbolTable getSymbolTable() {
-        return symbolTable;
+    public MethodSymbolTable getMethods() {
+        return methods;
+    }
+
+    public MethodSymbolTable getConstructors() {
+        return constructors;
     }
 
     public String getClassName() {
