@@ -2,15 +2,25 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package javamm.parser;
 
+import javamm.semantics.ClassSymbol;
+import javamm.semantics.MethodIdentifier;
+import javamm.semantics.MethodSymbol;
+import javamm.semantics.Symbol;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 public
 class ASTProgram extends SimpleNode {
-    public ASTProgram(int id) {
-        super(id);
-    }
+  public ASTProgram(int id) {
+    super(id);
+  }
 
-    public ASTProgram(Javamm p, int id) {
-        super(p, id);
-    }
+  public ASTProgram(Javamm p, int id) {
+    super(p, id);
+  }
 
     public void eval(Javamm parser) {
         super.eval(parser);
@@ -23,6 +33,62 @@ class ASTProgram extends SimpleNode {
             importNode.evalIdentifiers(parser);
         }
     }
+
+  @Override
+  public void printTable() {
+    System.out.println("//".repeat(40));
+    System.out.println("  Import Table:");
+
+    List<ClassSymbol> list = new ArrayList<>();
+    if(!this.table.getTable().isEmpty()) {
+      System.out.println("    Variable Table:");
+      Iterator it = this.table.getTable().entrySet().iterator();
+      while(it.hasNext()) {
+        Map.Entry pair = (Map.Entry) it.next();
+        System.out.println("      Name: " + pair.getKey() + " | Type: " + ((ClassSymbol)pair.getValue()).getType()); //TODO: Add arguments of constructor
+        list.add((ClassSymbol) pair.getValue());
+      }
+      System.out.println("\n    Imported Methods:");
+      for(ClassSymbol sym : list) {
+          Iterator iter = sym.getMethods().getTable().entrySet().iterator();
+          while(iter.hasNext()) {
+            Map.Entry pair = (Map.Entry) iter.next();
+            System.out.print("      Name: " + sym.getClassName() + "." + ((MethodIdentifier)pair.getKey()).getIdentifier() + " | Params: <");
+            List<Symbol.Type> parameters = ((MethodSymbol)pair.getValue()).getParameters();
+            for(int i = 0 ; i < parameters.size(); i++) {
+              System.out.print(parameters.get(i));
+              if(i != parameters.size()-1)
+                System.out.print(",");
+              else
+                break;
+            }
+            System.out.println("> | Returns: " + ((MethodSymbol)pair.getValue()).getReturnType());
+          }
+      }
+      System.out.println();
+    }
+
+    if(!methodTable.getTable().isEmpty()) {
+      System.out.println("    Static Methods:");
+      Iterator it = this.methodTable.getTable().entrySet().iterator();
+      while(it.hasNext()) {
+        Map.Entry pair = (Map.Entry) it.next();
+        System.out.print("      Name: " + ((MethodIdentifier)pair.getKey()).getIdentifier() + " | Params: <");
+        List<Symbol.Type> parameters = ((MethodSymbol)pair.getValue()).getParameters();
+        for(int i = 0 ; i < parameters.size(); i++) {
+          System.out.print(parameters.get(i));
+          if(i != parameters.size()-1)
+            System.out.print(",");
+          else
+            break;
+        }
+        System.out.println("> | Returns: " + ((MethodSymbol)pair.getValue()).getReturnType());
+      }
+      System.out.println();
+    }
+
+    super.printTable();
+  }
 
 }
 /* JavaCC - OriginalChecksum=a6621b64ae88273fafdfedc41d08c4b5 (do not edit this line) */

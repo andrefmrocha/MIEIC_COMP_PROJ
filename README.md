@@ -31,10 +31,10 @@ Where ``<class_name>`` is the name of the class you want to run and ``<arguments
 To run the JAR, do the following command:
 
 ```cmd
-java -jar <jar filename> <arguments>
+java -jar <jar filename> [-d] <arguments>
 ```
 
-Where ``<jar filename>`` is the name of the JAR file that has been copied to the root folder, and ``<arguments>`` are the arguments to be passed to ``main()``.
+Where ``<jar filename>`` is the name of the JAR file that has been copied to the root folder, `` -d `` is the debug mode flag, and ``<arguments>`` are the arguments to be passed to ``main()``.
 
 ## Test
 

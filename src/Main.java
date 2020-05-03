@@ -12,36 +12,48 @@ import javamm.parser.ParseException;
 import javamm.SemanticsException;
 
 public class Main {
-	
+	private static boolean debugMode = false;
+
 	public static void main(String[] args) {
 		PrintWriter writer;
 		Javamm javamm;
 		try {
-			javamm = new Javamm(new java.io.FileInputStream(args[0]));
+
+			//setup
+			String filename = checkDebugMode(args);
+			Matcher fileMatch = Pattern.compile("(?<=/)?(\\w)+.jmm$").matcher(filename);
+			if(!fileMatch.find())
+				throw new IllegalArgumentException("File has not the correct extension: .jmm");
+			javamm = new Javamm(new java.io.FileInputStream(filename));
 			SimpleNode node = javamm.Program();
 			if(javamm.getNumErrors() < javamm.NUM_ERRORS)
 				throw new RuntimeException();
 			SymbolTable newTable = new SymbolTable();
 			MethodSymbolTable methodTable = new MethodSymbolTable();
+
+			//syntax and semantic analysis
 			node.setTables(newTable, methodTable);
 			node.eval(javamm);
-			System.out.println("Errors: ");
-			for(SemanticsException e: javamm.semanticErrors){
-				System.out.println(e.getError() + " in line " + e.getNode().getLine());
+
+			if(debugMode) {
+				node.dump("");
+				node.printTable();
 			}
 
-			System.out.println("Warnings: ");
-			for(SemanticsException e: javamm.semanticWarnings){
-				System.out.println(e.getError() + " in line " + e.getNode().getLine());
-			}
+			if (javamm.semanticErrors.size() > 0) {
+				System.out.println("Errors: ");
+				for(SemanticsException e: javamm.semanticErrors){
+					System.out.println(e.getError() + " in line " + e.getNode().getLine());
+				}
 
-			node.dump("");
-			if (javamm.semanticErrors.size() > 0)
+				System.out.println("Warnings: ");
+				for(SemanticsException e: javamm.semanticWarnings){
+					System.out.println(e.getError() + " in line " + e.getNode().getLine());
+				}
 				throw new RuntimeException();
+			} else System.out.println("Analysis completed successfully. Moving on to code generation...");
 
-			Matcher fileMatch = Pattern.compile("(?<=/)?(\\w)+.jmm$").matcher(args[0]);
-			if(!fileMatch.find())
-				throw new IllegalArgumentException();
+			//code generation
 			String generated_name = fileMatch.group().replace(".jmm",".j");
 			File file = new File("jasmin_gen/" + generated_name);
 			file.getParentFile().mkdirs();
@@ -49,12 +61,27 @@ public class Main {
 			writer.println(".source " + generated_name);
 			node.write(writer);
 			writer.close();
+			System.out.println("Code generated successfully. The files are located in the folder 'jasmin_gen' in the project root.");
 		}catch (ParseException | FileNotFoundException e){
 			e.printStackTrace();
 			throw new RuntimeException();
 		}
 
 
+	}
+
+	private static String checkDebugMode(String[] args) throws ParseException {
+		if(args.length > 2 || args.length < 1)
+			throw new IllegalArgumentException("At least one argument needed and at most two arguments allowed: [ -d ] <filename>");
+		if(args.length < 2 && args[0].equals("-d"))
+			throw new IllegalArgumentException("No file selected: [ -d] <filename>");
+		if(args.length > 1 && args[1].equals("-d"))
+			throw new IllegalArgumentException("Wrong usage: [ -d ] <filename>");
+		if(args[0].equals("-d")) {
+			debugMode = true;
+			return args[1];
+		} else
+			return args[0];
 	}
 }
 	
