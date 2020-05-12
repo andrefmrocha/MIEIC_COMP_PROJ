@@ -33,7 +33,19 @@ class ASTNegation extends TypeNode {
 
     @Override
     public void write(PrintWriter writer) {
-        //TODO implement this or leave blank to not call the default one
+        int currCounter = ASTIf.labelCounter;
+        ASTIf.labelCounter++;
+        write(writer,"notNeg_" + currCounter);
+        writer.println("  iconst_1");
+        writer.println("  goto endEval_" + currCounter);
+        writer.println("notNeg_" + currCounter + ":");
+        writer.println("  iconst_0");
+        writer.println("endEval_" + currCounter + ":");
+    }
+
+    public void write(PrintWriter writer, String labelFalse) {
+        super.write(writer);
+        writer.println("  ifne " + labelFalse);
     }
 }
 /* JavaCC - OriginalChecksum=13de953db4e66e1048f234f837f24db4 (do not edit this line) */

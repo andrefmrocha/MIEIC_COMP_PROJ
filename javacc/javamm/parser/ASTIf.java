@@ -1,7 +1,6 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
-import javamm.semantics.Symbol;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -10,6 +9,8 @@ import java.util.*;
 /* JavaCCOptions:MULTI=true,NODE_USES_Javamm=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTIf extends ConditionalNode {
+    public static int labelCounter = 0; //if/else counter
+
     public TreeSet<String> initializedVars = new TreeSet<>();
 
     public ASTIf(int id) {
@@ -52,7 +53,41 @@ class ASTIf extends ConditionalNode {
 
     @Override
     public void write(PrintWriter writer) {
-        //TODO implement this or leave blank to not call the default one
+        SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
+        int currCounter = labelCounter;
+        switch (expression.id) {
+            case JavammTreeConstants.JJTAND:
+                ASTAnd andExp = (ASTAnd) expression;
+                andExp.write(writer,"else_" + currCounter);
+                break;
+            case JavammTreeConstants.JJTIDENTIFIER:
+                ASTIdentifier varExp = (ASTIdentifier) expression;
+                varExp.write(writer);
+                writer.println("  ifeq else_" + currCounter);
+                break;
+            case JavammTreeConstants.JJTBOOLEANVALUE:
+            case JavammTreeConstants.JJTNEGATION:
+                TypeNode boolExp = (TypeNode) expression;
+                boolExp.write(writer);
+                writer.println("  ifne else_" + currCounter);
+                break;
+            case JavammTreeConstants.JJTLESSTHAN:
+                ASTLessThan lsThanExp = (ASTLessThan) expression;
+                lsThanExp.write(writer, "else_" + currCounter);
+                break;
+            default:
+                return;
+        }
+
+        ASTThen thenNode = (ASTThen) this.jjtGetChild(1);
+        ASTElse elseNode = (ASTElse) this.jjtGetChild(2);
+
+        labelCounter++;
+        thenNode.write(writer);
+        writer.println("  goto endif_" + currCounter);
+        writer.println("else_" + currCounter + ":");
+        elseNode.write(writer);
+        writer.println("endif_" + currCounter + ":");
     }
 }
 /* JavaCC - OriginalChecksum=3f17c4ed5b4fd5cc052c1c2d168b79b9 (do not edit this line) */

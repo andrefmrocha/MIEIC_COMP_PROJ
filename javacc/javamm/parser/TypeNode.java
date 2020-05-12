@@ -6,6 +6,7 @@ import javamm.semantics.MethodSymbol;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
+import java.io.PrintWriter;
 
 public abstract class TypeNode extends SimpleNode {
     protected Type type = Type.VOID;
@@ -69,4 +70,6 @@ public abstract class TypeNode extends SimpleNode {
         return symbol.getType() == type ||
                 (symbol.getType() == Type.METHOD && ((MethodSymbol) symbol).getReturnType() == type);
     }
+
+    public void write(PrintWriter writer, String labelFalse) {}
 }

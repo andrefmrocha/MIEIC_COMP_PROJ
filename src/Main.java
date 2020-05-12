@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javamm.parser.ASTIf;
 import javamm.semantics.SymbolTable;
 import javamm.semantics.MethodSymbolTable;
 import javamm.parser.Javamm;
@@ -54,6 +55,7 @@ public class Main {
 			} else System.out.println("Analysis completed successfully. Moving on to code generation...");
 
 			//code generation
+			ASTIf.labelCounter = 0;
 			String generated_name = fileMatch.group().replace(".jmm",".j");
 			File file = new File("jasmin_gen/" + generated_name);
 			file.getParentFile().mkdirs();
