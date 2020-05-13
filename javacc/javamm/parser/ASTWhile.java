@@ -7,7 +7,8 @@ import java.io.PrintWriter;
 public
 class ASTWhile extends ConditionalNode {
 
-  protected int n = 0;
+  public static int labelCounter = 0;
+
   public ASTWhile(int id) {
     super(id);
   }
@@ -29,27 +30,29 @@ class ASTWhile extends ConditionalNode {
   @Override
   public void write(PrintWriter writer) {
 
-    writer.println("while_" + n + ":");
+    int localCounter = labelCounter;
+
+    writer.println("while_" + localCounter + ":");
     SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
     switch (expression.id) {
       case JavammTreeConstants.JJTAND:
         ASTAnd andExp = (ASTAnd) expression;
-        andExp.write(writer,"endwhile_" );
+        andExp.write(writer,"endwhile_" + localCounter);
         break;
       case JavammTreeConstants.JJTIDENTIFIER:
         ASTIdentifier varExp = (ASTIdentifier) expression;
         varExp.write(writer);
-        writer.println("  ifeq endwhile_" + n );
+        writer.println("  ifeq endwhile_" + localCounter );
         break;
       case JavammTreeConstants.JJTBOOLEANVALUE:
       case JavammTreeConstants.JJTNEGATION:
         TypeNode boolExp = (TypeNode) expression;
         boolExp.write(writer);
-        writer.println("  ifne endwhile_" + n );
+        writer.println("  ifne endwhile_" + localCounter );
         break;
       case JavammTreeConstants.JJTLESSTHAN:
         ASTLessThan lsThanExp = (ASTLessThan) expression;
-        lsThanExp.write(writer, "endwhile_" + n );
+        lsThanExp.write(writer, "endwhile_" + localCounter );
         break;
       default:
         return;
@@ -57,11 +60,14 @@ class ASTWhile extends ConditionalNode {
 
     for(int i = 1; i < this.jjtGetNumChildren(); i++) {
       SimpleNode exp = (SimpleNode) this.jjtGetChild(i);
+      if(exp.id ==  JavammTreeConstants.JJTWHILE)
+        labelCounter++;
       exp.write(writer);
     }
 
-    writer.println("  goto " + "while_" + n );
-    writer.println("  endwhile_" + n + ":" + "\n");
+    writer.println("  goto " + "while_" + localCounter );
+    writer.println("endwhile_" + localCounter + ":");
+    labelCounter++;
   }
 
 }
