@@ -1,33 +1,24 @@
-import io.println(int) void; // by default considers the return as void
-import test.batata(int,int[]) int;
-import test(batata,int,int[]) int;
-class Fac extends bananas {
+import static io.println(int) void; // by default considers the return as void
+class Fac {
     public int ComputeFac(int num){
         int num_aux ;
         if (num < 1) {
-            num[2] = 1+1;
+            num  = 1+1;
             num_aux = 1;
         }
         else
             num_aux = num * (this.ComputeFac(num-1));
-        while(abc) {
-            num_aux = 2;
-        }
 
-        while (absdhaso) {
-            1 + 1;
-        }
-
-        while(1) {
-         1;
-        }
         return num_aux;
     }
     public static void main(String[] args){
         int aux;
         void aubs;
         io.println(new Fac().ComputeFac(10)); //assuming the existence
-        // of the classfile io.class
+        aux = 1;
+
+        aux = aux + aux + 1 + 1000;
+
     }
 
 }
