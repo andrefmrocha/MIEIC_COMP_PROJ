@@ -14,46 +14,46 @@ class ASTAssignVar extends TypeNode {
     public String varIdentifier;
     private int iinc = Integer.MAX_VALUE;
 
-    public ASTAssignVar(int id) {
-        super(id);
+  public ASTAssignVar(int id) {
+    super(id);
+  }
+
+  public ASTAssignVar(Javamm p, int id) {
+    super(p, id);
+  }
+
+  @Override
+  public void eval(Javamm parser) {
+    if (this.jjtGetNumChildren() != 2) {
+      parser.semanticErrors.add(new SemanticsException("Variable assignment must have two operators", this));
+      return;
     }
 
-    public ASTAssignVar(Javamm p, int id) {
-        super(p, id);
+    SimpleNode identifier = (SimpleNode) this.jjtGetChild(0);
+
+    if (identifier.id != JavammTreeConstants.JJTIDENTIFIER) {
+      parser.semanticErrors.add(new SemanticsException("Variable has not a valid identifier", identifier));
+      return;
     }
 
-    @Override
-    public void eval(Javamm parser) {
-        if (this.jjtGetNumChildren() != 2) {
-            parser.semanticErrors.add(new SemanticsException("Variable assignment must have two operators", this));
-            return;
-        }
+    ASTIdentifier temp = (ASTIdentifier) identifier;
+    varIdentifier = temp.identifierName;
 
-        SimpleNode identifier = (SimpleNode) this.jjtGetChild(0);
-
-        if (identifier.id != JavammTreeConstants.JJTIDENTIFIER) {
-            parser.semanticErrors.add(new SemanticsException("Variable has not a valid identifier", identifier));
-            return;
-        }
-
-        ASTIdentifier temp = (ASTIdentifier) identifier;
-        varIdentifier = temp.identifierName;
-
-        if (!this.table.checkSymbol(varIdentifier)) {
-            parser.semanticErrors.add(new SemanticsException("Variable " + varIdentifier + " does not exist", identifier));
-            return;
-        }
-
-        Symbol symbol = this.table.getSymbol(varIdentifier);
-
-        SimpleNode expression = (SimpleNode) this.jjtGetChild(1);
-        this.evaluateChild(expression, symbol, parser);
-
-        symbol.setInitialized();
-
-        if (expression.id == JavammTreeConstants.JJTSUM)
-            this.optimizeMathOperation(expression);
+    if (!this.table.checkSymbol(varIdentifier)) {
+      parser.semanticErrors.add(new SemanticsException("Variable " + varIdentifier + " does not exist", identifier));
+      return;
     }
+
+    Symbol symbol = this.table.getSymbol(varIdentifier);
+
+    SimpleNode expression = (SimpleNode) this.jjtGetChild(1);
+    this.evaluateChild(expression, symbol, parser);
+
+    symbol.setInitialized();
+
+    if (expression.id == JavammTreeConstants.JJTSUM)
+        this.optimizeMathOperation(expression);
+}
 
     public void optimizeMathOperation(SimpleNode expression){
         List<SimpleNode> nodes = getSumNodes((ASTSum) expression);
@@ -127,7 +127,6 @@ class ASTAssignVar extends TypeNode {
                 writer.println("  " + storeInstr + separator + Integer.toString(varNum) + "\n");
             }
         }
-
     }
 }
 /* JavaCC - OriginalChecksum=661756e145ed220ec46575b3a8adecd3 (do not edit this line) */
