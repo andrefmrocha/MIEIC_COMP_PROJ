@@ -1,9 +1,6 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
-import javamm.semantics.MethodIdentifier;
-import javamm.semantics.MethodSymbol;
-import javamm.semantics.MethodSymbolTable;
 import javamm.semantics.Symbol;
 
 import java.io.PrintWriter;
@@ -62,7 +59,7 @@ class ASTMethod extends TypeNode {
         } else {
             methodBody = (ASTMethodBody) this.jjtGetChild(2);
         }
-        methodBody.returnValue = this.type;
+        methodBody.returnType = this.type;
         methodBody.setTables(table, methodTable);
         methodBody.eval(parser, stackPointer);
     }

@@ -8,7 +8,8 @@ import java.io.PrintWriter;
 
 public
 class ASTMethodReturn extends SimpleNode {
-    Symbol.Type type = null;
+    Symbol.Type expectedType = null;
+
 
     public ASTMethodReturn(int id) {
         super(id);
@@ -26,15 +27,17 @@ class ASTMethodReturn extends SimpleNode {
         }
 
         final TypeNode node = (TypeNode) this.jjtGetChild(0);
+        System.out.println("Return table " + table + " in line " + getLine());
         node.setTables(table, methodTable);
-        node.eval(parser);
-        type = node.type;
+        node.evaluateChild(node, new Symbol(expectedType), parser);
     }
 
     @Override
     public void write(PrintWriter writer) {
-        ((SimpleNode) this.jjtGetChild(0)).write(writer);
-        writer.println("  "  + Symbol.getJVMPrefix(type) + "return");
+        final SimpleNode node = (SimpleNode) this.jjtGetChild(0);
+        System.out.println("Table " + node.table + " in line " + node.getLine());
+        node.write(writer);
+        writer.println("  "  + Symbol.getJVMPrefix(expectedType) + "return");
     }
 }
 /* JavaCC - OriginalChecksum=f35d6e18a29162cb6c0e550634450721 (do not edit this line) */
