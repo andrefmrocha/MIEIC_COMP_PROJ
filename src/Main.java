@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javamm.parser.ASTIf;
+import javamm.parser.ASTWhile;
 import javamm.semantics.SymbolTable;
 import javamm.semantics.MethodSymbolTable;
 import javamm.parser.Javamm;
@@ -56,6 +57,7 @@ public class Main {
 
 			//code generation
 			ASTIf.labelCounter = 0;
+			ASTWhile.labelCounter = 0;
 			String generated_name = fileMatch.group().replace(".jmm",".j");
 			File file = new File("jasmin_gen/" + generated_name);
 			file.getParentFile().mkdirs();

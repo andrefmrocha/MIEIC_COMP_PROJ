@@ -128,5 +128,6 @@ class ASTAssignVar extends TypeNode {
             }
         }
     }
-}
+  }
+
 /* JavaCC - OriginalChecksum=661756e145ed220ec46575b3a8adecd3 (do not edit this line) */

@@ -6,6 +6,9 @@ import java.io.PrintWriter;
 /* JavaCCOptions:MULTI=true,NODE_USES_Javamm=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTWhile extends ConditionalNode {
+
+  public static int labelCounter = 0;
+
   public ASTWhile(int id) {
     super(id);
   }
@@ -26,7 +29,45 @@ class ASTWhile extends ConditionalNode {
 
   @Override
   public void write(PrintWriter writer) {
-    //TODO implement this or leave blank to not call the default one
+
+    int localCounter = labelCounter;
+
+    writer.println("while_" + localCounter + ":");
+    SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
+    switch (expression.id) {
+      case JavammTreeConstants.JJTAND:
+        ASTAnd andExp = (ASTAnd) expression;
+        andExp.write(writer,"endwhile_" + localCounter);
+        break;
+      case JavammTreeConstants.JJTIDENTIFIER:
+        ASTIdentifier varExp = (ASTIdentifier) expression;
+        varExp.write(writer);
+        writer.println("  ifeq endwhile_" + localCounter );
+        break;
+      case JavammTreeConstants.JJTBOOLEANVALUE:
+      case JavammTreeConstants.JJTNEGATION:
+        TypeNode boolExp = (TypeNode) expression;
+        boolExp.write(writer);
+        writer.println("  ifne endwhile_" + localCounter );
+        break;
+      case JavammTreeConstants.JJTLESSTHAN:
+        ASTLessThan lsThanExp = (ASTLessThan) expression;
+        lsThanExp.write(writer, "endwhile_" + localCounter );
+        break;
+      default:
+        return;
+    }
+
+    for(int i = 1; i < this.jjtGetNumChildren(); i++) {
+      SimpleNode exp = (SimpleNode) this.jjtGetChild(i);
+      if(exp.id ==  JavammTreeConstants.JJTWHILE)
+        labelCounter++;
+      exp.write(writer);
+    }
+
+    writer.println("  goto " + "while_" + localCounter );
+    writer.println("endwhile_" + localCounter + ":");
+    labelCounter++;
   }
 
 }
