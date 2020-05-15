@@ -37,8 +37,11 @@ class ASTIdentifier extends TypeNode {
       String separator = varNum > 3 ? " " : "_";
       writer.println("  " + loadInstr + separator + Integer.toString(varNum));
     }
+  }
 
-
+  @Override
+  protected int getMaxStackUsage() {
+    return 1;
   }
 
 }

@@ -47,4 +47,18 @@ public abstract class BinaryOperatorNode extends TypeNode {
 
         //then each operation will use this part and add its own action
     }
+
+    @Override
+    protected int getMaxStackUsage() {
+        SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
+        SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
+
+        int leftMax = leftOperand.getMaxStackUsage(); // leaves 1 value on stack
+        int rightMax = rightOperand.getMaxStackUsage();
+
+        int maxUsage = Math.max(2, leftMax);
+        maxUsage = Math.max(maxUsage, 1+rightMax);
+
+        return maxUsage;
+    }
 }

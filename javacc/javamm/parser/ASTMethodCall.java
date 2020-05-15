@@ -64,5 +64,23 @@ public class ASTMethodCall extends TypeNode {
         }
         method.write(writer);
     }
+
+    @Override
+    protected int getMaxStackUsage() {
+        final SimpleNode methodName = (SimpleNode) this.jjtGetChild(0);
+        final ASTCall call = ((ASTCall) this.jjtGetChild(1));
+
+        switch (methodName.id) {
+            case JavammTreeConstants.JJTTHIS:
+            case JavammTreeConstants.JJTNEW:
+            case JavammTreeConstants.JJTIDENTIFIER:
+                if(!call.isStatic) {
+                    int leftUsage = methodName.getMaxStackUsage(); // leaves a reference in stack
+                    int rightUsage = 1 + call.getMaxStackUsage();
+                    return Math.max(rightUsage, leftUsage);
+                }
+        }
+        return call.getMaxStackUsage();
+    }
 }
 /* JavaCC - OriginalChecksum=c431bc197d60321c47680450a6c0622a (do not edit this line) */

@@ -28,5 +28,10 @@ class ASTBooleanValue extends TypeNode {
   public void write(PrintWriter writer) {
     writer.println("  iconst_" + (bool ? 1 : 0));
   }
+
+  @Override
+  protected int getMaxStackUsage() {
+    return 1;
+  }
 }
 /* JavaCC - OriginalChecksum=3a15dd3418ff85dee49e992d4b407151 (do not edit this line) */

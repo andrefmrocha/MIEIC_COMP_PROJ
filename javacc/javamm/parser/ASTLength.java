@@ -62,7 +62,13 @@ class ASTLength extends TypeNode {
 
     @Override
     public void write(PrintWriter writer) {
-        //TODO implement this or leave blank to not call the default one
+        //TODO still not implemented!!
+    }
+
+    @Override
+    protected int getMaxStackUsage() {
+        //TODO still not implemented!!
+        return super.getMaxStackUsage();
     }
 }
 /* JavaCC - OriginalChecksum=d20841b9a326e3b2ada1a7a0c3a4a9a1 (do not edit this line) */

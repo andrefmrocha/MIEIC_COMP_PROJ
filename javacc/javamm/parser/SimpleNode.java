@@ -143,6 +143,16 @@ class SimpleNode implements Node {
     }
     return false;
   }
+
+  protected int getMaxStackUsage() {
+    int maxUsage = 0;
+    for (int i = 0; i < this.jjtGetNumChildren(); i++) {
+      SimpleNode child = (SimpleNode) this.jjtGetChild(i);
+      int childStackUsage = child.getMaxStackUsage();
+      maxUsage = Math.max(childStackUsage, maxUsage);
+    }
+    return maxUsage;
+  }
 }
 
 /* JavaCC - OriginalChecksum=221dbcb2c3eee918f7ff2d2eecd7686d (do not edit this line) */

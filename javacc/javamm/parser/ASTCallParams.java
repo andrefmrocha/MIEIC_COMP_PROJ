@@ -50,5 +50,19 @@ class ASTCallParams extends SimpleNode {
     public String toString() {
         return "CallParams";
     }
+
+    @Override
+    protected int getMaxStackUsage() {
+        int maxStackUsage = 0;
+        int valuesInStack = 0;
+        for (int i = 0; i < this.jjtGetNumChildren(); i++) {
+            SimpleNode child = (SimpleNode) this.jjtGetChild(i);
+            int childStackUsage = valuesInStack + child.getMaxStackUsage();
+
+            maxStackUsage = Math.max(maxStackUsage, childStackUsage);
+            valuesInStack++;
+        }
+        return maxStackUsage;
+    }
 }
 /* JavaCC - OriginalChecksum=4d38201678fd4fcffee01a18a99da450 (do not edit this line) */

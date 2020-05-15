@@ -78,7 +78,7 @@ class ASTMethod extends TypeNode {
         }
 
         int paramsCount = 0;
-        SimpleNode methodBody;
+        ASTMethodBody methodBody;
         if (this.jjtGetNumChildren() == 2) {
             methodBody = (ASTMethodBody) this.jjtGetChild(1);
         } else {
@@ -86,10 +86,11 @@ class ASTMethod extends TypeNode {
             methodBody = (ASTMethodBody) this.jjtGetChild(2);
         }
         int localsLimit = paramsCount +
-                ((ASTMethodBody)methodBody).localsCount +
+                methodBody.localsCount +
                 (this.checkForThis(this.table) ? 1 : 0);
+        int stackLimit = methodBody.getMaxStackUsage();
 
-        writer.println("  .limit stack 255");//TODO Check for these limits actual values
+        writer.println("  .limit stack " + stackLimit);//TODO Check for these limits actual values
         writer.println("  .limit locals " + localsLimit + "\n");
         methodBody.write(writer);
         writer.println(".end method\n");
