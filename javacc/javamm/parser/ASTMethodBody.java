@@ -7,6 +7,7 @@ import javamm.semantics.Symbol;
 public
 class ASTMethodBody extends SimpleNode {
     public Symbol.Type returnType = null;
+    public int localsCount = 0;
 
     public ASTMethodBody(int id) {
         super(id);
@@ -22,6 +23,7 @@ class ASTMethodBody extends SimpleNode {
             if (methodNode.id == JavammTreeConstants.JJTVAR){
                 ASTVar var = (ASTVar) methodNode;
                 var.stackPos = stackPointer++;
+                localsCount++;
             }
             methodNode.setTables(table, methodTable);
             if (methodNode.id == JavammTreeConstants.JJTMETHODRETURN) {

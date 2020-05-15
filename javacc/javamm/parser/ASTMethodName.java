@@ -25,7 +25,7 @@ class ASTMethodName extends SimpleNode {
         super(p, id);
     }
 
-    public void eval(SimpleNode parameters) {
+    public void eval(Javamm parser, SimpleNode parameters) {
         ASTIdentifier nameNode = (ASTIdentifier) this.jjtGetChild(1);
         SimpleNode typeNode = (SimpleNode) this.jjtGetChild(0);
         methodName = nameNode.identifierName;
@@ -33,6 +33,7 @@ class ASTMethodName extends SimpleNode {
 
         if (parameters != null) {
             parameters.setTables(table, methodTable);
+            parameters.eval(parser);
             for (int i = 0; i < parameters.jjtGetNumChildren(); i += 2) {
 
                 VarNode parameter = new VarNode(i, parameters.jjtGetChild(i), parameters.jjtGetChild(i + 1),
