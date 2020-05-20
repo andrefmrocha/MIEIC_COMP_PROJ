@@ -62,12 +62,14 @@ class ASTLength extends TypeNode {
 
     @Override
     public void write(PrintWriter writer) {
-        //TODO still not implemented!!
+        final SimpleNode var = (SimpleNode) this.jjtGetChild(0);
+        var.setTables(table, methodTable);
+        var.write(writer);
+        writer.println("  arraylength");
     }
 
     @Override
     protected int getMaxStackUsage() {
-        //TODO still not implemented!!
         return super.getMaxStackUsage();
     }
 }
