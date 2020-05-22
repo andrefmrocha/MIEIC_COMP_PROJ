@@ -41,7 +41,6 @@ class ASTLength extends TypeNode {
                             + " is not an int array", var));
                     return;
                 }
-                identifier.setTables(this.table,this.methodTable);
                 break;
 
             case JavammTreeConstants.JJTMETHODCALL:

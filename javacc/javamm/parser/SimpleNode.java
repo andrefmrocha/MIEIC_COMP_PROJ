@@ -19,6 +19,7 @@ class SimpleNode implements Node {
   protected Javamm parser;
   protected SymbolTable table;
   protected MethodSymbolTable methodTable;
+  protected boolean validStatement = false;
   private int line = 0;
 
   public void setLine( int line ) { this.line = line ; }

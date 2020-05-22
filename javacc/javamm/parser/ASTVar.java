@@ -5,10 +5,12 @@ public
 class ASTVar extends VarNode {
   public ASTVar(int id) {
     super(id,false);
+    this.validStatement = true;
   }
 
   public ASTVar(Javamm p, int id) {
     super(p, id,false);
+    this.validStatement = true;
   }
 
 }

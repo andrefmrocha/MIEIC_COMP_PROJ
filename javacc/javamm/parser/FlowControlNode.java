@@ -1,6 +1,6 @@
 package javamm.parser;
 
-import javamm.semantics.Symbol;
+import javamm.SemanticsException;
 
 import java.util.TreeSet;
 
@@ -24,6 +24,11 @@ public class FlowControlNode extends SimpleNode {
                     initializedVars.add(identifier);
             } else if (child.id == JavammTreeConstants.JJTIF)
                 initializedVars.addAll(((ASTIf) child).initializedVars);
+
+            if (!child.validStatement) {
+                parser.semanticErrors.add(new SemanticsException("Not a statement: " + child.toString(), child));
+                break;
+            }
 
             child.eval(parser);
         }

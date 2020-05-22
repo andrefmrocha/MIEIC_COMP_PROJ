@@ -16,10 +16,12 @@ class ASTAssignVar extends TypeNode {
 
   public ASTAssignVar(int id) {
     super(id);
+    this.validStatement = true;
   }
 
   public ASTAssignVar(Javamm p, int id) {
     super(p, id);
+    this.validStatement = true;
   }
 
   @Override
