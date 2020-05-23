@@ -184,6 +184,33 @@ public class ParserTest {
     }
 
     // CUSTOM MADE TESTS
+    @Test
+    public void test1() {
+        test("fixtures/public/test1.jmm", false);
+    }
+
+    @Test
+    public void test2() {
+        test("fixtures/public/test2.jmm", false);
+    }
+
+    @Test
+    public void test3() {
+        test("fixtures/public/test3.jmm", false);
+    }
+
+    @Test
+    public void test4() {
+        test("fixtures/public/test4.jmm", true);
+    }
+
+    @Test
+    public void test5() {
+        test("fixtures/public/test5.jmm", false);
+    }
+
+
+
 
 /*    @Test
     public void testCustomTest() {

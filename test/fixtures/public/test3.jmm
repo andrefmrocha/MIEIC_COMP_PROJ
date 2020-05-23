@@ -1,0 +1,78 @@
+/*
+Tests:
+    - intertwined calls
+    - complex conditions
+*/
+
+class test3 {
+
+    public int f1(int a, int b, boolean c) {
+
+        int result;
+        result = 2;
+        if ((a + b < a - b) && !c) {
+            a = 2;
+            result = this.f4(this.f3(this.f2()));
+            if (this.f5(b, c) < 10) {
+                result = this.f4(this.f5(b, c));
+            } else {}
+        } else {
+            result = 1;
+        }
+
+        return result;
+    }
+
+    public int[] f2() {
+        int[] arr;
+        arr = new int[3];
+        arr[0] = 1;
+        arr[1] = 2;
+        arr[2] = 3;
+
+        return arr;
+    }
+
+    public int f3(int[] a) {
+        return a[0];
+    }
+
+    public int f4(int a) {
+        return 3;
+    }
+
+    public int f5(int a, boolean c) {
+
+        int[] ia1;
+        int result;
+        if (this.f4(a) < 5) {
+            ia1 = this.f2();
+            result = ia1[0];
+        } else {
+            if (c) {
+                result = 2;
+            } else {}
+        }
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+
+        int i1;
+        int i2;
+        int[] ia1;
+        boolean bool1;
+        bool1 = true;
+
+        ia1 = new int[3];
+        ia1[0] = 1;
+        ia1[1] = 2;
+        ia1[2] = 3;
+
+        i1 = this.f1(2, 3, bool1);
+        i2 = this.f5(4, bool1);
+
+    }
+
+}
