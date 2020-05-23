@@ -42,14 +42,16 @@ public class Main {
 				node.printTable();
 			}
 
+			if (javamm.semanticWarnings.size() > 0 ) {
+				System.out.println("Warnings: ");
+				for(SemanticsException e: javamm.semanticWarnings){
+					System.out.println(e.getError() + " in line " + e.getNode().getLine());
+				}
+			}
+
 			if (javamm.semanticErrors.size() > 0) {
 				System.out.println("Errors: ");
 				for(SemanticsException e: javamm.semanticErrors){
-					System.out.println(e.getError() + " in line " + e.getNode().getLine());
-				}
-
-				System.out.println("Warnings: ");
-				for(SemanticsException e: javamm.semanticWarnings){
 					System.out.println(e.getError() + " in line " + e.getNode().getLine());
 				}
 				throw new RuntimeException();
