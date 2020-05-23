@@ -15,7 +15,6 @@ import java.util.Map;
 public
 class ASTMethod extends TypeNode {
     public List<Symbol> parameters = new ArrayList<>();
-    public Boolean hasThis = null;
 
     public ASTMethod(int id) {
         super(id);
@@ -27,7 +26,7 @@ class ASTMethod extends TypeNode {
 
     @Override
     public void eval(Javamm parser) {
-        if (this.jjtGetNumChildren() != 2 && this.jjtGetNumChildren() != 3){
+        if (this.jjtGetNumChildren() != 2 && this.jjtGetNumChildren() != 3) {
             parser.semanticErrors.add(new SemanticsException("Lacks the number of required children!", this));
             return;
         }
@@ -86,15 +85,14 @@ class ASTMethod extends TypeNode {
             methodBody = (ASTMethodBody) this.jjtGetChild(2);
         }
         int localsLimit = paramsCount +
-                methodBody.localsCount +
-                (this.checkForThis(this.table) ? 1 : 0);
+                methodBody.localsCount + 1;
         int stackLimit = methodBody.getMaxStackUsage();
 
         writer.println("  .limit stack " + stackLimit);//TODO Check for these limits actual values
         writer.println("  .limit locals " + localsLimit + "\n");
         methodBody.write(writer);
 
-        if(methodType.id == JavammTreeConstants.JJTMAIN || this.type == Symbol.Type.VOID) {
+        if (methodType.id == JavammTreeConstants.JJTMAIN || this.type == Symbol.Type.VOID) {
             writer.println("  return");
         }
         writer.println(".end method\n");
@@ -113,15 +111,15 @@ class ASTMethod extends TypeNode {
         if (methodHeader.id == JavammTreeConstants.JJTMETHODNAME) {
             ASTMethodName method = (ASTMethodName) methodHeader;
             System.out.print("    Header: " + method.methodName + " | Params: <");
-            for(int i = 0 ; i < parameters.size(); i++) {
+            for (int i = 0; i < parameters.size(); i++) {
                 System.out.print(parameters.get(i).getType());
-                if(i != parameters.size()-1)
+                if (i != parameters.size() - 1)
                     System.out.print(",");
                 else
                     break;
             }
             System.out.println("> | Returns: " + this.type + "\n");
-        } else  {
+        } else {
             System.out.println("    Header: main | Returns: VOID\n");
         }
 
@@ -134,13 +132,6 @@ class ASTMethod extends TypeNode {
             }
             System.out.println();
         }
-    }
-
-    @Override
-    protected boolean checkForThis(SymbolTable classTable) {
-        if (this.hasThis == null)
-            this.hasThis = super.checkForThis(classTable);
-        return this.hasThis;
     }
 }
 /* JavaCC - OriginalChecksum=e01bdf01dd9e8aa606ef225a59a26df3 (do not edit this line) */
