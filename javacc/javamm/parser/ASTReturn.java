@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 /* JavaCCOptions:MULTI=true,NODE_USES_Javamm=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTReturn extends TypeNode {
-  public Symbol.Type returnType;
+  public Symbol returnSymbol;
 
   public ASTReturn(int id) {
     super(id);
@@ -24,7 +24,12 @@ class ASTReturn extends TypeNode {
     SimpleNode child = (SimpleNode) this.jjtGetChild(0);
     child.setTables(table, methodTable);
     child.eval(parser);
-    this.returnType = Symbol.getNodeSymbolType(child); //TODO does not support statements
+    if(child.id == JavammTreeConstants.JJTIDENTIFIER) {
+      ASTIdentifier identifier = ((ASTIdentifier) child);
+      this.returnSymbol = this.table.getSymbol(identifier.identifierName);
+    } else {
+      this.returnSymbol = new Symbol(Symbol.getNodeSymbolType(child)); //TODO does not support statements
+    }
   }
 
   public void evalIdentifiers(Javamm parser) {

@@ -7,6 +7,8 @@ import javamm.semantics.Symbol.Type;
 import javamm.semantics.SymbolTable;
 
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 
 
 public class VarNode extends SimpleNode {
@@ -97,6 +99,29 @@ public class VarNode extends SimpleNode {
             default:
                 parser.semanticErrors.add(new SemanticsException("Found invalid type", node));
                 return Type.VOID;
+        }
+    }
+
+    public static Symbol getSymbol(SimpleNode node, SymbolTable table, Javamm parser) {
+        switch (node.id) {
+            case JavammTreeConstants.JJTINTARRAY:
+                return new Symbol(Type.INT_ARRAY);
+            case JavammTreeConstants.JJTINT:
+                return new Symbol(Type.INT);
+            case JavammTreeConstants.JJTBOOLEAN:
+                return new Symbol(Type.BOOL);
+            case JavammTreeConstants.JJTVOID:
+                return new Symbol(Type.VOID);
+            case JavammTreeConstants.JJTIDENTIFIER:
+                final ASTIdentifier identifier = (ASTIdentifier) node;
+                if (!table.checkSymbol(identifier.identifierName)) {
+                    parser.semanticErrors.add(new SemanticsException("Could not find " + identifier.identifierName, node));
+                    return new Symbol(Type.VOID);
+                }
+                return table.getSymbol(identifier.identifierName);
+            default:
+                parser.semanticErrors.add(new SemanticsException("Found invalid type", node));
+                return new Symbol(Type.VOID);
         }
     }
 

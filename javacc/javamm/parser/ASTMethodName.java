@@ -29,7 +29,7 @@ class ASTMethodName extends SimpleNode {
         ASTIdentifier nameNode = (ASTIdentifier) this.jjtGetChild(1);
         SimpleNode typeNode = (SimpleNode) this.jjtGetChild(0);
         methodName = nameNode.identifierName;
-        Symbol.Type type = VarNode.getType(typeNode, table, parser);
+        Symbol returnSymbol = VarNode.getSymbol(typeNode, table, parser);
 
         if (parameters != null) {
             parameters.setTables(table, methodTable);
@@ -43,8 +43,8 @@ class ASTMethodName extends SimpleNode {
                 parametersTypes.add(VarNode.getType((SimpleNode) parameters.jjtGetChild(i), table, parser));
             }
         }
-        this.methodTable.putSymbol(new MethodIdentifier(methodName, parametersTypes), new MethodSymbol(type, parametersTypes));
-        this.returnType = type;
+        this.methodTable.putSymbol(new MethodIdentifier(methodName, parametersTypes), new MethodSymbol(returnSymbol, parametersTypes));
+        this.returnType = returnSymbol.getType();
     }
 
     @Override

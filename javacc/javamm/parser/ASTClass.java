@@ -43,11 +43,15 @@ class ASTClass extends SimpleNode {
           child.setTables(table, newTable);
           child.eval(parser);
           extendedClass = ((ASTExtend) child).extendedClass;
+          classSymbol = new ClassSymbol(Symbol.Type.CLASS, className, newTable, extendedClass);
+          table.putSymbol(className, classSymbol);
           break;
         case JavammTreeConstants.JJTIDENTIFIER:
           ASTIdentifier temp = (ASTIdentifier) child;
           className = temp.identifierName;
           this.table.setClassName(className);
+          classSymbol = new ClassSymbol(Symbol.Type.CLASS, className, newTable, extendedClass);
+          table.putSymbol(className, classSymbol);
           break;
         case JavammTreeConstants.JJTMETHOD:
           child.setTables(new SymbolTable(table), newTable);
@@ -58,9 +62,6 @@ class ASTClass extends SimpleNode {
           return;
       }
     }
-
-    classSymbol = new ClassSymbol(Symbol.Type.CLASS, className, newTable, extendedClass);
-    table.putSymbol(className, classSymbol);
 
     for (int i = 0; i < this.jjtGetNumChildren(); i++) {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
@@ -137,7 +138,7 @@ class ASTClass extends SimpleNode {
           else
             break;
         }
-        System.out.println("> | Returns: " + ((MethodSymbol) pair.getValue()).getReturnType());
+        System.out.println("> | Returns: " + ((MethodSymbol) pair.getValue()).getReturnSymbol().getType());
       }
       System.out.println();
     }

@@ -31,6 +31,7 @@ class ASTImport extends SimpleNode {
         Type returnValue = Type.VOID;
         List<String> identifiers = new ArrayList<>();
         List<Type> params = new ArrayList<>();
+        ASTReturn returnNode = null;
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {
             SimpleNode currNode = (SimpleNode) this.jjtGetChild(i);
             currNode.setTables(table, methodTable);
@@ -39,7 +40,8 @@ class ASTImport extends SimpleNode {
             if (currNode.id == JavammTreeConstants.JJTIMPORTPARAMS) {
                 params = ((ASTImportParams) currNode).paramTypes;
             } else if (currNode.id == JavammTreeConstants.JJTRETURN) {
-                returnValue = ((ASTReturn) currNode).returnType;
+                returnNode = ((ASTReturn) currNode);
+                returnValue = returnNode.returnSymbol.getType();
             } else if (currNode.id == JavammTreeConstants.JJTIDENTIFIER) {
                 identifiers.add(((ASTIdentifier) currNode).identifierName);
             }
@@ -55,14 +57,13 @@ class ASTImport extends SimpleNode {
                     return;
                 }
                 ((ClassSymbol) symbol).getConstructors().putSymbol(
-                        new MethodIdentifier(ClassSymbol.init, params), new MethodSymbol(returnValue, params));
+                        new MethodIdentifier(ClassSymbol.init, params), new MethodSymbol(symbol, params));
             } else
                 table.putSymbol(fullImportName, new ClassSymbol(fullImportName, params));
 
 
-        }
-        else if (this.isStatic)
-            methodTable.putSymbol(new MethodIdentifier(fullImportName, params), new MethodSymbol(returnValue, params));
+        } else if (this.isStatic)
+            methodTable.putSymbol(new MethodIdentifier(fullImportName, params), new MethodSymbol(new Symbol(returnValue), params));
         else {
             String methodName = identifiers.get(1);
             String className = identifiers.get(0);
@@ -78,7 +79,8 @@ class ASTImport extends SimpleNode {
             }
 
             ClassSymbol classSymbol = (ClassSymbol) symbol;
-            classSymbol.getMethods().putSymbol(new MethodIdentifier(methodName, params), new MethodSymbol(returnValue, params));
+            classSymbol.getMethods().putSymbol(new MethodIdentifier(methodName, params), new MethodSymbol(
+                    returnValue == Type.CLASS ? returnNode.returnSymbol : new Symbol(returnValue), params));
         }
     }
 

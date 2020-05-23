@@ -12,26 +12,26 @@ public class ClassSymbol extends Symbol {
 
     public ClassSymbol(String className) {
         super(Type.CLASS, true);
-        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(Type.CLASS, new ArrayList<>()));
+        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(this, new ArrayList<>()));
         this.className = className;
     }
 
     public ClassSymbol(String className, List<Type> constructorParams) {
         super(Type.CLASS, true);
-        constructors.putSymbol(new MethodIdentifier(init, constructorParams), new MethodSymbol(Type.CLASS, constructorParams));
+        constructors.putSymbol(new MethodIdentifier(init, constructorParams), new MethodSymbol(this, constructorParams));
         this.className = className;
     }
 
     public ClassSymbol(Type type, String className, MethodSymbolTable methods) {
         super(type, true);
-        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(Type.CLASS, new ArrayList<>()));
+        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(this, new ArrayList<>()));
         this.className = className;
         this.methods = methods;
     }
 
     public ClassSymbol(Type type, String className, MethodSymbolTable methods, ClassSymbol extension) {
         super(type, true);
-        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(Type.CLASS, new ArrayList<>()));
+        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(this, new ArrayList<>()));
         this.className = className;
         this.methods = methods;
         this.extension = extension;
@@ -39,7 +39,7 @@ public class ClassSymbol extends Symbol {
 
     public ClassSymbol(Type type, String className, MethodSymbolTable methods, ClassSymbol extension, int stackPos) {
         super(type, true, stackPos);
-        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(Type.CLASS, new ArrayList<>()));
+        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(this, new ArrayList<>()));
         this.className = className;
         this.methods = methods;
         this.extension = extension;

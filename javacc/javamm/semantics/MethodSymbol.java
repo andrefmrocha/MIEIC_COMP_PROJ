@@ -4,11 +4,11 @@ import java.util.List;
 
 public class MethodSymbol extends Symbol {
     final private List<Type> parameters;
-    final private Type returnType;
+    final private Symbol returnType;
 
-    public MethodSymbol(Type returnType, List<Type> parameters) {
+    public MethodSymbol(Symbol returnSymbol, List<Type> parameters) {
         super(Type.METHOD);
-        this.returnType = returnType;
+        this.returnType = returnSymbol;
         this.parameters = parameters;
     }
 
@@ -16,5 +16,5 @@ public class MethodSymbol extends Symbol {
         return parameters;
     }
 
-    public Type getReturnType() { return returnType; }
+    public Symbol getReturnSymbol() { return returnType; }
 }

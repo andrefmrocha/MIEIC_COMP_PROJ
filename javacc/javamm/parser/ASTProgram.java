@@ -62,7 +62,7 @@ class ASTProgram extends SimpleNode {
               else
                 break;
             }
-            System.out.println("> | Returns: " + ((MethodSymbol)pair.getValue()).getReturnType());
+            System.out.println("> | Returns: " + ((MethodSymbol)pair.getValue()).getReturnSymbol().getType());
           }
       }
       System.out.println();
@@ -82,7 +82,7 @@ class ASTProgram extends SimpleNode {
           else
             break;
         }
-        System.out.println("> | Returns: " + ((MethodSymbol)pair.getValue()).getReturnType());
+        System.out.println("> | Returns: " + ((MethodSymbol)pair.getValue()).getReturnSymbol().getType());
       }
       System.out.println();
     }

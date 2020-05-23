@@ -42,7 +42,7 @@ class ASTMain extends SimpleNode {
     }
 
     parametersTypes.add(Symbol.Type.CLASS);
-    this.table.getParent().putSymbol("main",new MethodSymbol(Symbol.Type.MAIN,parametersTypes));
+    this.table.getParent().putSymbol("main",new MethodSymbol(new Symbol(Symbol.Type.MAIN),parametersTypes));
   }
 
   @Override

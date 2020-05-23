@@ -1,6 +1,7 @@
 package javamm.semantics;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MethodSymbolTable {
     final private HashMap<MethodIdentifier, MethodSymbol> table = new HashMap<>();
@@ -40,5 +41,14 @@ public class MethodSymbolTable {
 
     public void putSymbol(MethodIdentifier name, MethodSymbol symbol) {
         table.put(name, symbol);
+    }
+
+    public void print() {
+        for(Map.Entry<MethodIdentifier,MethodSymbol> entry : table.entrySet())
+            System.out.println(entry.getKey().getIdentifier() + " | " + entry.getKey().getParameters());
+        if( parent != null) {
+            for(Map.Entry<MethodIdentifier,MethodSymbol> entry : parent.getTable().entrySet())
+                System.out.println(entry.getKey().getIdentifier() + " | " + entry.getKey().getParameters());
+        }
     }
 }

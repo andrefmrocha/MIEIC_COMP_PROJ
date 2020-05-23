@@ -57,6 +57,8 @@ public class Symbol {
             case INT_ARRAY:
                 return "[I";
             case VOID:
+            case OBJ:
+            case CLASS:
                 return "V";
         }
         return null;
