@@ -201,7 +201,7 @@ public class ParserTest {
 
     @Test
     public void test4() {
-        test("fixtures/public/test4.jmm", true);
+        test("fixtures/public/test4.jmm", false);
     }
 
     @Test

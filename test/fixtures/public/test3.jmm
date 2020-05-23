@@ -45,6 +45,9 @@ class test3 {
 
         int[] ia1;
         int result;
+        result = 3;
+        ia1 = new int[3];
+
         if (this.f4(a) < 5) {
             ia1 = this.f2();
             result = ia1[0];

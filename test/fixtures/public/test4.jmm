@@ -16,9 +16,7 @@ class test4 {
         return result;
     }
 
-    //need to change to int
-    //here to create error and be able to visualize warnings
-    public void f2(int a, int b, int c) {
+    public int f2(int a, int b, int c) {
 
         int result;
         if (a + b < c) {
