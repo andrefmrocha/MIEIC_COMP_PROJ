@@ -21,21 +21,34 @@ class ASTMethodReturn extends SimpleNode {
 
     @Override
     public void eval(Javamm parser) {
-        if (!(this.jjtGetChild(0) instanceof TypeNode)) {
-            parser.semanticErrors.add(new SemanticsException("Unknown return type!", this));
-            return;
-        }
+        if(expectedType != Symbol.Type.VOID) {
+            if(this.jjtGetNumChildren() == 0) {
+                parser.semanticErrors.add(new SemanticsException("Expected return type: " + expectedType,this));
+                return;
+            }
 
-        final TypeNode node = (TypeNode) this.jjtGetChild(0);
-        node.setTables(table, methodTable);
-        node.evaluateChild(node, new Symbol(expectedType), parser);
+            if (!(this.jjtGetChild(0) instanceof TypeNode)) {
+                parser.semanticErrors.add(new SemanticsException("Unknown return type!", this));
+                return;
+            }
+
+            final TypeNode node = (TypeNode) this.jjtGetChild(0);
+            node.setTables(table, methodTable);
+            node.evaluateChild(node, new Symbol(expectedType), parser);
+        } else {
+            if(this.jjtGetNumChildren() >0) {
+                parser.semanticErrors.add(new SemanticsException("Expected return type: " + expectedType,this));
+            }
+        }
     }
 
     @Override
     public void write(PrintWriter writer) {
-        final SimpleNode node = (SimpleNode) this.jjtGetChild(0);
-        node.write(writer);
-        writer.println("  "  + Symbol.getJVMPrefix(expectedType) + "return");
+        if(expectedType != Symbol.Type.VOID) {
+            final SimpleNode node = (SimpleNode) this.jjtGetChild(0);
+            node.write(writer);
+            writer.println("  "  + Symbol.getJVMPrefix(expectedType) + "return");
+        }
     }
 }
 /* JavaCC - OriginalChecksum=f35d6e18a29162cb6c0e550634450721 (do not edit this line) */

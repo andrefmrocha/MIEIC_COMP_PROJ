@@ -93,6 +93,10 @@ class ASTMethod extends TypeNode {
         writer.println("  .limit stack " + stackLimit);//TODO Check for these limits actual values
         writer.println("  .limit locals " + localsLimit + "\n");
         methodBody.write(writer);
+
+        if(methodType.id == JavammTreeConstants.JJTMAIN || this.type == Symbol.Type.VOID) {
+            writer.println("  return");
+        }
         writer.println(".end method\n");
     }
 

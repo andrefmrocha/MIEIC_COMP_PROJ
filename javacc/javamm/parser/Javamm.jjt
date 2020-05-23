@@ -155,7 +155,7 @@ void MethodBody() #void : {} {
 void MethodDeclaration() #void : {}
 {
     (<PUBLIC>
-    (MethodName() (<LFTBRCKT> [Parameters()] <RGHTBRCKT> | "()" )  <LFTCRLBRCKT> (MethodBody() (<RETURN> Expression()) #MethodReturn <SEMICOLON>)#MethodBody <RGHTCRLBRCKT>
+    (MethodName() (<LFTBRCKT> [Parameters()] <RGHTBRCKT> | "()" )  <LFTCRLBRCKT> (MethodBody() [(<RETURN> [Expression()]) #MethodReturn <SEMICOLON>])#MethodBody <RGHTCRLBRCKT>
     | ((<STATIC> <VOID> <MAIN> <LFTBRCKT> <STRING> (<LFTSQRBRCKT> <RGHTSQRBRCKT> | "[]") Identifier()  <RGHTBRCKT> ) #Main <LFTCRLBRCKT> MethodBody() #MethodBody <RGHTCRLBRCKT>  ))
     )#Method
 
