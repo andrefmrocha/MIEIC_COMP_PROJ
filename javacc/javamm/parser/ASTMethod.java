@@ -2,6 +2,7 @@ package javamm.parser;
 
 import javamm.SemanticsException;
 import javamm.semantics.Symbol;
+import javamm.semantics.SymbolTable;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import java.util.Map;
 public
 class ASTMethod extends TypeNode {
     public List<Symbol> parameters = new ArrayList<>();
+    public Boolean hasThis = null;
+
     public ASTMethod(int id) {
         super(id);
     }
@@ -41,7 +44,7 @@ class ASTMethod extends TypeNode {
             methodType.setTables(table, methodTable);
             ASTMethodName method = (ASTMethodName) methodType;
             this.parameters = method.parameters;
-            method.eval(parameters);
+            method.eval(parser, parameters);
             this.type = method.returnType;
         } else if (methodType.id == JavammTreeConstants.JJTMAIN) {
             methodType.setTables(table, methodTable);
@@ -73,15 +76,22 @@ class ASTMethod extends TypeNode {
         } else if (methodType.id == JavammTreeConstants.JJTMAIN) {
             writer.println(".method public static main([Ljava/lang/String;)V");
         }
-        writer.println("  .limit stack 255");//TODO Check for these limits actual values
-        writer.println("  .limit locals 255\n");
-        SimpleNode methodBody;
+
+        int paramsCount = 0;
+        ASTMethodBody methodBody;
         if (this.jjtGetNumChildren() == 2) {
             methodBody = (ASTMethodBody) this.jjtGetChild(1);
         } else {
+            paramsCount = ((ASTParameters) this.jjtGetChild(1)).nParams;
             methodBody = (ASTMethodBody) this.jjtGetChild(2);
         }
+        int localsLimit = paramsCount +
+                methodBody.localsCount +
+                (this.checkForThis(this.table) ? 1 : 0);
+        int stackLimit = methodBody.getMaxStackUsage();
 
+        writer.println("  .limit stack " + stackLimit);//TODO Check for these limits actual values
+        writer.println("  .limit locals " + localsLimit + "\n");
         methodBody.write(writer);
         writer.println(".end method\n");
     }
@@ -120,6 +130,13 @@ class ASTMethod extends TypeNode {
             }
             System.out.println();
         }
+    }
+
+    @Override
+    protected boolean checkForThis(SymbolTable classTable) {
+        if (this.hasThis == null)
+            this.hasThis = super.checkForThis(classTable);
+        return this.hasThis;
     }
 }
 /* JavaCC - OriginalChecksum=e01bdf01dd9e8aa606ef225a59a26df3 (do not edit this line) */

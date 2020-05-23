@@ -48,5 +48,19 @@ class ASTAssignVarArray extends TypeNode {
         value.write(writer); // push value to assign
         writer.println("  iastore\n"); // store value
     }
+
+    @Override
+    protected int getMaxStackUsage() {
+        SimpleNode arrayAccess = (SimpleNode) this.jjtGetChild(0);
+        SimpleNode arrayValue = (SimpleNode) this.jjtGetChild(1);
+
+        int leftMaxUsage = arrayAccess.getMaxStackUsage(); // left leaves 2 values on stack
+        int rightMaxUsage = arrayValue.getMaxStackUsage(); // right leaves 1 value in stack
+
+        int maxUsage = Math.max(leftMaxUsage, 2+rightMaxUsage);
+        maxUsage = Math.max(maxUsage, 3);
+
+        return maxUsage;
+    }
 }
 /* JavaCC - OriginalChecksum=0fabe93ca61357985801f024c411ccd1 (do not edit this line) */

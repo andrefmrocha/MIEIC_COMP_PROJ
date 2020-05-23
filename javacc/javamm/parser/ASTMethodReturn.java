@@ -27,7 +27,6 @@ class ASTMethodReturn extends SimpleNode {
         }
 
         final TypeNode node = (TypeNode) this.jjtGetChild(0);
-        System.out.println("Return table " + table + " in line " + getLine());
         node.setTables(table, methodTable);
         node.evaluateChild(node, new Symbol(expectedType), parser);
     }
@@ -35,7 +34,6 @@ class ASTMethodReturn extends SimpleNode {
     @Override
     public void write(PrintWriter writer) {
         final SimpleNode node = (SimpleNode) this.jjtGetChild(0);
-        System.out.println("Table " + node.table + " in line " + node.getLine());
         node.write(writer);
         writer.println("  "  + Symbol.getJVMPrefix(expectedType) + "return");
     }

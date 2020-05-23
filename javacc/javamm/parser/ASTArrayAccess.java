@@ -59,5 +59,15 @@ class ASTArrayAccess extends TypeNode {
         identifier.write(writer);
         offset.write(writer);
     }
+
+    @Override
+    protected int getMaxStackUsage() {
+        SimpleNode offset = (SimpleNode) this.jjtGetChild(1);
+        int offsetMaxUsage = offset.getMaxStackUsage();
+
+        // at least 2 values are left in stack, identifier and offset
+        // +1 because of identifier
+        return Math.max(2, 1+offsetMaxUsage);
+    }
 }
 /* JavaCC - OriginalChecksum=07823d6065ca9b37f085148b14d167b9 (do not edit this line) */

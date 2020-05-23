@@ -34,5 +34,10 @@ class ASTNumeric extends TypeNode {
     }
   }
 
+  @Override
+  protected int getMaxStackUsage() {
+    return 1;
+  }
+
 }
 /* JavaCC - OriginalChecksum=d1df27becc141526f727d9a5e4174f25 (do not edit this line) */

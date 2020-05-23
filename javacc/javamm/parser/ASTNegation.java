@@ -47,5 +47,12 @@ class ASTNegation extends TypeNode {
         super.write(writer);
         writer.println("  ifne " + labelFalse);
     }
+
+    @Override
+    protected int getMaxStackUsage() {
+        SimpleNode child = (SimpleNode) this.jjtGetChild(0);
+        int childStackUsage = child.getMaxStackUsage();
+        return Math.max(childStackUsage, 1);
+    }
 }
 /* JavaCC - OriginalChecksum=13de953db4e66e1048f234f837f24db4 (do not edit this line) */

@@ -103,10 +103,11 @@ class ASTAssignVar extends TypeNode {
 
     @Override
     public void write(PrintWriter writer) {
+
         String varName = ((ASTIdentifier) this.jjtGetChild(0)).identifierName;
         Symbol leftSymbol = this.table.getSymbol(varName);
-        SimpleNode right = (SimpleNode) this.jjtGetChild(1);
         int varNum = leftSymbol.getStackPos();
+        SimpleNode right = (SimpleNode) this.jjtGetChild(1);
         if(iinc != Integer.MAX_VALUE && iinc >= -32768 && iinc <= 32767){
             final String iincInstruction = (iinc > 127 || iinc < -128) ? "iinc_w" : "iinc";
             writer.println("  "+ iincInstruction + " " + varNum + ", " + iinc);
@@ -127,6 +128,20 @@ class ASTAssignVar extends TypeNode {
                 writer.println("  " + storeInstr + separator + Integer.toString(varNum) + "\n");
             }
         }
+    }
+
+    @Override
+    protected int getMaxStackUsage() {
+        if(iinc != Integer.MAX_VALUE && iinc >= -32768 && iinc <= 32767) return 0;
+
+        SimpleNode right = (SimpleNode) this.jjtGetChild(1);
+        String varName = ((ASTIdentifier) this.jjtGetChild(0)).identifierName;
+        Symbol leftSymbol = this.table.getSymbol(varName);
+        if (leftSymbol.getStackPos() == -1) {
+            return 1 + right.getMaxStackUsage(); // +1 from a_load
+        }
+
+        return right.getMaxStackUsage();
     }
   }
 

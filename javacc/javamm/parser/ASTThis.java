@@ -19,5 +19,10 @@ class ASTThis extends SimpleNode {
         writer.println("  aload_0");
     }
 
+    @Override
+    protected int getMaxStackUsage() {
+        return 1;
+    }
+
 }
 /* JavaCC - OriginalChecksum=d1b4bf035afae7b16b90bef37d06c462 (do not edit this line) */

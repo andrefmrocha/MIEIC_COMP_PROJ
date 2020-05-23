@@ -55,5 +55,12 @@ class ASTNew extends TypeNode {
         }
         writer.println(")V");
     }
+
+    @Override
+    protected int getMaxStackUsage() {
+        SimpleNode callParams = (SimpleNode) this.jjtGetChild(1);
+        return 2 + callParams.getMaxStackUsage();
+    }
+
 }
 /* JavaCC - OriginalChecksum=c6d588009442d8c81f835326710afcd3 (do not edit this line) */
