@@ -3,6 +3,7 @@ package javamm.parser;
 import javamm.SemanticsException;
 import javamm.semantics.ClassSymbol;
 import javamm.semantics.MethodIdentifier;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
@@ -59,9 +60,12 @@ class ASTNew extends TypeNode {
     }
 
     @Override
-    protected int getMaxStackUsage() {
-        SimpleNode callParams = (SimpleNode) this.jjtGetChild(1);
-        return 2 + callParams.getMaxStackUsage();
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        stackUsage.inc(2);
+
+        ASTCallParams params = (ASTCallParams) this.jjtGetChild(1);
+        params.calculateStackUsage(stackUsage);
+        stackUsage.dec(params.nParams + 1);
     }
 
 }

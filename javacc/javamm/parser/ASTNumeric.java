@@ -1,5 +1,6 @@
 package javamm.parser;
 
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol.Type;
 
 import java.io.PrintWriter;
@@ -35,8 +36,8 @@ class ASTNumeric extends TypeNode {
   }
 
   @Override
-  protected int getMaxStackUsage() {
-    return 1;
+  protected void calculateStackUsage(StackUsage stackUsage) {
+    stackUsage.inc(1);
   }
 
 }

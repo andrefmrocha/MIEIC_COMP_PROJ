@@ -1,6 +1,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
@@ -36,6 +37,12 @@ class ASTNewArray extends TypeNode {
         SimpleNode offset = (SimpleNode) this.jjtGetChild(0);
         offset.write(writer);
         writer.println("  newarray int");
+    }
+
+    @Override
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        SimpleNode offset = (SimpleNode) this.jjtGetChild(0);
+        offset.calculateStackUsage(stackUsage);
     }
 }
 /* JavaCC - OriginalChecksum=3a631d25cbdc4e13263745a21c4cb259 (do not edit this line) */

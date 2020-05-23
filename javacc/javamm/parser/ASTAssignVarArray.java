@@ -1,6 +1,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
@@ -42,7 +43,6 @@ class ASTAssignVarArray extends TypeNode {
 
     @Override
     public void write(PrintWriter writer) {
-        Symbol arrayID = this.table.getSymbol(arrayIdentifier);
         ASTArrayAccess arrayOffset = (ASTArrayAccess) this.jjtGetChild(0);
         SimpleNode value = (SimpleNode) this.jjtGetChild(1);
 
@@ -52,17 +52,14 @@ class ASTAssignVarArray extends TypeNode {
     }
 
     @Override
-    protected int getMaxStackUsage() {
-        SimpleNode arrayAccess = (SimpleNode) this.jjtGetChild(0);
-        SimpleNode arrayValue = (SimpleNode) this.jjtGetChild(1);
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        ASTArrayAccess arrayOffset = (ASTArrayAccess) this.jjtGetChild(0);
+        SimpleNode value = (SimpleNode) this.jjtGetChild(1);
 
-        int leftMaxUsage = arrayAccess.getMaxStackUsage(); // left leaves 2 values on stack
-        int rightMaxUsage = arrayValue.getMaxStackUsage(); // right leaves 1 value in stack
+        arrayOffset.calculateBodyStackUsage(stackUsage);
+        value.calculateStackUsage(stackUsage);
 
-        int maxUsage = Math.max(leftMaxUsage, 2+rightMaxUsage);
-        maxUsage = Math.max(maxUsage, 3);
-
-        return maxUsage;
+        stackUsage.dec(3);
     }
 }
 /* JavaCC - OriginalChecksum=0fabe93ca61357985801f024c411ccd1 (do not edit this line) */

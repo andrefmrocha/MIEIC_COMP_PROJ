@@ -1,5 +1,6 @@
 package javamm.parser;
 
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol.Type;
 import java.io.PrintWriter;
 
@@ -24,6 +25,11 @@ class ASTMul extends BinaryOperatorNode {
   public void write(PrintWriter writer) {
     super.write(writer);
     writer.println("  imul");
+  }
+
+  @Override
+  protected void calculateStackUsage(StackUsage stackUsage) {
+    super.calculateStackUsage(stackUsage);
   }
 }
 /* JavaCC - OriginalChecksum=e5abe143d74eea8d5312703bd5001c7a (do not edit this line) */

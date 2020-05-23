@@ -1,5 +1,6 @@
 package javamm.parser;
 
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol.Type;
 import java.io.PrintWriter;
 
@@ -26,6 +27,10 @@ class ASTSub extends BinaryOperatorNode {
     writer.println("  isub");
   }
 
+  @Override
+  protected void calculateStackUsage(StackUsage stackUsage) {
+    super.calculateStackUsage(stackUsage);
+  }
 
 }
 /* JavaCC - OriginalChecksum=b7fc14f4941a1c938c1b03e9740f85d8 (do not edit this line) */

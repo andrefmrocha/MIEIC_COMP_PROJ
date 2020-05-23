@@ -4,6 +4,7 @@ package javamm.parser;
 
 import javamm.SemanticsException;
 import javamm.semantics.MethodIdentifier;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ import java.util.List;
 
 public
 class ASTCallParams extends SimpleNode {
+    public int nParams;
+
     public ASTCallParams(int id) {
         super(id);
     }
@@ -43,6 +46,7 @@ class ASTCallParams extends SimpleNode {
                 params.add(VarNode.getType(node, table, parser));
 
         }
+        nParams = params.size();
         return new MethodIdentifier(identifier, params);
     }
 
@@ -52,17 +56,8 @@ class ASTCallParams extends SimpleNode {
     }
 
     @Override
-    protected int getMaxStackUsage() {
-        int maxStackUsage = 0;
-        int valuesInStack = 0;
-        for (int i = 0; i < this.jjtGetNumChildren(); i++) {
-            SimpleNode child = (SimpleNode) this.jjtGetChild(i);
-            int childStackUsage = valuesInStack + child.getMaxStackUsage();
-
-            maxStackUsage = Math.max(maxStackUsage, childStackUsage);
-            valuesInStack++;
-        }
-        return maxStackUsage;
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        super.calculateStackUsage(stackUsage);
     }
 }
 /* JavaCC - OriginalChecksum=4d38201678fd4fcffee01a18a99da450 (do not edit this line) */
