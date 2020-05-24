@@ -49,6 +49,7 @@ class ASTAnd extends BooleanBinaryOperatorNode {
     stackUsage.inc(1); //iconst_x
   }
 
+  @Override
   public void calculateParamsStackUsage(StackUsage stackUsage) {
     SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
     SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);

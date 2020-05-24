@@ -60,12 +60,9 @@ class ASTIf extends ConditionalNode {
         int currCounter = labelCounter;
         switch (expression.id) {
             case JavammTreeConstants.JJTAND:
-                ASTAnd andExp = (ASTAnd) expression;
-                andExp.write(writer,"else_" + currCounter);
-                break;
             case JavammTreeConstants.JJTLESSTHAN:
-                ASTLessThan lsThanExp = (ASTLessThan) expression;
-                lsThanExp.write(writer, "else_" + currCounter);
+                BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
+                node.write(writer, "else_" + currCounter);
                 break;
             case JavammTreeConstants.JJTIDENTIFIER:
             case JavammTreeConstants.JJTBOOLEANVALUE:
@@ -103,12 +100,9 @@ class ASTIf extends ConditionalNode {
                 stackUsage.dec(1); // ifeq
                 break;
             case JavammTreeConstants.JJTAND:
-                ASTAnd andExp = (ASTAnd) expression;
-                andExp.calculateParamsStackUsage(stackUsage);
-                break;
             case JavammTreeConstants.JJTLESSTHAN:
-                ASTLessThan lsThanExp = (ASTLessThan) expression;
-                lsThanExp.calculateParamsStackUsage(stackUsage);
+                BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
+                node.calculateParamsStackUsage(stackUsage);
                 break;
             default:
                 return;

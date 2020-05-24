@@ -1,5 +1,6 @@
 package javamm.parser;
 
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 
 import java.io.PrintWriter;
@@ -15,4 +16,6 @@ public abstract class BooleanBinaryOperatorNode extends BinaryOperatorNode{
   }
 
   public abstract void write(PrintWriter writer, String labelFalse);
+
+  public abstract void calculateParamsStackUsage(StackUsage stackUsage);
 }

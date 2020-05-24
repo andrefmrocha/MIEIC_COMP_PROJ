@@ -46,12 +46,9 @@ class ASTWhile extends ConditionalNode {
     SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
     switch (expression.id) {
       case JavammTreeConstants.JJTAND:
-        ASTAnd andExp = (ASTAnd) expression;
-        andExp.write(writer,"endwhile_" + localCounter);
-        break;
       case JavammTreeConstants.JJTLESSTHAN:
-        ASTLessThan lsThanExp = (ASTLessThan) expression;
-        lsThanExp.write(writer, "endwhile_" + localCounter );
+        BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
+        node.write(writer, "endwhile_" + localCounter);
         break;
       case JavammTreeConstants.JJTBOOLEANVALUE:
       case JavammTreeConstants.JJTNEGATION:
@@ -90,12 +87,9 @@ class ASTWhile extends ConditionalNode {
         stackUsage.dec(1); // ifeq
         break;
       case JavammTreeConstants.JJTAND:
-        ASTAnd andExp = (ASTAnd) expression;
-        andExp.calculateParamsStackUsage(stackUsage);
-        break;
       case JavammTreeConstants.JJTLESSTHAN:
-        ASTLessThan lsThanExp = (ASTLessThan) expression;
-        lsThanExp.calculateParamsStackUsage(stackUsage);
+        BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
+        node.calculateParamsStackUsage(stackUsage);
         break;
       default:
         return;
