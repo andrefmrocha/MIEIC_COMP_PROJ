@@ -25,12 +25,12 @@ class ASTCall extends TypeNode {
         super(p, id);
     }
 
-    public void setMethodInvokation(String invokationIdent, String classIdent, String methodIdent, List<Symbol> types, Symbol.Type returnType) {
+    public void setMethodInvokation(String invokationIdent, String classIdent, String methodIdent, List<Symbol> types, Symbol returnSymbol) {
         methodInvokation = invokationIdent + classIdent + "/" + methodIdent + "(";
         for (Symbol symbol : types) {
             methodInvokation += symbol.getJVMType();
         }
-        methodInvokation += ")" + Symbol.getJVMTypeByType(returnType);
+        methodInvokation += ")" + returnSymbol.getJVMType();
     }
 
     public void evalWithIdentifier(String identifier, boolean newIdentifier, Javamm parser) {
@@ -65,14 +65,14 @@ class ASTCall extends TypeNode {
 
             this.returnSymbol = classSymbol.getMethods().getSymbol(methodId).getReturnSymbol();
             this.type = returnSymbol.getType();
-            setMethodInvokation("  " + invokevirtual + " ", classSymbol.getClassName(), methodIdentifier.identifierName, methodId.getParameters(), this.type);
+            setMethodInvokation("  " + invokevirtual + " ", classSymbol.getClassName(), methodIdentifier.identifierName, methodId.getParameters(), returnSymbol);
 
         } else if (methodTable.checkSymbol(importMethodId)) {
             final MethodSymbol symbol = methodTable.getSymbol(importMethodId);
 
             this.returnSymbol = symbol.getReturnSymbol();
             this.type = returnSymbol.getType();
-            setMethodInvokation("  " + invokestatic + " ", identifier, methodIdentifier.identifierName, importMethodId.getParameters(), this.type);
+            setMethodInvokation("  " + invokestatic + " ", identifier, methodIdentifier.identifierName, importMethodId.getParameters(), returnSymbol);
             isStatic = true;
         } else
             parser.semanticErrors.add(new SemanticsException(identifier + " was not found", methodIdentifier));
@@ -97,7 +97,7 @@ class ASTCall extends TypeNode {
         }
         this.returnSymbol = symbol.getReturnSymbol();
         this.type = returnSymbol.getType();
-        setMethodInvokation("  " + invokevirtual + " ", this.table.getClassName(), methodIdentifier.identifierName, methodId.getParameters(), this.type);
+        setMethodInvokation("  " + invokevirtual + " ", this.table.getClassName(), methodIdentifier.identifierName, methodId.getParameters(), returnSymbol);
     }
 
     @Override

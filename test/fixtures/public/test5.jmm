@@ -1,0 +1,32 @@
+/*
+Tests:
+    - extra features: import constructors with arguments and void functions
+*/
+import classA;
+import classA(int,int);
+import classA.func1(int) int;
+
+class test5 {
+
+    int atr1;
+
+    public void f1(boolean c) {
+        if (c) {
+            atr1 = 5;
+        } else {
+            atr1 = 10;
+        }
+    }
+
+    public static void main(String[] args) {
+        classA objA;
+        int i1;
+
+        objA = new classA(2, 2);
+
+        i1 = objA.func1(2);
+        this.f1(true);
+
+    }
+
+}
