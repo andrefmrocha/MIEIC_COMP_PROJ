@@ -76,20 +76,40 @@ class test3 {
         return 2;
     }
 
-    public int f7()
-    {
-            int i1;
-            int i2;
+    public int f7() {
+        int i1;
+        int i2;
 
-            i1 = 4;
-            i2 = i2 * 2;
-            if( i1 < i2) {
-                new classA();
-            } else if (i2 < i1) {
-                this.f4(i1);
-            } else{}
+        i1 = 4;
+        i2 = i2 * 2;
+        if (i1 < i2) {
+            new classA();
+        } else if (i2 < i1) {
+            this.f4(i1);
+        } else {}
 
-            return i2;
+        return i2;
+
+    }
+
+    public int f8() {
+        int a;
+        int b;
+
+        a = 5;
+        b = 10;
+        if (a < b) {
+            while (a + 1 < b) {
+                a = 5;
+                if (a < b) {
+                    a = a * 2;
+                } else {}
+            }
+        } else if (b < a) {
+            this.f4(a);
+        } else {}
+
+        return b;
 
     }
 
@@ -111,6 +131,7 @@ class test3 {
         i2 = this.f5(4, bool1);
         i3 = this.f6(2, bool1);
         i1 = this.f7();
+        i2 = this.f8();
 
     }
 

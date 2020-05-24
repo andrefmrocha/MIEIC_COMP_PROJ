@@ -3,6 +3,7 @@ package javamm.parser;
 import javamm.SemanticsException;
 import javamm.semantics.ClassSymbol;
 import javamm.semantics.MethodIdentifier;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
@@ -34,7 +35,20 @@ class ASTNew extends TypeNode {
         this.evaluateChild(child, new Symbol(type), parser);
 
         ASTIdentifier identifier = (ASTIdentifier) child;
-        classSymbol = (ClassSymbol) table.getSymbol(identifier.identifierName);
+        if (!table.checkSymbol(identifier.identifierName)) {
+            parser.semanticErrors.add(new SemanticsException("No class with the name " + identifier.identifierName, identifier));
+            return;
+        }
+
+        Symbol symbol = table.getSymbol(identifier.identifierName);
+
+        if (symbol.getType() != Type.CLASS) {
+            parser.semanticErrors.add(new SemanticsException("Expected " + identifier.identifierName
+                    + " to be a class, found " + symbol.getType(), identifier));
+            return;
+        }
+
+        classSymbol = (ClassSymbol) symbol;
         final ASTCallParams callParams = ((ASTCallParams) this.jjtGetChild(1));
         callParams.setTables(table, methodTable);
         constructor = callParams.getMethodIdentifier(ClassSymbol.init, parser);
@@ -42,8 +56,6 @@ class ASTNew extends TypeNode {
 
         if (!classSymbol.getConstructors().checkSymbol(constructor))
             parser.semanticErrors.add(new SemanticsException("Can't find constructor with that signature", callParams));
-
-
     }
 
     @Override
@@ -52,16 +64,19 @@ class ASTNew extends TypeNode {
         writer.println("  dup"); //duplicate object on top of stack, need 2 references (1 constructor + 1 assign)
         ((SimpleNode) this.jjtGetChild(1)).write(writer);
         writer.print("  invokespecial " + identifier + "/<init>("); // call constructor
-        for(Type type : constructor.getParameters()){
-            writer.print(Symbol.getJVMTypeByType(type));
+        for (Symbol symbol : constructor.getParameters()) {
+            writer.print(Symbol.getJVMTypeByType(symbol.getType()));
         }
         writer.println(")V");
     }
 
     @Override
-    protected int getMaxStackUsage() {
-        SimpleNode callParams = (SimpleNode) this.jjtGetChild(1);
-        return 2 + callParams.getMaxStackUsage();
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        stackUsage.inc(2);
+
+        ASTCallParams params = (ASTCallParams) this.jjtGetChild(1);
+        params.calculateStackUsage(stackUsage);
+        stackUsage.dec(params.nParams + 1);
     }
 
 }

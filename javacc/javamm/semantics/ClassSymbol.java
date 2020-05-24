@@ -2,6 +2,7 @@ package javamm.semantics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ClassSymbol extends Symbol {
     public static final String init = "<init>";
@@ -12,26 +13,26 @@ public class ClassSymbol extends Symbol {
 
     public ClassSymbol(String className) {
         super(Type.CLASS, true);
-        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(Type.CLASS, new ArrayList<>()));
+        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(this, new ArrayList<>()));
         this.className = className;
     }
 
-    public ClassSymbol(String className, List<Type> constructorParams) {
+    public ClassSymbol(String className, List<Symbol> constructorParams) {
         super(Type.CLASS, true);
-        constructors.putSymbol(new MethodIdentifier(init, constructorParams), new MethodSymbol(Type.CLASS, constructorParams));
+        constructors.putSymbol(new MethodIdentifier(init, constructorParams), new MethodSymbol(this, constructorParams));
         this.className = className;
     }
 
     public ClassSymbol(Type type, String className, MethodSymbolTable methods) {
         super(type, true);
-        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(Type.CLASS, new ArrayList<>()));
+        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(this, new ArrayList<>()));
         this.className = className;
         this.methods = methods;
     }
 
     public ClassSymbol(Type type, String className, MethodSymbolTable methods, ClassSymbol extension) {
         super(type, true);
-        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(Type.CLASS, new ArrayList<>()));
+        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(this, new ArrayList<>()));
         this.className = className;
         this.methods = methods;
         this.extension = extension;
@@ -39,7 +40,7 @@ public class ClassSymbol extends Symbol {
 
     public ClassSymbol(Type type, String className, MethodSymbolTable methods, ClassSymbol extension, int stackPos) {
         super(type, true, stackPos);
-        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(Type.CLASS, new ArrayList<>()));
+        constructors.putSymbol(new MethodIdentifier(init, new ArrayList<>()), new MethodSymbol(this, new ArrayList<>()));
         this.className = className;
         this.methods = methods;
         this.extension = extension;
@@ -80,5 +81,28 @@ public class ClassSymbol extends Symbol {
     @Override
     public String getJVMType() {
         return "L" + className + ";";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClassSymbol that = (ClassSymbol) o;
+        return derivesFrom(that);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Type.CLASS);
+    }
+
+    @Override
+    public String toString() {
+        return "ClassSymbol{" +
+                "methods=" + methods +
+                ", constructors=" + constructors +
+                ", extension=" + extension +
+                ", className='" + className + '\'' +
+                '}';
     }
 }

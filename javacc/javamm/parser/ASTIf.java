@@ -1,6 +1,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.semantics.StackUsage;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -10,6 +11,8 @@ import java.util.*;
 public
 class ASTIf extends ConditionalNode {
     public static int labelCounter = 0; //if/else counter
+    private int requiredThenPops = 0;
+    private int requiredElsePops = 0;
 
     public TreeSet<String> initializedVars = new TreeSet<>();
 
@@ -84,10 +87,50 @@ class ASTIf extends ConditionalNode {
 
         labelCounter++;
         thenNode.write(writer);
+        StackUsage.popStack(writer, requiredThenPops);
         writer.println("  goto endif_" + currCounter);
         writer.println("else_" + currCounter + ":");
         elseNode.write(writer);
+        StackUsage.popStack(writer, requiredElsePops);
         writer.println("endif_" + currCounter + ":");
+    }
+
+    @Override
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
+        switch (expression.id) {
+            case JavammTreeConstants.JJTIDENTIFIER:
+            case JavammTreeConstants.JJTBOOLEANVALUE:
+            case JavammTreeConstants.JJTNEGATION:
+                expression.calculateStackUsage(stackUsage);
+                stackUsage.dec(1); // ifne
+                break;
+            case JavammTreeConstants.JJTAND:
+                ASTAnd andExp = (ASTAnd) expression;
+                andExp.calculateParamsStackUsage(stackUsage);
+                break;
+            case JavammTreeConstants.JJTLESSTHAN:
+                ASTLessThan lsThanExp = (ASTLessThan) expression;
+                lsThanExp.calculateParamsStackUsage(stackUsage);
+                break;
+            default:
+                return;
+        }
+
+        ASTThen thenNode = (ASTThen) this.jjtGetChild(1);
+        ASTElse elseNode = (ASTElse) this.jjtGetChild(2);
+
+        int stackUsageBeforeThen = stackUsage.getStackUsage();
+        thenNode.calculateStackUsage(stackUsage);
+        int stackUsageAfterThen = stackUsage.getStackUsage();
+
+        stackUsage.set(stackUsageBeforeThen);
+        elseNode.calculateStackUsage(stackUsage);
+
+        this.requiredThenPops = stackUsageAfterThen - stackUsageBeforeThen;
+        this.requiredElsePops = stackUsage.getStackUsage() - stackUsageBeforeThen;
+
+        stackUsage.set(stackUsageBeforeThen);
     }
 }
 /* JavaCC - OriginalChecksum=3f17c4ed5b4fd5cc052c1c2d168b79b9 (do not edit this line) */

@@ -1,5 +1,6 @@
 package javamm.parser;
 
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol.Type;
 
 import java.io.PrintWriter;
@@ -25,6 +26,11 @@ class ASTDiv extends BinaryOperatorNode {
   public void write(PrintWriter writer) {
     super.write(writer);
     writer.println("  idiv");
+  }
+
+  @Override
+  protected void calculateStackUsage(StackUsage stackUsage) {
+    super.calculateStackUsage(stackUsage);
   }
 }
 /* JavaCC - OriginalChecksum=a6ae99679f76890aff99ebcee897988e (do not edit this line) */

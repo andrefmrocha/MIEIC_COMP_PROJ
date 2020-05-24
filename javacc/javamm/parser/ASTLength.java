@@ -1,6 +1,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 
 import java.io.PrintWriter;
@@ -69,8 +70,9 @@ class ASTLength extends TypeNode {
     }
 
     @Override
-    protected int getMaxStackUsage() {
-        return super.getMaxStackUsage();
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        final SimpleNode var = (SimpleNode) this.jjtGetChild(0);
+        var.calculateStackUsage(stackUsage);
     }
 }
 /* JavaCC - OriginalChecksum=d20841b9a326e3b2ada1a7a0c3a4a9a1 (do not edit this line) */

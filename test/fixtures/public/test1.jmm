@@ -73,9 +73,9 @@ class test1 {
         return new classA();
     }
 
-    /* public test1 f4() {
+    public test1 f4() {
          return new test1();
-    }*/
+    }
 
     public int f5() {
         int result;
@@ -106,12 +106,12 @@ class test1 {
         atr3 = new classA();
         objA = new classA();
         objA2 = new classA();
-        //objA1 = new classA1();
+        objA1 = new classA1();
 
         bool1 = objA.func1(ia1, 2, 3);
         i1 = objA.func1(ia1);
         objA.func2(i1);
-        //objA1 = objA.func3(2);
+        objA1 = objA.func3(2);
         i2 = classB.func1(1, 2);
         i3 = this.f1();
         i4 = this.f2(i1, i2, i3);
@@ -119,7 +119,7 @@ class test1 {
         ia1[0] = ia1[2];
         i4 = atr3.func1(ia1);
         i2 = this.f5();
-        //this.f4();
+        this.f4();
 
 
     }

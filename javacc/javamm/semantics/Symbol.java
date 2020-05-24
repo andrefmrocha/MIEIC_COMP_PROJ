@@ -4,6 +4,8 @@ package javamm.semantics;
 import javamm.parser.JavammTreeConstants;
 import javamm.parser.SimpleNode;
 
+import java.util.Objects;
+
 public class Symbol {
     private int stackPos = -1;
 
@@ -57,6 +59,8 @@ public class Symbol {
             case INT_ARRAY:
                 return "[I";
             case VOID:
+            case OBJ:
+            case CLASS:
                 return "V";
         }
         return null;
@@ -99,7 +103,20 @@ public class Symbol {
     }
 
     public void setStackPos(int stackPos) {
-        if(stackPos != -1)
+        if (stackPos != -1)
             this.stackPos = stackPos;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Symbol symbol = (Symbol) o;
+        return type == symbol.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type);
     }
 }

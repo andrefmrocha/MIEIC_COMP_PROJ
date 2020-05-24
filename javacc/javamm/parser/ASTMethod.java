@@ -1,6 +1,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 import javamm.semantics.SymbolTable;
 
@@ -44,7 +45,7 @@ class ASTMethod extends TypeNode {
             ASTMethodName method = (ASTMethodName) methodType;
             this.parameters = method.parameters;
             method.eval(parser, parameters);
-            this.type = method.returnType;
+            this.type = method.returnSymbol.getType();
         } else if (methodType.id == JavammTreeConstants.JJTMAIN) {
             methodType.setTables(table, methodTable);
             methodType.eval(parser);
@@ -86,13 +87,16 @@ class ASTMethod extends TypeNode {
         }
         int localsLimit = paramsCount +
                 methodBody.localsCount + 1;
-        int stackLimit = methodBody.getMaxStackUsage();
 
-        writer.println("  .limit stack " + stackLimit);//TODO Check for these limits actual values
+        StackUsage stackUsage = new StackUsage();
+        methodBody.calculateStackUsage(stackUsage);
+
+        writer.println("  .limit stack " + stackUsage.getMaxStackUsage());
         writer.println("  .limit locals " + localsLimit + "\n");
-        methodBody.write(writer);
+        methodBody.write(writer, stackUsage);
 
         if (methodType.id == JavammTreeConstants.JJTMAIN || this.type == Symbol.Type.VOID) {
+            stackUsage.popStack(writer);
             writer.println("  return");
         }
         writer.println(".end method\n");
