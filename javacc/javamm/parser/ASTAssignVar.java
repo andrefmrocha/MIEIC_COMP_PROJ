@@ -54,7 +54,7 @@ class ASTAssignVar extends TypeNode {
 
     symbol.setInitialized();
 
-    if (expression.id == JavammTreeConstants.JJTSUM)
+    if (expression.id == JavammTreeConstants.JJTSUM && symbol.getStackPos() != -1)
         this.optimizeMathOperation(expression);
 }
 
@@ -123,7 +123,7 @@ class ASTAssignVar extends TypeNode {
 
             if (varNum == -1) {
                 String className = this.table.getClassName();
-                String jvmType = Symbol.getJVMTypeByType(leftSymbol.getType());
+                String jvmType = leftSymbol.getJVMType();
                 writer.println("  putfield " + className + "/" + varName + " " + jvmType + "\n");
             } else {
                 String storeInstr = Symbol.getJVMPrefix(leftSymbol.getType()) + "store";

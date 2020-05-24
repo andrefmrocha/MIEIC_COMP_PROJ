@@ -112,7 +112,9 @@ class ASTCall extends TypeNode {
     protected void calculateStackUsage(StackUsage stackUsage) {
         ASTCallParams callParams = (ASTCallParams) this.jjtGetChild(1);
         callParams.calculateStackUsage(stackUsage);
-        stackUsage.dec(callParams.nParams);
+        stackUsage.dec(callParams.nParams + 1); // consume params + object reference
+        if(returnSymbol.getType() != Symbol.Type.VOID)
+            stackUsage.inc(1);
     }
 
 }

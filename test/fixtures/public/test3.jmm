@@ -112,9 +112,7 @@ class test3 {
         return b;
 
     }
-
-    public static void main(String[] args) {
-
+    public void foo(){
         int i1;
         int i2;
         int i3;
@@ -132,7 +130,12 @@ class test3 {
         i3 = this.f6(2, bool1);
         i1 = this.f7();
         i2 = this.f8();
+    }
 
+    public static void main(String[] args) {
+        test3 x;
+        x = new test3();
+        x.foo();
     }
 
 }

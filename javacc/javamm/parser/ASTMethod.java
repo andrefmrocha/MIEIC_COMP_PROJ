@@ -62,8 +62,12 @@ class ASTMethod extends TypeNode {
         } else {
             methodBody = (ASTMethodBody) this.jjtGetChild(2);
         }
+        if(((SimpleNode)this.jjtGetChild(0)).id == JavammTreeConstants.JJTMAIN){
+            methodBody.setTables(table.getParent(), methodTable.getParent());
+        } else {
+            methodBody.setTables(table, methodTable);
+        }
         methodBody.returnType = this.type;
-        methodBody.setTables(table, methodTable);
         methodBody.eval(parser, stackPointer);
     }
 

@@ -31,9 +31,9 @@ class test4 {
     }
 
     public static void main(String[] args) {
-
-        this.f1(true);
-
+        test4 x;
+        x = new test4();
+        x.f1(true);
     }
 
 

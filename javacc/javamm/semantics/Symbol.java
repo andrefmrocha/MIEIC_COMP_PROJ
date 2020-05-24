@@ -50,22 +50,6 @@ public class Symbol {
         return null;
     }
 
-    public static String getJVMTypeByType(Type type) {
-        switch (type) {
-            case INT:
-                return "I";
-            case BOOL:
-                return "Z";
-            case INT_ARRAY:
-                return "[I";
-            case VOID:
-            case OBJ:
-            case CLASS:
-                return "V";
-        }
-        return null;
-    }
-
     public static String getJVMPrefix(Type type) {
         switch (type) {
             case INT:
@@ -83,7 +67,19 @@ public class Symbol {
     }
 
     public String getJVMType() {
-        return getJVMTypeByType(type);
+        switch (type) {
+            case INT:
+                return "I";
+            case BOOL:
+                return "Z";
+            case INT_ARRAY:
+                return "[I";
+            case VOID:
+            case OBJ:
+            case CLASS:
+                return "V";
+        }
+        return null;
     }
 
     public boolean isInitialized() {

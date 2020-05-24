@@ -47,11 +47,9 @@ class ASTMethodName extends SimpleNode {
     @Override
     public void write(PrintWriter writer) {
         writer.print(".method public " + methodName + "(");
-        System.out.println("Method " + methodName);
         for (Symbol symbol: parameters) {
             writer.print(symbol.getJVMType());
         }
-        System.out.println("Method return " + returnSymbol.getJVMType());
         writer.println(")" + returnSymbol.getJVMType());
     }
 }

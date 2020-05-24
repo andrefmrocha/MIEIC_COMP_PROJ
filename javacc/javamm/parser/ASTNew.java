@@ -65,7 +65,7 @@ class ASTNew extends TypeNode {
         ((SimpleNode) this.jjtGetChild(1)).write(writer);
         writer.print("  invokespecial " + identifier + "/<init>("); // call constructor
         for (Symbol symbol : constructor.getParameters()) {
-            writer.print(Symbol.getJVMTypeByType(symbol.getType()));
+            writer.print(symbol.getJVMType());
         }
         writer.println(")V");
     }

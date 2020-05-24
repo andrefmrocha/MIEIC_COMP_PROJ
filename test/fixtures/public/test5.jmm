@@ -18,7 +18,7 @@ class test5 {
         }
     }
 
-    public static void main(String[] args) {
+    public void foo(){
         classA objA;
         int i1;
 
@@ -26,7 +26,12 @@ class test5 {
 
         i1 = objA.func1(2);
         this.f1(true);
+    }
 
+    public static void main(String[] args) {
+        test5 x;
+        x = new test5();
+        x.foo();
     }
 
 }
