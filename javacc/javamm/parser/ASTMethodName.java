@@ -12,7 +12,7 @@ import java.util.List;
 
 public
 class ASTMethodName extends SimpleNode {
-    public Symbol.Type returnType = null;
+    public Symbol returnSymbol = null;
     public String methodName;
     public List<Symbol> parameters = new ArrayList<>();
 
@@ -28,7 +28,7 @@ class ASTMethodName extends SimpleNode {
         ASTIdentifier nameNode = (ASTIdentifier) this.jjtGetChild(1);
         SimpleNode typeNode = (SimpleNode) this.jjtGetChild(0);
         methodName = nameNode.identifierName;
-        Symbol returnSymbol = VarNode.getSymbol(typeNode, table, parser);
+        returnSymbol = VarNode.getSymbol(typeNode, table, parser);
 
         if (parameters != null) {
             parameters.setTables(table, methodTable);
@@ -42,16 +42,17 @@ class ASTMethodName extends SimpleNode {
             }
         }
         this.methodTable.putSymbol(new MethodIdentifier(methodName, this.parameters), new MethodSymbol(returnSymbol, this.parameters));
-        this.returnType = returnSymbol.getType();
     }
 
     @Override
     public void write(PrintWriter writer) {
         writer.print(".method public " + methodName + "(");
+        System.out.println("Method " + methodName);
         for (Symbol symbol: parameters) {
-            writer.print(Symbol.getJVMTypeByType(symbol.getType()));
+            writer.print(symbol.getJVMType());
         }
-        writer.println(")" + Symbol.getJVMTypeByType(returnType));
+        System.out.println("Method return " + returnSymbol.getJVMType());
+        writer.println(")" + returnSymbol.getJVMType());
     }
 }
 /* JavaCC - OriginalChecksum=4573a3da8b3ef87c2c4dda84d8669778 (do not edit this line) */

@@ -45,7 +45,7 @@ class ASTMethod extends TypeNode {
             ASTMethodName method = (ASTMethodName) methodType;
             this.parameters = method.parameters;
             method.eval(parser, parameters);
-            this.type = method.returnType;
+            this.type = method.returnSymbol.getType();
         } else if (methodType.id == JavammTreeConstants.JJTMAIN) {
             methodType.setTables(table, methodTable);
             methodType.eval(parser);
