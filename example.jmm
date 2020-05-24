@@ -23,8 +23,7 @@ class Fac {
     public void voyage() {
         int a;
         a = 2;
-
-        return a;
+        return;
     }
 
 }

@@ -14,10 +14,12 @@ class ASTAssignVarArray extends TypeNode {
 
     public ASTAssignVarArray(int id) {
         super(id);
+        this.validStatement = true;
     }
 
     public ASTAssignVarArray(Javamm p, int id) {
         super(p, id);
+        this.validStatement = true;
     }
 
     @Override

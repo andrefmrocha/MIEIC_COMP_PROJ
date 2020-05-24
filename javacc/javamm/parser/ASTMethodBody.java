@@ -36,6 +36,12 @@ class ASTMethodBody extends SimpleNode {
                 break;
 
             }
+
+            if (!methodNode.validStatement) {
+                parser.semanticErrors.add(new SemanticsException("Not a statement: " + methodNode.toString(), methodNode));
+                return;
+            }
+
             methodNode.eval(parser);
         }
         if(!foundReturn && returnType != Symbol.Type.VOID) {

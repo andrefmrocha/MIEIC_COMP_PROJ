@@ -19,6 +19,7 @@ class SimpleNode implements Node {
   protected Javamm parser;
   protected SymbolTable table;
   protected MethodSymbolTable methodTable;
+  protected boolean validStatement = false;
   private int line = 0;
 
   public void setLine( int line ) { this.line = line ; }
@@ -126,22 +127,6 @@ class SimpleNode implements Node {
 
   public int getId() {
     return id;
-  }
-
-  protected boolean checkForThis(SymbolTable classTable) {
-    if (id == JavammTreeConstants.JJTTHIS)
-      return true;
-    if(id == JavammTreeConstants.JJTIDENTIFIER) {
-      String identifier = ((ASTIdentifier)this).identifierName;
-      if(classTable.checkSymbol(identifier))
-        return  true;
-    }
-   for(int i = 0; i< this.jjtGetNumChildren(); i++) {
-      SimpleNode node = (SimpleNode) this.jjtGetChild(i);
-      if (node.checkForThis(classTable))
-        return true;
-    }
-    return false;
   }
 
   protected int getMaxStackUsage() {

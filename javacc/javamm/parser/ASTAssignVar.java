@@ -16,10 +16,12 @@ class ASTAssignVar extends TypeNode {
 
   public ASTAssignVar(int id) {
     super(id);
+    this.validStatement = true;
   }
 
   public ASTAssignVar(Javamm p, int id) {
     super(p, id);
+    this.validStatement = true;
   }
 
   @Override
@@ -110,7 +112,7 @@ class ASTAssignVar extends TypeNode {
         SimpleNode right = (SimpleNode) this.jjtGetChild(1);
         if(iinc != Integer.MAX_VALUE && iinc >= -32768 && iinc <= 32767){
             final String iincInstruction = (iinc > 127 || iinc < -128) ? "iinc_w" : "iinc";
-            writer.println("  "+ iincInstruction + " " + varNum + ", " + iinc);
+            writer.println("  "+ iincInstruction + " " + varNum + " " + iinc);
 
         } else {
             if (varNum == -1)

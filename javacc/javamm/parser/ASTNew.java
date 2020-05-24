@@ -19,11 +19,13 @@ class ASTNew extends TypeNode {
     public ASTNew(int id) {
         super(id);
         type = Type.CLASS;
+        this.validStatement = true;
     }
 
     public ASTNew(Javamm p, int id) {
         super(p, id);
         type = Type.CLASS;
+        this.validStatement = true;
     }
 
     @Override

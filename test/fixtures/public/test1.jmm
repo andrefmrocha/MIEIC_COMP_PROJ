@@ -5,7 +5,6 @@ Tests
     -class functions and attributes
     -arrays
 */
-
 import classA1;
 import classA;
 import classA.func1(int[], int, int) boolean;
@@ -93,7 +92,6 @@ class test1 {
         int i2;
         int i3;
         int i4;
-        int i5;
         int[] ia1;
         ia1 = new int[3];
         ia1[0] = 1;
@@ -104,6 +102,7 @@ class test1 {
         atr3 = new classA();
         objA = new classA();
         objA2 = new classA();
+        //objA1 = new classA1();
 
         bool1 = objA.func1(ia1, 2, 3);
         i1 = objA.func1(ia1);
@@ -114,10 +113,9 @@ class test1 {
         i4 = this.f2(i1, i2, i3);
         this.f3();
         ia1[0] = ia1[2];
-        i5 = atr3.func1(ia1);
+        i4 = atr3.func1(ia1);
+
 
     }
-
-
 
 }
