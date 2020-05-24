@@ -32,7 +32,7 @@ class ASTIdentifier extends TypeNode {
     if(varNum == -1) {
       writer.println("  aload_0");
       String className = this.table.getClassName();
-      String jvmType = Symbol.getJVMTypeByType(s.getType());
+      String jvmType = s.getJVMType();
       writer.println("  getfield " + className + "/" + identifierName + " " + jvmType);
     } else {
       String separator = varNum > 3 ? " " : "_";

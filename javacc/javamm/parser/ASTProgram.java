@@ -46,6 +46,7 @@ class ASTProgram extends SimpleNode {
       Iterator it = this.table.getTable().entrySet().iterator();
       while(it.hasNext()) {
         Map.Entry pair = (Map.Entry) it.next();
+        System.out.println("key: " + pair.getKey());
         System.out.println("      Name: " + pair.getKey() + " | Type: " + ((ClassSymbol)pair.getValue()).getType()); //TODO: Add arguments of constructor
         list.add((ClassSymbol) pair.getValue());
       }

@@ -87,7 +87,7 @@ class test1 {
         return result;
     }
 
-    public static void main(String[] args) {
+    public void foo() {
         classA objA;
         classA objA2;
         classA1 objA1;
@@ -120,8 +120,12 @@ class test1 {
         i4 = atr3.func1(ia1);
         i2 = this.f5();
         this.f4();
+    }
 
-
+    public static void main(String[] args) {
+        test1 x;
+        x = new test1();
+        x.foo();
     }
 
 }

@@ -26,7 +26,7 @@ class test2 extends classA {
         this.f3(p);
     }
 
-    public static void main(String[] args) {
+    public void foo(){
         classA objA;
         classA objA2;
         test2 objt2;
@@ -44,7 +44,12 @@ class test2 extends classA {
 
         this.getClassA();
         this.f4();
+    }
 
+    public static void main(String[] args) {
+        test2 x;
+        x = new test2();
+        x.foo();
     }
 
     public classA getClassA() {
