@@ -49,20 +49,16 @@ class ASTWhile extends ConditionalNode {
         ASTAnd andExp = (ASTAnd) expression;
         andExp.write(writer,"endwhile_" + localCounter);
         break;
-      case JavammTreeConstants.JJTIDENTIFIER:
-        ASTIdentifier varExp = (ASTIdentifier) expression;
-        varExp.write(writer);
-        writer.println("  ifeq endwhile_" + localCounter );
-        break;
-      case JavammTreeConstants.JJTBOOLEANVALUE:
-      case JavammTreeConstants.JJTNEGATION:
-        TypeNode boolExp = (TypeNode) expression;
-        boolExp.write(writer);
-        writer.println("  ifne endwhile_" + localCounter );
-        break;
       case JavammTreeConstants.JJTLESSTHAN:
         ASTLessThan lsThanExp = (ASTLessThan) expression;
         lsThanExp.write(writer, "endwhile_" + localCounter );
+        break;
+      case JavammTreeConstants.JJTBOOLEANVALUE:
+      case JavammTreeConstants.JJTNEGATION:
+      case JavammTreeConstants.JJTIDENTIFIER:
+      case JavammTreeConstants.JJTMETHODCALL:
+        expression.write(writer);
+        writer.println("  ifeq endwhile_" + localCounter );
         break;
       default:
         return;
@@ -89,8 +85,9 @@ class ASTWhile extends ConditionalNode {
       case JavammTreeConstants.JJTIDENTIFIER:
       case JavammTreeConstants.JJTBOOLEANVALUE:
       case JavammTreeConstants.JJTNEGATION:
+      case JavammTreeConstants.JJTMETHODCALL:
         expression.calculateStackUsage(stackUsage);
-        stackUsage.dec(1); // ifne
+        stackUsage.dec(1); // ifeq
         break;
       case JavammTreeConstants.JJTAND:
         ASTAnd andExp = (ASTAnd) expression;

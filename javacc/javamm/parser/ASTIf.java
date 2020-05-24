@@ -63,20 +63,16 @@ class ASTIf extends ConditionalNode {
                 ASTAnd andExp = (ASTAnd) expression;
                 andExp.write(writer,"else_" + currCounter);
                 break;
-            case JavammTreeConstants.JJTIDENTIFIER:
-                ASTIdentifier varExp = (ASTIdentifier) expression;
-                varExp.write(writer);
-                writer.println("  ifeq else_" + currCounter);
-                break;
-            case JavammTreeConstants.JJTBOOLEANVALUE:
-            case JavammTreeConstants.JJTNEGATION:
-                TypeNode boolExp = (TypeNode) expression;
-                boolExp.write(writer);
-                writer.println("  ifne else_" + currCounter);
-                break;
             case JavammTreeConstants.JJTLESSTHAN:
                 ASTLessThan lsThanExp = (ASTLessThan) expression;
                 lsThanExp.write(writer, "else_" + currCounter);
+                break;
+            case JavammTreeConstants.JJTIDENTIFIER:
+            case JavammTreeConstants.JJTBOOLEANVALUE:
+            case JavammTreeConstants.JJTNEGATION:
+            case JavammTreeConstants.JJTMETHODCALL:
+                expression.write(writer);
+                writer.println("  ifeq else_" + currCounter);
                 break;
             default:
                 return;
@@ -102,8 +98,9 @@ class ASTIf extends ConditionalNode {
             case JavammTreeConstants.JJTIDENTIFIER:
             case JavammTreeConstants.JJTBOOLEANVALUE:
             case JavammTreeConstants.JJTNEGATION:
+            case JavammTreeConstants.JJTMETHODCALL:
                 expression.calculateStackUsage(stackUsage);
-                stackUsage.dec(1); // ifne
+                stackUsage.dec(1); // ifeq
                 break;
             case JavammTreeConstants.JJTAND:
                 ASTAnd andExp = (ASTAnd) expression;
