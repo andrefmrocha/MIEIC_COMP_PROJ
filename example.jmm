@@ -1,29 +1,15 @@
-import static io.println(int) void; // by default considers the return as void
-class Fac {
-    public int ComputeFac(int num){
-        int num_aux ;
-        if (num < 1) {
-            num  = 1+1;
-            num_aux = 1;
-        }
-        else
-            num_aux = num * (this.ComputeFac(num-1));
-
-        return num_aux;
+import static io.println(int) void;
+import Parent;
+class Simple extends Parent {
+    public Simple t() {
+        return new Simple();
     }
-    public static void main(String[] args){
-        int aux;
-        void aubs;
-        io.println(new Fac().ComputeFac(10)); //assuming the existence
-        aux = 1;
-
-        aux = aux + 1 + 1000;
+    public void coisa(Parent p) {}
+    public void t2() {
+        Simple p;
+        p = this.t();
+        this.coisa(new Parent());
+        this.coisa(new Simple());
+        this.coisa(p);
     }
-
-    public void voyage() {
-        int a;
-        a = 2;
-        return;
-    }
-
 }

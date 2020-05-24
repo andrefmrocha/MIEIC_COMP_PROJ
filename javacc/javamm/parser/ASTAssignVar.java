@@ -1,6 +1,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 
 import java.io.PrintWriter;
@@ -122,7 +123,7 @@ class ASTAssignVar extends TypeNode {
 
             if (varNum == -1) {
                 String className = this.table.getClassName();
-                String jvmType = Symbol.getJVMTypeByType(leftSymbol.getType());
+                String jvmType = leftSymbol.getJVMType();
                 writer.println("  putfield " + className + "/" + varName + " " + jvmType + "\n");
             } else {
                 String storeInstr = Symbol.getJVMPrefix(leftSymbol.getType()) + "store";
@@ -133,17 +134,20 @@ class ASTAssignVar extends TypeNode {
     }
 
     @Override
-    protected int getMaxStackUsage() {
-        if(iinc != Integer.MAX_VALUE && iinc >= -32768 && iinc <= 32767) return 0;
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        if(iinc != Integer.MAX_VALUE && iinc >= -32768 && iinc <= 32767) return;
 
-        SimpleNode right = (SimpleNode) this.jjtGetChild(1);
         String varName = ((ASTIdentifier) this.jjtGetChild(0)).identifierName;
         Symbol leftSymbol = this.table.getSymbol(varName);
-        if (leftSymbol.getStackPos() == -1) {
-            return 1 + right.getMaxStackUsage(); // +1 from a_load
-        }
+        int varNum = leftSymbol.getStackPos();
+        SimpleNode right = (SimpleNode) this.jjtGetChild(1);
 
-        return right.getMaxStackUsage();
+        if (varNum == -1)
+            stackUsage.inc(1);
+
+        right.calculateStackUsage(stackUsage);
+
+        stackUsage.dec(varNum == -1 ? 2 : 1);
     }
   }
 

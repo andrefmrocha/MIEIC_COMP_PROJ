@@ -2,6 +2,8 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package javamm.parser;
 
+import javamm.semantics.StackUsage;
+
 import java.io.PrintWriter;
 
 public
@@ -20,8 +22,8 @@ class ASTThis extends SimpleNode {
     }
 
     @Override
-    protected int getMaxStackUsage() {
-        return 1;
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        stackUsage.inc(1);
     }
 
 }

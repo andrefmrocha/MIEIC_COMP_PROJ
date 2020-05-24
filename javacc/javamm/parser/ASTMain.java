@@ -23,7 +23,7 @@ class ASTMain extends SimpleNode {
 
   @Override
   public void eval(Javamm parser)  {
-    List<Symbol.Type> parametersTypes =  new ArrayList<>();
+    List<Symbol> parametersTypes =  new ArrayList<>();
 
     if(this.table.getParent().getSymbol("main") != null){
       parser.semanticErrors.add(new SemanticsException("Main is already defined in this class!", this));
@@ -41,8 +41,8 @@ class ASTMain extends SimpleNode {
       this.table.putSymbol(identifier.identifierName, new ClassSymbol(identifier.identifierName));
     }
 
-    parametersTypes.add(Symbol.Type.CLASS);
-    this.table.getParent().putSymbol("main",new MethodSymbol(Symbol.Type.MAIN,parametersTypes));
+    parametersTypes.add(new Symbol(Symbol.Type.CLASS));
+    this.table.getParent().putSymbol("main",new MethodSymbol(new Symbol(Symbol.Type.MAIN),parametersTypes));
   }
 
   @Override

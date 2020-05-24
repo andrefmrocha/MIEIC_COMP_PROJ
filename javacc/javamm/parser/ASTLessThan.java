@@ -1,5 +1,6 @@
 package javamm.parser;
 
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol.Type;
 
 import java.io.PrintWriter;
@@ -40,6 +41,21 @@ class ASTLessThan extends BooleanBinaryOperatorNode {
     leftOperand.write(writer);
     rightOperand.write(writer);
     writer.println("  if_icmpge " + labelFalse);
+  }
+
+  @Override
+  protected void calculateStackUsage(StackUsage stackUsage) {
+    calculateParamsStackUsage(stackUsage);
+    stackUsage.inc(1); //iconst_x
+  }
+
+  public void calculateParamsStackUsage(StackUsage stackUsage) {
+    SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
+    SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
+
+    leftOperand.calculateStackUsage(stackUsage);
+    rightOperand.calculateStackUsage(stackUsage);
+    stackUsage.dec(2); //if_icmpge
   }
 }
 /* JavaCC - OriginalChecksum=c0d8a8972c0a4b4df64282733df15850 (do not edit this line) */

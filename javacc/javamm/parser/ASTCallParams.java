@@ -4,6 +4,7 @@ package javamm.parser;
 
 import javamm.SemanticsException;
 import javamm.semantics.MethodIdentifier;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ import java.util.List;
 
 public
 class ASTCallParams extends SimpleNode {
+    public int nParams;
+
     public ASTCallParams(int id) {
         super(id);
     }
@@ -21,7 +24,7 @@ class ASTCallParams extends SimpleNode {
     }
 
     public MethodIdentifier getMethodIdentifier(String identifier, Javamm parser) {
-        final List<Symbol.Type> params = new ArrayList<>();
+        final List<Symbol> params = new ArrayList<>();
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {
             SimpleNode node = (SimpleNode) this.jjtGetChild(i);
             node.setTables(table, methodTable);
@@ -31,18 +34,23 @@ class ASTCallParams extends SimpleNode {
                     parser.semanticErrors.add(new SemanticsException("No variable named " + identifierNode.identifierName + " found", node));
                     return null;
                 }
-                Symbol symbol = table.getSymbol(identifierNode.identifierName);
-                params.add(symbol.getType());
+                params.add(table.getSymbol(identifierNode.identifierName));
 
+            } else if(node.id == JavammTreeConstants.JJTNEW){
+                ASTNew astNew = (ASTNew) node;
+                astNew.setTables(table, methodTable);
+                astNew.eval(parser);
+                params.add(astNew.classSymbol);
             } else if (node instanceof TypeNode) {
                 TypeNode typeNode = (TypeNode) node;
                 typeNode.setTables(table, methodTable);
                 typeNode.eval(parser);
-                params.add(typeNode.type);
+                params.add(new Symbol(typeNode.type));
             } else
-                params.add(VarNode.getType(node, table, parser));
+                params.add(new Symbol(VarNode.getType(node, table, parser)));
 
         }
+        nParams = params.size();
         return new MethodIdentifier(identifier, params);
     }
 
@@ -52,17 +60,8 @@ class ASTCallParams extends SimpleNode {
     }
 
     @Override
-    protected int getMaxStackUsage() {
-        int maxStackUsage = 0;
-        int valuesInStack = 0;
-        for (int i = 0; i < this.jjtGetNumChildren(); i++) {
-            SimpleNode child = (SimpleNode) this.jjtGetChild(i);
-            int childStackUsage = valuesInStack + child.getMaxStackUsage();
-
-            maxStackUsage = Math.max(maxStackUsage, childStackUsage);
-            valuesInStack++;
-        }
-        return maxStackUsage;
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        super.calculateStackUsage(stackUsage);
     }
 }
 /* JavaCC - OriginalChecksum=4d38201678fd4fcffee01a18a99da450 (do not edit this line) */

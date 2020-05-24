@@ -1,6 +1,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
@@ -61,13 +62,18 @@ class ASTArrayAccess extends TypeNode {
     }
 
     @Override
-    protected int getMaxStackUsage() {
-        SimpleNode offset = (SimpleNode) this.jjtGetChild(1);
-        int offsetMaxUsage = offset.getMaxStackUsage();
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        calculateBodyStackUsage(stackUsage);
+        stackUsage.dec(1);
+    }
 
-        // at least 2 values are left in stack, identifier and offset
-        // +1 because of identifier
-        return Math.max(2, 1+offsetMaxUsage);
+
+    protected void calculateBodyStackUsage(StackUsage stackUsage) {
+        SimpleNode identifier = (SimpleNode) this.jjtGetChild(0);
+        SimpleNode offset = (SimpleNode) this.jjtGetChild(1);
+
+        identifier.calculateStackUsage(stackUsage);
+        offset.calculateStackUsage(stackUsage);
     }
 }
 /* JavaCC - OriginalChecksum=07823d6065ca9b37f085148b14d167b9 (do not edit this line) */

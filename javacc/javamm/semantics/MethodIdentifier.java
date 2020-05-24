@@ -2,6 +2,7 @@ package javamm.semantics;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MethodIdentifier {
     public String getIdentifier() {
@@ -9,8 +10,7 @@ public class MethodIdentifier {
     }
 
     final String identifier;
-    final List<Symbol.Type> parameters;
-
+    final List<Symbol> parameters;
 
     @Override
     public boolean equals(Object o) {
@@ -27,12 +27,16 @@ public class MethodIdentifier {
     }
 
 
-    public MethodIdentifier(String identifier, List<Symbol.Type> parameters) {
+    public MethodIdentifier(String identifier, List<Symbol> parameters) {
         this.identifier = identifier;
         this.parameters = parameters;
     }
 
-    public List<Symbol.Type> getParameters() {
+    public List<Symbol> getParameters() {
         return parameters;
+    }
+
+    public List<Symbol.Type> getParametersTypes(){
+        return parameters.stream().map(Symbol::getType).collect(Collectors.toList());
     }
 }

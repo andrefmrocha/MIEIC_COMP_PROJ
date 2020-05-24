@@ -4,6 +4,8 @@ package javamm.semantics;
 import javamm.parser.JavammTreeConstants;
 import javamm.parser.SimpleNode;
 
+import java.util.Objects;
+
 public class Symbol {
     private int stackPos = -1;
 
@@ -48,20 +50,6 @@ public class Symbol {
         return null;
     }
 
-    public static String getJVMTypeByType(Type type) {
-        switch (type) {
-            case INT:
-                return "I";
-            case BOOL:
-                return "Z";
-            case INT_ARRAY:
-                return "[I";
-            case VOID:
-                return "V";
-        }
-        return null;
-    }
-
     public static String getJVMPrefix(Type type) {
         switch (type) {
             case INT:
@@ -79,7 +67,19 @@ public class Symbol {
     }
 
     public String getJVMType() {
-        return getJVMTypeByType(type);
+        switch (type) {
+            case INT:
+                return "I";
+            case BOOL:
+                return "Z";
+            case INT_ARRAY:
+                return "[I";
+            case VOID:
+            case OBJ:
+            case CLASS:
+                return "V";
+        }
+        return null;
     }
 
     public boolean isInitialized() {
@@ -99,7 +99,20 @@ public class Symbol {
     }
 
     public void setStackPos(int stackPos) {
-        if(stackPos != -1)
+        if (stackPos != -1)
             this.stackPos = stackPos;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Symbol symbol = (Symbol) o;
+        return type == symbol.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type);
     }
 }

@@ -2,6 +2,7 @@ package javamm.parser;
 
 import javamm.SemanticsException;
 import javamm.semantics.ClassSymbol;
+import javamm.semantics.StackUsage;
 
 import java.io.PrintWriter;
 
@@ -68,21 +69,12 @@ public class ASTMethodCall extends TypeNode {
     }
 
     @Override
-    protected int getMaxStackUsage() {
+    protected void calculateStackUsage(StackUsage stackUsage) {
         final SimpleNode methodName = (SimpleNode) this.jjtGetChild(0);
         final ASTCall call = ((ASTCall) this.jjtGetChild(1));
 
-        switch (methodName.id) {
-            case JavammTreeConstants.JJTTHIS:
-            case JavammTreeConstants.JJTNEW:
-            case JavammTreeConstants.JJTIDENTIFIER:
-                if(!call.isStatic) {
-                    int leftUsage = methodName.getMaxStackUsage(); // leaves a reference in stack
-                    int rightUsage = 1 + call.getMaxStackUsage();
-                    return Math.max(rightUsage, leftUsage);
-                }
-        }
-        return call.getMaxStackUsage();
+        methodName.calculateStackUsage(stackUsage);
+        call.calculateStackUsage(stackUsage);
     }
 }
 /* JavaCC - OriginalChecksum=c431bc197d60321c47680450a6c0622a (do not edit this line) */

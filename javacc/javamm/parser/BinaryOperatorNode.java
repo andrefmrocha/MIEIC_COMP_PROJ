@@ -1,6 +1,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
@@ -49,16 +50,13 @@ public abstract class BinaryOperatorNode extends TypeNode {
     }
 
     @Override
-    protected int getMaxStackUsage() {
+    protected void calculateStackUsage(StackUsage stackUsage) {
         SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
         SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
 
-        int leftMax = leftOperand.getMaxStackUsage(); // leaves 1 value on stack
-        int rightMax = rightOperand.getMaxStackUsage();
+        leftOperand.calculateStackUsage(stackUsage);
+        rightOperand.calculateStackUsage(stackUsage);
 
-        int maxUsage = Math.max(2, leftMax);
-        maxUsage = Math.max(maxUsage, 1+rightMax);
-
-        return maxUsage;
+        stackUsage.dec(1);
     }
 }

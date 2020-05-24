@@ -1,5 +1,6 @@
 package javamm.parser;
 
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol.Type;
 
 import java.io.PrintWriter;
@@ -30,8 +31,8 @@ class ASTBooleanValue extends TypeNode {
   }
 
   @Override
-  protected int getMaxStackUsage() {
-    return 1;
+  protected void calculateStackUsage(StackUsage stackUsage) {
+    stackUsage.inc(1);
   }
 }
 /* JavaCC - OriginalChecksum=3a15dd3418ff85dee49e992d4b407151 (do not edit this line) */
