@@ -1,12 +1,12 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
-import javamm.semantics.ClassSymbol;
-import javamm.semantics.MethodSymbol;
-import javamm.semantics.Symbol;
+import javamm.semantics.*;
 import javamm.semantics.Symbol.Type;
 
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
+import java.util.Map;
 
 public abstract class TypeNode extends SimpleNode {
     protected Type type = Type.VOID;
@@ -43,17 +43,28 @@ public abstract class TypeNode extends SimpleNode {
             child.setTables(table, methodTable);
             child.eval(parser);
             Type childType = ((TypeNode) child).type;
-            if( !(childType == Type.CLASS && expectedType == Type.OBJ) && expectedType != childType)
+            if (!(childType == Type.CLASS && expectedType == Type.OBJ) && expectedType != childType)
                 parser.semanticErrors.add(new SemanticsException("Expression is not of type: " + expectedType.toString() + " got " + childType.toString(), child));
-            else if (expectedType == Type.OBJ ) {
+            else if (expectedType == Type.OBJ) {
                 // compare classes and check if extends
+// compare classes and check if extends
                 ClassSymbol expectedClass = (ClassSymbol) symbol;
-                ClassSymbol childClassSymbol = null;
-                if (child instanceof ASTClass)
+                ClassSymbol childClassSymbol;
+                if (child.id == JavammTreeConstants.JJTCLASS)
                     childClassSymbol = ((ASTClass) child).classSymbol;
-                else if (child instanceof ASTNew)
+                else if (child.id == JavammTreeConstants.JJTNEW)
                     childClassSymbol = ((ASTNew) child).classSymbol;
-                else {
+                else if (child.id == JavammTreeConstants.JJTMETHODCALL) {
+                    Symbol callSymbol = ((ASTCall) child.jjtGetChild(1)).returnSymbol;
+
+                    if (callSymbol.getType() != Type.CLASS) {
+                        parser.semanticErrors.add(new SemanticsException("Expected OBJ, got " + callSymbol.getType(), child));
+                        return;
+                    }
+
+                    childClassSymbol = (ClassSymbol) callSymbol;
+
+                } else {
                     parser.semanticErrors.add(new SemanticsException("Unknown node with type CLASS", child));
                     return;
                 }
@@ -68,8 +79,10 @@ public abstract class TypeNode extends SimpleNode {
 
     boolean checkType(Type type, Symbol symbol) {
         return symbol.getType() == type ||
-                (symbol.getType() == Type.METHOD && ((MethodSymbol) symbol).getReturnType() == type);
+                (symbol.getType() == Type.METHOD && ((MethodSymbol) symbol).getReturnSymbol().getType() == type) ||
+                ((symbol.getType() == Type.OBJ && type == Type.CLASS) || (symbol.getType() == Type.CLASS && type == Type.OBJ));
     }
 
-    public void write(PrintWriter writer, String labelFalse) {}
+    public void write(PrintWriter writer, String labelFalse) {
+    }
 }
