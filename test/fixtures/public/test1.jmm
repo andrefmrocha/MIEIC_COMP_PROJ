@@ -56,8 +56,8 @@ class test1 {
         arr[1] = 2;
         arr[2] = 3;
 
-        while (a < b)
-            a = a + 1; {
+        while (a < b) {
+            a = a + 1;
             while (b < c) {
                 b = b + 1;
                 while (a < c)
@@ -73,9 +73,13 @@ class test1 {
         return new classA();
     }
 
-    public int f4(boolean flag) {
+    /* public test1 f4() {
+         return new test1();
+    }*/
+
+    public int f5() {
         int result;
-        if (flag)
+        if (atr2)
             result = atr1;
         else
             result = 10;
@@ -114,6 +118,8 @@ class test1 {
         this.f3();
         ia1[0] = ia1[2];
         i4 = atr3.func1(ia1);
+        i2 = this.f5();
+        //this.f4();
 
 
     }

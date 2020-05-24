@@ -29,5 +29,11 @@ class test2 extends classA {
 
         objt2.f1(2, 3);
 
+        this.getClassA();
+
+    }
+
+    public classA getClassA() {
+        return new classA();
     }
 }

@@ -2,8 +2,9 @@
 Tests:
     - intertwined calls
     - complex conditions
-    - stack handling
+    - stack usage
 */
+import classA;
 
 class test3 {
 
@@ -75,6 +76,23 @@ class test3 {
         return 2;
     }
 
+    public int f7()
+    {
+            int i1;
+            int i2;
+
+            i1 = 4;
+            i2 = i2 * 2;
+            if( i1 < i2) {
+                new classA();
+            } else if (i2 < i1) {
+                this.f4(i1);
+            } else{}
+
+            return i2;
+
+    }
+
     public static void main(String[] args) {
 
         int i1;
@@ -92,6 +110,7 @@ class test3 {
         i1 = this.f1(2, 3, bool1);
         i2 = this.f5(4, bool1);
         i3 = this.f6(2, bool1);
+        i1 = this.f7();
 
     }
 
