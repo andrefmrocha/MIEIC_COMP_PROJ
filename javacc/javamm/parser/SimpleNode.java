@@ -2,6 +2,7 @@ package javamm.parser;
 
 import javamm.SemanticsException;
 import javamm.semantics.MethodSymbolTable;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 import javamm.semantics.SymbolTable;
 
@@ -129,14 +130,11 @@ class SimpleNode implements Node {
     return id;
   }
 
-  protected int getMaxStackUsage() {
-    int maxUsage = 0;
-    for (int i = 0; i < this.jjtGetNumChildren(); i++) {
+  protected void calculateStackUsage(StackUsage stackUsage) {
+    for(int i = 0; i < this.jjtGetNumChildren(); i++) {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
-      int childStackUsage = child.getMaxStackUsage();
-      maxUsage = Math.max(childStackUsage, maxUsage);
+      child.calculateStackUsage(stackUsage);
     }
-    return maxUsage;
   }
 }
 

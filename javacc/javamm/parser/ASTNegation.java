@@ -1,6 +1,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
@@ -49,10 +50,8 @@ class ASTNegation extends TypeNode {
     }
 
     @Override
-    protected int getMaxStackUsage() {
-        SimpleNode child = (SimpleNode) this.jjtGetChild(0);
-        int childStackUsage = child.getMaxStackUsage();
-        return Math.max(childStackUsage, 1);
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        super.calculateStackUsage(stackUsage);
     }
 }
 /* JavaCC - OriginalChecksum=13de953db4e66e1048f234f837f24db4 (do not edit this line) */

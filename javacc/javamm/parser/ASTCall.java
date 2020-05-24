@@ -3,10 +3,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
-import javamm.semantics.ClassSymbol;
-import javamm.semantics.MethodIdentifier;
-import javamm.semantics.MethodSymbol;
-import javamm.semantics.Symbol;
+import javamm.semantics.*;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -107,6 +104,13 @@ class ASTCall extends TypeNode {
             ((SimpleNode) this.jjtGetChild(i)).write(writer);
         }
         writer.println(methodInvokation);
+    }
+
+    @Override
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        ASTCallParams callParams = (ASTCallParams) this.jjtGetChild(1);
+        callParams.calculateStackUsage(stackUsage);
+        stackUsage.dec(callParams.nParams);
     }
 
 }

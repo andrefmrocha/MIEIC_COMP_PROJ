@@ -3,6 +3,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 import java.io.PrintWriter;
 
@@ -49,6 +50,15 @@ class ASTMethodReturn extends SimpleNode {
             final SimpleNode node = (SimpleNode) this.jjtGetChild(0);
             node.write(writer);
             writer.println("  "  + Symbol.getJVMPrefix(expectedType) + "return");
+        }
+    }
+
+    @Override
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        if(expectedType != Symbol.Type.VOID) {
+            final SimpleNode node = (SimpleNode) this.jjtGetChild(0);
+            node.calculateStackUsage(stackUsage);
+            stackUsage.dec(1);
         }
     }
 }

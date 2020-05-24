@@ -1,6 +1,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.semantics.StackUsage;
 
 import java.io.PrintWriter;
 
@@ -10,6 +11,7 @@ public
 class ASTWhile extends ConditionalNode {
 
   public static int labelCounter = 0;
+  private int requiredPops = 0;
 
   public ASTWhile(int id) {
     super(id);
@@ -73,9 +75,43 @@ class ASTWhile extends ConditionalNode {
       exp.write(writer);
     }
 
+
+    StackUsage.popStack(writer, this.requiredPops);
     writer.println("  goto " + "while_" + localCounter );
     writer.println("endwhile_" + localCounter + ":");
     labelCounter++;
+  }
+
+  @Override
+  protected void calculateStackUsage(StackUsage stackUsage) {
+    SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
+    switch (expression.id) {
+      case JavammTreeConstants.JJTIDENTIFIER:
+      case JavammTreeConstants.JJTBOOLEANVALUE:
+      case JavammTreeConstants.JJTNEGATION:
+        expression.calculateStackUsage(stackUsage);
+        stackUsage.dec(1); // ifne
+        break;
+      case JavammTreeConstants.JJTAND:
+        ASTAnd andExp = (ASTAnd) expression;
+        andExp.calculateParamsStackUsage(stackUsage);
+        break;
+      case JavammTreeConstants.JJTLESSTHAN:
+        ASTLessThan lsThanExp = (ASTLessThan) expression;
+        lsThanExp.calculateParamsStackUsage(stackUsage);
+        break;
+      default:
+        return;
+    }
+
+    int stackUsageBefore = stackUsage.getStackUsage();
+    for(int i = 1; i < this.jjtGetNumChildren(); i++) {
+      SimpleNode exp = (SimpleNode) this.jjtGetChild(i);
+      exp.calculateStackUsage(stackUsage);
+    }
+
+    this.requiredPops = stackUsage.getStackUsage() - stackUsageBefore;
+    stackUsage.set(stackUsageBefore);
   }
 
 }
