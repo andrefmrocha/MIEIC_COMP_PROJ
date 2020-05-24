@@ -8,10 +8,12 @@ import java.io.PrintWriter;
 public abstract class ConditionalNode extends TypeNode {
     public ConditionalNode(int i) {
         super(i);
+        this.validStatement = true;
     }
 
     public ConditionalNode(Javamm p, int i) {
         super(p, i);
+        this.validStatement = true;
     }
 
     @Override

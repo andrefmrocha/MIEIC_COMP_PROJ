@@ -10,13 +10,14 @@ public
 class ASTMethodReturn extends SimpleNode {
     Symbol.Type expectedType = null;
 
-
     public ASTMethodReturn(int id) {
         super(id);
+        this.validStatement = true;
     }
 
     public ASTMethodReturn(Javamm p, int id) {
         super(p, id);
+        this.validStatement = true;
     }
 
     @Override

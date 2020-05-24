@@ -11,10 +11,12 @@ public class ASTMethodCall extends TypeNode {
 
     public ASTMethodCall(int id) {
         super(id);
+        this.validStatement = true;
     }
 
     public ASTMethodCall(Javamm p, int id) {
         super(p, id);
+        this.validStatement = true;
     }
 
     @Override
