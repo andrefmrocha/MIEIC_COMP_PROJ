@@ -128,22 +128,6 @@ class SimpleNode implements Node {
     return id;
   }
 
-  protected boolean checkForThis(SymbolTable classTable) {
-    if (id == JavammTreeConstants.JJTTHIS)
-      return true;
-    if(id == JavammTreeConstants.JJTIDENTIFIER) {
-      String identifier = ((ASTIdentifier)this).identifierName;
-      if(classTable.checkSymbol(identifier))
-        return  true;
-    }
-   for(int i = 0; i< this.jjtGetNumChildren(); i++) {
-      SimpleNode node = (SimpleNode) this.jjtGetChild(i);
-      if (node.checkForThis(classTable))
-        return true;
-    }
-    return false;
-  }
-
   protected int getMaxStackUsage() {
     int maxUsage = 0;
     for (int i = 0; i < this.jjtGetNumChildren(); i++) {
