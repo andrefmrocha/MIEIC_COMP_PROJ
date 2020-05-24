@@ -1,6 +1,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.semantics.ClassSymbol;
 import javamm.semantics.Symbol;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.List;
 /* JavaCCOptions:MULTI=true,NODE_USES_Javamm=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTImportParams extends SimpleNode {
-    public List<Symbol.Type> paramTypes = new ArrayList<>();
+    public List<Symbol> paramTypes = new ArrayList<>();
 
     public ASTImportParams(int id) {
         super(id);
@@ -24,12 +25,22 @@ class ASTImportParams extends SimpleNode {
 
         for(int i = 0; i < this.jjtGetNumChildren(); i++){
             SimpleNode currNode = (SimpleNode) this.jjtGetChild(i);
-            currNode.setTables(table, methodTable);
-            currNode.eval(parser);
+            if(currNode.id == JavammTreeConstants.JJTIDENTIFIER){
+                ASTIdentifier identifier = (ASTIdentifier) currNode;
+                if(!table.checkSymbol(identifier.identifierName)){
+                    parser.semanticErrors.add(new SemanticsException("Unknown identifier type: " + identifier.identifierName    , this));
+                }
 
-            Symbol.Type type = Symbol.getNodeSymbolType(currNode);
-            if(type != Symbol.Type.VOID)
-                paramTypes.add(type);
+                ClassSymbol symbol = (ClassSymbol) table.getSymbol(identifier.identifierName);
+                paramTypes.add(symbol);
+            }else {
+                currNode.setTables(table, methodTable);
+                currNode.eval(parser);
+
+                Symbol.Type type = Symbol.getNodeSymbolType(currNode);
+                if(type != Symbol.Type.VOID)
+                    paramTypes.add(new Symbol(type));
+            }
         }
 
     }

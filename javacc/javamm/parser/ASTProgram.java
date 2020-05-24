@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public
 class ASTProgram extends SimpleNode {
@@ -54,7 +55,8 @@ class ASTProgram extends SimpleNode {
           while(iter.hasNext()) {
             Map.Entry pair = (Map.Entry) iter.next();
             System.out.print("      Name: " + sym.getClassName() + "." + ((MethodIdentifier)pair.getKey()).getIdentifier() + " | Params: <");
-            List<Symbol.Type> parameters = ((MethodSymbol)pair.getValue()).getParameters();
+            List<Symbol.Type> parameters = ((MethodSymbol)pair.getValue())
+                    .getParameters().stream().map(Symbol::getType).collect(Collectors.toList());
             for(int i = 0 ; i < parameters.size(); i++) {
               System.out.print(parameters.get(i));
               if(i != parameters.size()-1)
@@ -74,7 +76,8 @@ class ASTProgram extends SimpleNode {
       while(it.hasNext()) {
         Map.Entry pair = (Map.Entry) it.next();
         System.out.print("      Name: " + ((MethodIdentifier)pair.getKey()).getIdentifier() + " | Params: <");
-        List<Symbol.Type> parameters = ((MethodSymbol)pair.getValue()).getParameters();
+        List<Symbol.Type> parameters = ((MethodSymbol)pair.getValue()).getParameters()
+                .stream().map(Symbol::getType).collect(Collectors.toList());
         for(int i = 0 ; i < parameters.size(); i++) {
           System.out.print(parameters.get(i));
           if(i != parameters.size()-1)

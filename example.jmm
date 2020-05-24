@@ -6,7 +6,7 @@ class Simple extends Parent {
     }
     public void coisa(Parent p) {}
     public void t2() {
-        Parent p;
+        Simple p;
         p = this.t();
         this.coisa(new Parent());
         this.coisa(new Simple());

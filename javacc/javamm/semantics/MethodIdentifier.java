@@ -10,13 +10,7 @@ public class MethodIdentifier {
     }
 
     final String identifier;
-    final List<Symbol.Type> parameters;
-
-    public List<Symbol.Type> convertParameters(){
-        return parameters.stream().map(type -> type == Symbol.Type.OBJ ? Symbol.Type.CLASS : type
-        ).collect(Collectors.toList());
-    }
-
+    final List<Symbol> parameters;
 
     @Override
     public boolean equals(Object o) {
@@ -24,21 +18,25 @@ public class MethodIdentifier {
         if (o == null || getClass() != o.getClass()) return false;
         MethodIdentifier that = (MethodIdentifier) o;
         return Objects.equals(identifier, that.identifier) &&
-                Objects.equals(convertParameters(), that.parameters);
+                Objects.equals(parameters, that.parameters);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(identifier, convertParameters());
+        return Objects.hash(identifier, parameters);
     }
 
 
-    public MethodIdentifier(String identifier, List<Symbol.Type> parameters) {
+    public MethodIdentifier(String identifier, List<Symbol> parameters) {
         this.identifier = identifier;
         this.parameters = parameters;
     }
 
-    public List<Symbol.Type> getParameters() {
+    public List<Symbol> getParameters() {
         return parameters;
+    }
+
+    public List<Symbol.Type> getParametersTypes(){
+        return parameters.stream().map(Symbol::getType).collect(Collectors.toList());
     }
 }

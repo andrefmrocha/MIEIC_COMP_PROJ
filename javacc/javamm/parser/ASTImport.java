@@ -30,7 +30,7 @@ class ASTImport extends SimpleNode {
 
         Type returnValue = Type.VOID;
         List<String> identifiers = new ArrayList<>();
-        List<Type> params = new ArrayList<>();
+        List<Symbol> params = new ArrayList<>();
         ASTReturn returnNode = null;
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {
             SimpleNode currNode = (SimpleNode) this.jjtGetChild(i);

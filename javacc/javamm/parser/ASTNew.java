@@ -56,8 +56,6 @@ class ASTNew extends TypeNode {
 
         if (!classSymbol.getConstructors().checkSymbol(constructor))
             parser.semanticErrors.add(new SemanticsException("Can't find constructor with that signature", callParams));
-
-
     }
 
     @Override
@@ -66,8 +64,8 @@ class ASTNew extends TypeNode {
         writer.println("  dup"); //duplicate object on top of stack, need 2 references (1 constructor + 1 assign)
         ((SimpleNode) this.jjtGetChild(1)).write(writer);
         writer.print("  invokespecial " + identifier + "/<init>("); // call constructor
-        for (Type type : constructor.getParameters()) {
-            writer.print(Symbol.getJVMTypeByType(type));
+        for (Symbol symbol : constructor.getParameters()) {
+            writer.print(Symbol.getJVMTypeByType(symbol.getType()));
         }
         writer.println(")V");
     }

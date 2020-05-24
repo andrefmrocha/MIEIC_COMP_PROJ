@@ -65,14 +65,14 @@ class ASTCall extends TypeNode {
 
             this.returnSymbol = classSymbol.getMethods().getSymbol(methodId).getReturnSymbol();
             this.type = returnSymbol.getType();
-            setMethodInvokation("  " + invokevirtual + " ", classSymbol.getClassName(), methodIdentifier.identifierName, methodId.getParameters(), this.type);
+            setMethodInvokation("  " + invokevirtual + " ", classSymbol.getClassName(), methodIdentifier.identifierName, methodId.getParametersTypes(), this.type);
 
         } else if (methodTable.checkSymbol(importMethodId)) {
             final MethodSymbol symbol = methodTable.getSymbol(importMethodId);
 
             this.returnSymbol = symbol.getReturnSymbol();
             this.type = returnSymbol.getType();
-            setMethodInvokation("  " + invokestatic + " ", identifier, methodIdentifier.identifierName, importMethodId.getParameters(), this.type);
+            setMethodInvokation("  " + invokestatic + " ", identifier, methodIdentifier.identifierName, importMethodId.getParametersTypes(), this.type);
             isStatic = true;
         } else
             parser.semanticErrors.add(new SemanticsException(identifier + " was not found", methodIdentifier));
@@ -86,7 +86,7 @@ class ASTCall extends TypeNode {
         final MethodIdentifier methodId = callParams
                 .getMethodIdentifier(methodIdentifier.identifierName, parser);
         if (!methodTable.checkSymbol(methodId)) {
-            parser.semanticErrors.add(new SemanticsException("Method " + methodIdentifier.identifierName, methodIdentifier));
+            parser.semanticErrors.add(new SemanticsException("Method " + methodIdentifier.identifierName + " not found", methodIdentifier));
             return;
         }
         final MethodSymbol symbol = methodTable.getSymbol(methodId);
@@ -97,7 +97,7 @@ class ASTCall extends TypeNode {
         }
         this.returnSymbol = symbol.getReturnSymbol();
         this.type = returnSymbol.getType();
-        setMethodInvokation("  " + invokevirtual + " ", this.table.getClassName(), methodIdentifier.identifierName, methodId.getParameters(), this.type);
+        setMethodInvokation("  " + invokevirtual + " ", this.table.getClassName(), methodIdentifier.identifierName, methodId.getParametersTypes(), this.type);
     }
 
     @Override

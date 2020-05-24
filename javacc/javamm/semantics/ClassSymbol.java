@@ -2,6 +2,7 @@ package javamm.semantics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ClassSymbol extends Symbol {
     public static final String init = "<init>";
@@ -16,7 +17,7 @@ public class ClassSymbol extends Symbol {
         this.className = className;
     }
 
-    public ClassSymbol(String className, List<Type> constructorParams) {
+    public ClassSymbol(String className, List<Symbol> constructorParams) {
         super(Type.CLASS, true);
         constructors.putSymbol(new MethodIdentifier(init, constructorParams), new MethodSymbol(this, constructorParams));
         this.className = className;
@@ -80,5 +81,28 @@ public class ClassSymbol extends Symbol {
     @Override
     public String getJVMType() {
         return "L" + className + ";";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClassSymbol that = (ClassSymbol) o;
+        return derivesFrom(that);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Type.CLASS);
+    }
+
+    @Override
+    public String toString() {
+        return "ClassSymbol{" +
+                "methods=" + methods +
+                ", constructors=" + constructors +
+                ", extension=" + extension +
+                ", className='" + className + '\'' +
+                '}';
     }
 }

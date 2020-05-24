@@ -14,7 +14,6 @@ public
 class ASTMethodName extends SimpleNode {
     public Symbol.Type returnType = null;
     public String methodName;
-    public List<Symbol.Type> parametersTypes = new ArrayList<>();
     public List<Symbol> parameters = new ArrayList<>();
 
     public ASTMethodName(int id) {
@@ -40,18 +39,17 @@ class ASTMethodName extends SimpleNode {
                         table, true, i / 2);
                 parameter.eval(parser);
                 this.parameters.add(parameter.getSymbol());
-                parametersTypes.add(VarNode.getType((SimpleNode) parameters.jjtGetChild(i), table, parser));
             }
         }
-        this.methodTable.putSymbol(new MethodIdentifier(methodName, parametersTypes), new MethodSymbol(returnSymbol, parametersTypes));
+        this.methodTable.putSymbol(new MethodIdentifier(methodName, this.parameters), new MethodSymbol(returnSymbol, this.parameters));
         this.returnType = returnSymbol.getType();
     }
 
     @Override
     public void write(PrintWriter writer) {
         writer.print(".method public " + methodName + "(");
-        for (Symbol.Type type : parametersTypes) {
-            writer.print(Symbol.getJVMTypeByType(type));
+        for (Symbol symbol: parameters) {
+            writer.print(Symbol.getJVMTypeByType(symbol.getType()));
         }
         writer.println(")" + Symbol.getJVMTypeByType(returnType));
     }
