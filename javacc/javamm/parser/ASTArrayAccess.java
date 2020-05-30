@@ -1,13 +1,11 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
-import javamm.cfg.CFGNode;
 import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 import javamm.semantics.Symbol.Type;
 
 import java.io.PrintWriter;
-import java.util.List;
 
 import static javamm.parser.JavammTreeConstants.JJTIDENTIFIER;
 
