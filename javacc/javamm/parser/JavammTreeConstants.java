@@ -88,7 +88,10 @@ public interface JavammTreeConstants
             "This",
             "New",
             "NewArray",
-            "MethodReturn"
+            "MethodReturn",
+            "Then",
+            "Else",
+            "CallParams"
     };
 }
 /* JavaCC - OriginalChecksum=1eaead22e08643eb1c16fe97aed01532 (do not edit this line) */
