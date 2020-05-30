@@ -97,10 +97,9 @@ class ASTMethod extends TypeNode {
 
         writer.println("  .limit stack " + stackUsage.getMaxStackUsage());
         writer.println("  .limit locals " + localsLimit + "\n");
-        methodBody.write(writer, stackUsage);
+        methodBody.write(writer);
 
         if (methodType.id == JavammTreeConstants.JJTMAIN || this.type == Symbol.Type.VOID) {
-            stackUsage.popStack(writer);
             writer.println("  return");
         }
         writer.println(".end method\n");

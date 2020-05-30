@@ -38,5 +38,26 @@ class Simple {
         return 0;
     }
 
+    public void t() {
+        int a;
+        (new Simple()).add(1,1);
+
+        while(true) {
+            (new Simple()).add(1,1);
+        }
+
+        a = 1;
+
+        if (true) {
+            (new Simple()).add(1,1);
+            (new Simple()).add(1,1);
+            (new Simple()).add(1,1);
+        }
+        else {
+            (new Simple()).add(1,1);
+        }
+
+        a = 2;
+    }
 
 }
