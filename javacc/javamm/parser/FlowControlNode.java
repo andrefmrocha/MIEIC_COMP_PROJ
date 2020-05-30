@@ -1,7 +1,10 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.cfg.CFGNode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 public class FlowControlNode extends SimpleNode {
@@ -38,5 +41,19 @@ public class FlowControlNode extends SimpleNode {
         }
 
         return initializedVars;
+    }
+
+    @Override
+    public List<CFGNode> getNodes() {
+        List<CFGNode> graph = new ArrayList<>();
+        for(int i = 0; i < this.jjtGetNumChildren(); i++){
+            List<CFGNode> nodes = ((SimpleNode) this.jjtGetChild(i)).getNodes();
+
+            if(graph.size() != 0)
+                graph.get(graph.size() - 1).addEdge(nodes.get(0));
+
+            graph.addAll(nodes);
+        }
+        return graph;
     }
 }
