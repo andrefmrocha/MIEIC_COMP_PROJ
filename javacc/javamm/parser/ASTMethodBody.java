@@ -43,6 +43,7 @@ class ASTMethodBody extends SimpleNode {
                 final ASTMethodReturn methodReturn = (ASTMethodReturn) methodNode;
                 methodReturn.expectedType = returnType;
                 methodNode.eval(parser);
+                addNodesToGraph(graph, methodNode);
                 break;
 
             }
@@ -53,18 +54,22 @@ class ASTMethodBody extends SimpleNode {
             }
 
             methodNode.eval(parser);
-            List<CFGNode> nodes = methodNode.getNodes();
-
-            if(graph.size() != 0)
-                graph.get(graph.size() - 1).addEdge(nodes.get(0));
-
-            graph.addAll(nodes);
+            addNodesToGraph(graph, methodNode);
         }
         if(!foundReturn && returnType != Symbol.Type.VOID) {
             parser.semanticErrors.add(new SemanticsException("Return not found. Must return: " + returnType,this));
         }
 
         this.graph = new Graph(graph);
+    }
+
+    private void addNodesToGraph(List<CFGNode> graph, SimpleNode methodNode) {
+        List<CFGNode> nodes = methodNode.getNodes();
+
+        if(graph.size() != 0)
+            graph.get(graph.size() - 1).addEdge(nodes.get(0));
+
+        graph.addAll(nodes);
     }
 
     public void write(PrintWriter writer, StackUsage stackUsage) {
