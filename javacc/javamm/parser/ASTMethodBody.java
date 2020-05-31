@@ -30,7 +30,7 @@ class ASTMethodBody extends SimpleNode {
 
     public void eval(Javamm parser, int stackPointer) {
         boolean foundReturn = false;
-        List<CFGNode> graph = new ArrayList<>();
+        List<CFGNode> nodes = new ArrayList<>();
 
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {
             SimpleNode methodNode = (SimpleNode) this.jjtGetChild(i);
@@ -45,6 +45,7 @@ class ASTMethodBody extends SimpleNode {
                 final ASTMethodReturn methodReturn = (ASTMethodReturn) methodNode;
                 methodReturn.expectedType = returnType;
                 methodNode.eval(parser);
+                addNodesToGraph(nodes, methodNode);
                 break;
 
             }
@@ -55,18 +56,22 @@ class ASTMethodBody extends SimpleNode {
             }
 
             methodNode.eval(parser);
-            List<CFGNode> nodes = methodNode.getNodes();
-
-            if(graph.size() != 0)
-                graph.get(graph.size() - 1).addEdge(nodes.get(0));
-
-            graph.addAll(nodes);
+            addNodesToGraph(nodes, methodNode);
         }
         if(!foundReturn && returnType != Symbol.Type.VOID) {
             parser.semanticErrors.add(new SemanticsException("Return not found. Must return: " + returnType,this));
         }
 
-        this.graph = new Graph(graph);
+        this.graph = new Graph(nodes);
+    }
+
+    private void addNodesToGraph(List<CFGNode> graph, SimpleNode methodNode) {
+        List<CFGNode> nodes = methodNode.getNodes();
+
+        if(graph.size() != 0)
+            graph.get(graph.size() - 1).addEdge(nodes.get(0));
+
+        graph.addAll(nodes);
     }
 
     public void write(PrintWriter writer) {
