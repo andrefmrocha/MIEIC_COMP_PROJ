@@ -45,9 +45,9 @@ public class ParserTest {
 
         if (!success) {
             if (mustFail) {
-                System.out.println("Expected Parser to throw exception");
+                System.out.println("Expected parser to throw exception");
             } else {
-                System.out.println("Expected Parser to complete successfully");
+                System.out.println("Expected parser to complete successfully");
             }
             fail();
         }
@@ -145,7 +145,7 @@ public class ParserTest {
 
     @Test
     public void testvarNotInit() {
-        test("fixtures/public/fail/semantic/varNotInit.jmm", false);
+        test("fixtures/public/fail/semantic/varNotInit.jmm", true);
     }
 
     @Test
@@ -201,19 +201,11 @@ public class ParserTest {
 
     @Test
     public void test4() {
-        test("fixtures/public/test4.jmm", false);
+        test("fixtures/public/test4.jmm", true);
     }
 
     @Test
     public void test5() {
         test("fixtures/public/test5.jmm", false);
     }
-
-
-
-
-/*    @Test
-    public void testCustomTest() {
-        test("fixtures/public/CustomTest.jmm", false);
-    }*/
 }
