@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javamm.parser.ASTIf;
+import javamm.parser.ASTProgram;
 import javamm.parser.ASTWhile;
 import javamm.semantics.SymbolTable;
 import javamm.semantics.MethodSymbolTable;
@@ -16,6 +17,7 @@ import javamm.SemanticsException;
 public class Main {
     public static final String JASMIN_GEN = "jasmin_gen/";
     private static boolean debugMode = false;
+    private static final Pattern filePattern = Pattern.compile("(?<=/)?(\\w)+.jmm$");
 
     public static void main(String[] args) {
         PrintWriter writer;
@@ -24,7 +26,7 @@ public class Main {
 
             //setup
             String filename = checkDebugMode(args);
-            Matcher fileMatch = Pattern.compile("(?<=/)?(\\w)+.jmm$").matcher(filename);
+            Matcher fileMatch = filePattern.matcher(filename);
             if (!fileMatch.find())
                 throw new IllegalArgumentException("File has not the correct extension: .jmm");
             javamm = new Javamm(new java.io.FileInputStream(filename));
@@ -99,17 +101,30 @@ public class Main {
     }
 
     private static String checkDebugMode(String[] args) throws ParseException {
-        if (args.length > 2 || args.length < 1)
-            throw new IllegalArgumentException("At least one argument needed and at most two arguments allowed: [ -d ] <filename>");
-        if (args.length < 2 && args[0].equals("-d"))
-            throw new IllegalArgumentException("No file selected: [ -d] <filename>");
-        if (args.length > 1 && args[1].equals("-d"))
-            throw new IllegalArgumentException("Wrong usage: [ -d ] <filename>");
-        if (args[0].equals("-d")) {
-            debugMode = true;
-            return args[1];
-        } else
-            return args[0];
+        if (args.length > 4 || args.length < 1)
+            throw new IllegalArgumentException("At least one argument needed and at most four arguments allowed: java –jar comp2020-5f.jar [-r=<num>] [-o] [-d] <input_file.jmm>");
+
+        Pattern registerPatter = Pattern.compile("-r=\\d+");
+        String fileName = null;
+        for (String arg : args) {
+            switch (arg) {
+                case "-d":
+                    debugMode = true;
+                    continue;
+                case "-o":
+                    ASTProgram.optimize = true;
+                    continue;
+            }
+            if(registerPatter.matcher(arg).matches()) {
+                ASTProgram.registerAllocated = Integer.parseInt(arg.split("-r=")[1]);
+            } else if (filePattern.matcher(arg).find()) {
+                fileName = arg;
+            }
+        }
+        if (fileName == null)
+            throw new IllegalArgumentException("No file selected: java –jar comp2020-5f.jar [-r=<num>] [-o] [-d] <input_file.jmm>");
+
+        return fileName;
     }
 }
 	

@@ -26,6 +26,10 @@ class ASTNumeric extends TypeNode {
 
   @Override
   public void write(PrintWriter writer) {
+    writeNumericInstruction(writer, number);
+  }
+
+  public static void writeNumericInstruction(PrintWriter writer, int number) {
     if(number > 32767) {
       writer.println("  ldc " + number);
     } else if (number > 127) {

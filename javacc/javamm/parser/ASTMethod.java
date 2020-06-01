@@ -89,6 +89,25 @@ class ASTMethod extends TypeNode {
             paramsCount = ((ASTParameters) this.jjtGetChild(1)).nParams;
             methodBody = (ASTMethodBody) this.jjtGetChild(2);
         }
+
+        if(ASTProgram.optimize) {
+            int constVars = 0;
+            for(int i = 0; i< methodBody.jjtGetNumChildren(); i++) {
+                SimpleNode node = (SimpleNode) methodBody.jjtGetChild(i);
+                if(node.id == JavammTreeConstants.JJTVAR) {
+                    String symName = ((ASTIdentifier)node.jjtGetChild(1)).identifierName;
+                    Symbol symbol = methodBody.table.getSymbol(symName);
+                    if(!symbol.hasChanged() && symbol.getValue() != -1) { //check if the variable can be replaced with a constant
+                        constVars++;
+                        methodBody.localsCount--; //therefore reducing the number of locals needed
+                    } else {
+                        ASTVar varNode = (ASTVar) node;
+                        varNode.stackPos -= constVars;
+                        symbol.setStackPos(varNode.stackPos); //move up the non constant variables in the stack
+                    }
+                }
+            }
+        }
         int localsLimit = paramsCount +
                 methodBody.localsCount + 1;
 
