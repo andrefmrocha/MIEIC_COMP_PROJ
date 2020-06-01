@@ -35,7 +35,7 @@ class ASTCallParams extends SimpleNode {
                     return null;
                 }
                 params.add(table.getSymbol(identifierNode.identifierName));
-
+                identifierNode.eval(parser);
             } else if(node.id == JavammTreeConstants.JJTNEW){
                 ASTNew astNew = (ASTNew) node;
                 astNew.setTables(table, methodTable);

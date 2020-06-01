@@ -24,6 +24,7 @@ public abstract class TypeNode extends SimpleNode {
         if (child.id == JavammTreeConstants.JJTIDENTIFIER) {  //Check if the node is a variable
             ASTIdentifier temp = (ASTIdentifier) child;
             temp.setTables(this.table, this.methodTable);
+            temp.eval(parser);
             String name = temp.identifierName;
             if (!table.checkSymbol(name)) { //And check if the identifier already has a symbol declared
                 parser.semanticErrors.add(new SemanticsException("Did not find variable named  " + name, child));

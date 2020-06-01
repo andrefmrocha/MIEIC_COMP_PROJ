@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 public
 class ASTIdentifier extends TypeNode {
   public String identifierName;
+  public int value = -1;
 
   public ASTIdentifier(int id) {
     super(id);
@@ -24,6 +25,14 @@ class ASTIdentifier extends TypeNode {
   }
 
   @Override
+  public void eval(Javamm parser) {
+    if(this.table != null) {
+      Symbol s = this.table.getSymbol(identifierName);
+      if (s != null) value = s.getValue();
+    }
+  }
+
+  @Override
   public void write(PrintWriter writer) {
     Symbol s = this.table.getSymbol(identifierName);
     String loadInstr = Symbol.getJVMPrefix(s.getType()) + "load";
@@ -34,6 +43,8 @@ class ASTIdentifier extends TypeNode {
       String className = this.table.getClassName();
       String jvmType = s.getJVMType();
       writer.println("  getfield " + className + "/" + identifierName + " " + jvmType);
+    } else if(ASTProgram.optimize && !s.hasChanged() && value != -1) {
+      ASTNumeric.writeNumericInstruction(writer,value);
     } else {
       String separator = varNum > 3 ? " " : "_";
       writer.println("  " + loadInstr + separator + Integer.toString(varNum));

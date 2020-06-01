@@ -15,6 +15,8 @@ public class Symbol {
 
     final protected Type type;
     protected boolean isInitialized;
+    protected boolean hasChanged = false;
+    protected int value = -1;
 
     public Type getType() {
         return type;
@@ -84,6 +86,16 @@ public class Symbol {
 
     public boolean isInitialized() {
         return isInitialized;
+    }
+
+    public boolean hasChanged() {return hasChanged;}
+
+    public void didChange() {hasChanged = true;}
+
+    public int getValue() {return value;}
+
+    public void setValue(int value) {
+        this.value = value;
     }
 
     public void setInitialized() {
