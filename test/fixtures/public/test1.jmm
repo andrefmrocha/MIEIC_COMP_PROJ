@@ -59,16 +59,21 @@ class test1 {
 
         int result;
         int[] arr;
+        boolean z;
+        boolean p;
+
         arr = new int[3];
         arr[0] = 1;
         arr[1] = 2;
         arr[2] = 3;
+        z = true;
+        p = false;
 
         while (a < b) {
             a = a + 1;
             while (b < c) {
                 b = b + 1;
-                while (a < c)
+                while (z && p)
                     a = a + 1;
             }
 

@@ -9,57 +9,62 @@ import java.io.PrintWriter;
 /* JavaCCOptions:MULTI=true,NODE_USES_Javamm=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTAnd extends BooleanBinaryOperatorNode {
-  public ASTAnd(int id) {
-    super(id,Type.BOOL,Type.BOOL);
-  }
+    public ASTAnd(int id) {
+        super(id, Type.BOOL, Type.BOOL);
+    }
 
-  public ASTAnd(Javamm p, int id) {
-    super(p, id,Type.BOOL,Type.BOOL);
-  }
+    public ASTAnd(Javamm p, int id) {
+        super(p, id, Type.BOOL, Type.BOOL);
+    }
 
-  @Override
-  public Type[] getSupportedTypes() {
-    return new Type[]{Type.BOOL};
-  }
+    @Override
+    public Type[] getSupportedTypes() {
+        return new Type[]{Type.BOOL};
+    }
 
-  @Override
-  public void write(PrintWriter writer) {
-    int currCounter = ASTIf.labelCounter;
-    ASTIf.labelCounter++;
-    write(writer,"notAnd_" + currCounter);
-    writer.println("  iconst_1");
-    writer.println("  goto endEval_" + currCounter);
-    writer.println("notAnd_" + currCounter + ":");
-    writer.println("  iconst_0");
-    writer.println("endEval_" + currCounter + ":");
-  }
+    @Override
+    public void write(PrintWriter writer) {
+        int currCounter = ASTIf.labelCounter;
+        ASTIf.labelCounter++;
+        write(writer, "notAnd_" + currCounter);
+        writer.println("  iconst_1");
+        writer.println("  goto endEval_" + currCounter);
+        writer.println("notAnd_" + currCounter + ":");
+        writer.println("  iconst_0");
+        writer.println("endEval_" + currCounter + ":");
+    }
 
-  @Override
-  public void write(PrintWriter writer, String labelFalse) {
-    SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
-    SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
+    @Override
+    public void write(PrintWriter writer, String labelFalse, boolean revert) {
+        SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
+        SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
 
-    leftOperand.write(writer);
-    writer.println("  ifeq " + labelFalse);
-    rightOperand.write(writer);
-    writer.println("  ifeq " + labelFalse);
-  }
+        leftOperand.write(writer);
+        writer.println("  ifeq " + labelFalse);
+        rightOperand.write(writer);
+        writer.println("  ifeq " + labelFalse);
+    }
 
-  @Override
-  protected void calculateStackUsage(StackUsage stackUsage) {
-    calculateParamsStackUsage(stackUsage);
-    stackUsage.inc(1); //iconst_x
-  }
+    @Override
+    public void writeConditionOpt(PrintWriter writer, String labelFalse) {
+        writer.println("  ifneq " + labelFalse);
+    }
 
-  @Override
-  public void calculateParamsStackUsage(StackUsage stackUsage) {
-    SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
-    SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
+    @Override
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        calculateParamsStackUsage(stackUsage);
+        stackUsage.inc(1); //iconst_x
+    }
 
-    leftOperand.calculateStackUsage(stackUsage);
-    stackUsage.dec(1); //ifeq
-    rightOperand.calculateStackUsage(stackUsage);
-    stackUsage.dec(1); //ifeq
-  }
+    @Override
+    public void calculateParamsStackUsage(StackUsage stackUsage) {
+        SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
+        SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
+
+        leftOperand.calculateStackUsage(stackUsage);
+        stackUsage.dec(1); //ifeq
+        rightOperand.calculateStackUsage(stackUsage);
+        stackUsage.dec(1); //ifeq
+    }
 }
 /* JavaCC - OriginalChecksum=1766d5431be81e19119cf5feee80cd49 (do not edit this line) */

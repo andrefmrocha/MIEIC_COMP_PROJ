@@ -1,5 +1,6 @@
 package javamm.parser;
 
+import com.sun.jdi.BooleanValue;
 import javamm.SemanticsException;
 import javamm.cfg.CFGNode;
 import javamm.semantics.StackUsage;
@@ -14,98 +15,121 @@ import java.util.List;
 public
 class ASTWhile extends ConditionalNode {
 
-  public static int labelCounter = 0;
-  private HashMap<Integer, Integer> requiredPops = new HashMap<>();
+    public static int labelCounter = 0;
+    private HashMap<Integer, Integer> requiredPops = new HashMap<>();
 
-  public ASTWhile(int id) {
-    super(id);
-  }
-
-  public ASTWhile(Javamm p, int id) {
-    super(p, id);
-  }
-
-  @Override
-  public void eval(Javamm parser) {
-    super.eval(parser);
-    for (int i = 1; i < this.jjtGetNumChildren(); i++) {
-      SimpleNode child = (SimpleNode) this.jjtGetChild(i);
-
-      if (!child.validStatement) {
-        parser.semanticErrors.add(new SemanticsException("Not a statement: " + child.toString(), child));
-        return;
-      }
-
-      child.setTables(table, methodTable);
-      child.eval(parser);
-    }
-  }
-
-  @Override
-  public void write(PrintWriter writer) {
-
-    int localCounter = labelCounter;
-
-    writer.println("while_" + localCounter + ":");
-    SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
-    switch (expression.id) {
-      case JavammTreeConstants.JJTAND:
-      case JavammTreeConstants.JJTLESSTHAN:
-        BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
-        node.write(writer, "endwhile_" + localCounter);
-        break;
-      case JavammTreeConstants.JJTBOOLEANVALUE:
-      case JavammTreeConstants.JJTNEGATION:
-      case JavammTreeConstants.JJTIDENTIFIER:
-      case JavammTreeConstants.JJTMETHODCALL:
-        expression.write(writer);
-        writer.println("  ifeq endwhile_" + localCounter );
-        break;
-      default:
-        return;
+    public ASTWhile(int id) {
+        super(id);
     }
 
-    for(int i = 1; i < this.jjtGetNumChildren(); i++) {
-      SimpleNode exp = (SimpleNode) this.jjtGetChild(i);
-      if(exp.id ==  JavammTreeConstants.JJTWHILE)
+    public ASTWhile(Javamm p, int id) {
+        super(p, id);
+    }
+
+    @Override
+    public void eval(Javamm parser) {
+        super.eval(parser);
+        for (int i = 1; i < this.jjtGetNumChildren(); i++) {
+            SimpleNode child = (SimpleNode) this.jjtGetChild(i);
+
+            if (!child.validStatement) {
+                parser.semanticErrors.add(new SemanticsException("Not a statement: " + child.toString(), child));
+                return;
+            }
+
+            child.setTables(table, methodTable);
+            child.eval(parser);
+        }
+    }
+
+    @Override
+    public void write(PrintWriter writer) {
+
+        BooleanBinaryOperatorNode b = null;
+        int localCounter = labelCounter;
+
+        if (!ASTProgram.optimize)
+            writer.println("while_" + localCounter + ":");
+        SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
+        switch (expression.id) {
+            case JavammTreeConstants.JJTAND:
+            case JavammTreeConstants.JJTLESSTHAN:
+                BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
+                if (ASTProgram.optimize) {
+                    node.write(writer, "endwhile_" + localCounter, false);
+                    writer.println("while_" + localCounter + ":");
+                    b = node;
+                } else {
+                    node.write(writer, "endwhile_" + localCounter, false);
+                }
+                break;
+            case JavammTreeConstants.JJTBOOLEANVALUE:
+            case JavammTreeConstants.JJTNEGATION:
+            case JavammTreeConstants.JJTIDENTIFIER:
+            case JavammTreeConstants.JJTMETHODCALL:
+                expression.write(writer);
+                if (ASTProgram.optimize) {
+                    writer.println("  ifeq endwhile_" + localCounter);
+                    writer.println("while_" + localCounter + ":");
+                } else
+                    writer.println("  ifeq endwhile_" + localCounter);
+                break;
+            default:
+                return;
+        }
+
+        for (int i = 1; i < this.jjtGetNumChildren(); i++) {
+            SimpleNode exp = (SimpleNode) this.jjtGetChild(i);
+            if (exp.id == JavammTreeConstants.JJTWHILE)
+                labelCounter++;
+            exp.write(writer);
+            StackUsage.popStack(writer, this.requiredPops.get(i));
+        }
+
+
+        if (!ASTProgram.optimize)
+            writer.println("  goto while_" + localCounter);
+        else
+        {
+            if(b != null)
+                b.writeConditionOpt(writer, "while_" + localCounter);
+            else
+                writer.println("  ifneq while_" + localCounter);
+        }
+
+
+        writer.println("endwhile_" + localCounter + ":");
         labelCounter++;
-      exp.write(writer);
-      StackUsage.popStack(writer, this.requiredPops.get(i));
     }
 
-    writer.println("  goto " + "while_" + localCounter );
-    writer.println("endwhile_" + localCounter + ":");
-    labelCounter++;
-  }
+    @Override
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
+        switch (expression.id) {
+            case JavammTreeConstants.JJTIDENTIFIER:
+            case JavammTreeConstants.JJTBOOLEANVALUE:
+            case JavammTreeConstants.JJTNEGATION:
+            case JavammTreeConstants.JJTMETHODCALL:
+                expression.calculateStackUsage(stackUsage);
+                stackUsage.dec(1); // ifeq
+                break;
+            case JavammTreeConstants.JJTAND:
+            case JavammTreeConstants.JJTLESSTHAN:
+                BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
+                node.calculateParamsStackUsage(stackUsage);
+                break;
+            default:
+                return;
+        }
 
-  @Override
-  protected void calculateStackUsage(StackUsage stackUsage) {
-    SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
-    switch (expression.id) {
-      case JavammTreeConstants.JJTIDENTIFIER:
-      case JavammTreeConstants.JJTBOOLEANVALUE:
-      case JavammTreeConstants.JJTNEGATION:
-      case JavammTreeConstants.JJTMETHODCALL:
-        expression.calculateStackUsage(stackUsage);
-        stackUsage.dec(1); // ifeq
-        break;
-      case JavammTreeConstants.JJTAND:
-      case JavammTreeConstants.JJTLESSTHAN:
-        BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
-        node.calculateParamsStackUsage(stackUsage);
-        break;
-      default:
-        return;
+        int stackUsageBefore = stackUsage.getStackUsage();
+        for (int i = 1; i < this.jjtGetNumChildren(); i++) {
+            SimpleNode exp = (SimpleNode) this.jjtGetChild(i);
+            exp.calculateStackUsage(stackUsage);
+            this.requiredPops.put(i, stackUsage.getStackUsage() - stackUsageBefore);
+            stackUsage.set(stackUsageBefore);
+        }
     }
-
-    int stackUsageBefore = stackUsage.getStackUsage();
-    for(int i = 1; i < this.jjtGetNumChildren(); i++) {
-      SimpleNode exp = (SimpleNode) this.jjtGetChild(i);
-      exp.calculateStackUsage(stackUsage);
-      this.requiredPops.put(i, stackUsage.getStackUsage() - stackUsageBefore);
-      stackUsage.set(stackUsageBefore);
-    }
-  }
 
   @Override
   public List<CFGNode> getNodes() {
