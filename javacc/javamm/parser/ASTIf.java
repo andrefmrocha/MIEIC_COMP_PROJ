@@ -1,6 +1,7 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.cfg.CFGNode;
 import javamm.semantics.StackUsage;
 
 import java.io.PrintWriter;
@@ -109,6 +110,33 @@ class ASTIf extends ConditionalNode {
 
         thenNode.calculateStackUsage(stackUsage);
         elseNode.calculateStackUsage(stackUsage);
+    }
+
+    @Override
+    public List<CFGNode> getNodes() {
+        CFGNode ifNode = new CFGNode(((SimpleNode) this.jjtGetChild(0)).getSymbols());
+        CFGNode endNode = new CFGNode(new ArrayList<>());
+
+        List<CFGNode> thenNodes = ((SimpleNode) this.jjtGetChild(1)).getNodes();
+        List<CFGNode> elseNodes = ((SimpleNode) this.jjtGetChild(2)).getNodes();
+
+        if(thenNodes.size() != 0){
+            ifNode.addEdge(thenNodes.get(0));
+            thenNodes.get(thenNodes.size() - 1).addEdge(endNode);
+        }
+
+        if(elseNodes.size() != 0){
+            ifNode.addEdge(elseNodes.get(0));
+            elseNodes.get(elseNodes.size() - 1).addEdge(endNode);
+        }
+
+        List<CFGNode> nodes = new ArrayList<>();
+        nodes.add(ifNode);
+        nodes.addAll(thenNodes);
+        nodes.addAll(elseNodes);
+        nodes.add(endNode);
+
+        return nodes;
     }
 }
 /* JavaCC - OriginalChecksum=3f17c4ed5b4fd5cc052c1c2d168b79b9 (do not edit this line) */
