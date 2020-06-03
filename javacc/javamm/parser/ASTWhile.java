@@ -5,6 +5,7 @@ import javamm.cfg.CFGNode;
 import javamm.semantics.StackUsage;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public
 class ASTWhile extends ConditionalNode {
 
   public static int labelCounter = 0;
-  private int requiredPops = 0;
+  private HashMap<Integer, Integer> requiredPops = new HashMap<>();
 
   public ASTWhile(int id) {
     super(id);
@@ -69,10 +70,9 @@ class ASTWhile extends ConditionalNode {
       if(exp.id ==  JavammTreeConstants.JJTWHILE)
         labelCounter++;
       exp.write(writer);
+      StackUsage.popStack(writer, this.requiredPops.get(i));
     }
 
-
-    StackUsage.popStack(writer, this.requiredPops);
     writer.println("  goto " + "while_" + localCounter );
     writer.println("endwhile_" + localCounter + ":");
     labelCounter++;
@@ -102,10 +102,9 @@ class ASTWhile extends ConditionalNode {
     for(int i = 1; i < this.jjtGetNumChildren(); i++) {
       SimpleNode exp = (SimpleNode) this.jjtGetChild(i);
       exp.calculateStackUsage(stackUsage);
+      this.requiredPops.put(i, stackUsage.getStackUsage() - stackUsageBefore);
+      stackUsage.set(stackUsageBefore);
     }
-
-    this.requiredPops = stackUsage.getStackUsage() - stackUsageBefore;
-    stackUsage.set(stackUsageBefore);
   }
 
   @Override
@@ -137,6 +136,5 @@ class ASTWhile extends ConditionalNode {
 
     return nodes;
   }
-
 }
 /* JavaCC - OriginalChecksum=5f4455af0142b2fe9a424f1a313045fd (do not edit this line) */

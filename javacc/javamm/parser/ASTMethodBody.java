@@ -7,6 +7,7 @@ import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ public
 class ASTMethodBody extends SimpleNode {
     public Symbol.Type returnType = null;
     public int localsCount = 0;
+    private HashMap<Integer, Integer> requiredPops = new HashMap<>();
     public Graph graph = null;
 
     public ASTMethodBody(int id) {
@@ -28,7 +30,7 @@ class ASTMethodBody extends SimpleNode {
 
     public void eval(Javamm parser, int stackPointer) {
         boolean foundReturn = false;
-        List<CFGNode> graph = new ArrayList<>();
+        List<CFGNode> nodes = new ArrayList<>();
 
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {
             SimpleNode methodNode = (SimpleNode) this.jjtGetChild(i);
@@ -43,7 +45,7 @@ class ASTMethodBody extends SimpleNode {
                 final ASTMethodReturn methodReturn = (ASTMethodReturn) methodNode;
                 methodReturn.expectedType = returnType;
                 methodNode.eval(parser);
-                addNodesToGraph(graph, methodNode);
+                addNodesToGraph(nodes, methodNode);
                 break;
 
             }
@@ -54,13 +56,13 @@ class ASTMethodBody extends SimpleNode {
             }
 
             methodNode.eval(parser);
-            addNodesToGraph(graph, methodNode);
+            addNodesToGraph(nodes, methodNode);
         }
         if(!foundReturn && returnType != Symbol.Type.VOID) {
             parser.semanticErrors.add(new SemanticsException("Return not found. Must return: " + returnType,this));
         }
 
-        this.graph = new Graph(graph);
+        this.graph = new Graph(nodes);
     }
 
     private void addNodesToGraph(List<CFGNode> graph, SimpleNode methodNode) {
@@ -72,20 +74,23 @@ class ASTMethodBody extends SimpleNode {
         graph.addAll(nodes);
     }
 
-    public void write(PrintWriter writer, StackUsage stackUsage) {
+    public void write(PrintWriter writer) {
         for(int i = 0; i< this.jjtGetNumChildren(); i++) {
             SimpleNode node = (SimpleNode) this.jjtGetChild(i);
-
-            if (node.getId() == JavammTreeConstants.JJTMETHODRETURN) {
-                stackUsage.popStack(writer);
-            }
             node.write(writer);
+            StackUsage.popStack(writer, this.requiredPops.get(i));
         }
     }
 
     @Override
     protected void calculateStackUsage(StackUsage stackUsage) {
-        super.calculateStackUsage(stackUsage);
+        int stackUsageBefore = stackUsage.getStackUsage();
+        for(int i = 0; i < this.jjtGetNumChildren(); i++) {
+            SimpleNode child = (SimpleNode) this.jjtGetChild(i);
+            child.calculateStackUsage(stackUsage);
+            this.requiredPops.put(i, stackUsage.getStackUsage() - stackUsageBefore);
+            stackUsage.set(stackUsageBefore);
+        }
     }
 
 }

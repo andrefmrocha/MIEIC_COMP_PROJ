@@ -3,11 +3,18 @@ package javamm.parser;
 import javamm.SemanticsException;
 import javamm.cfg.CFGNode;
 
+import javamm.semantics.StackUsage;
+
+import java.io.PrintWriter;
+import java.util.HashMap;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
 public class FlowControlNode extends SimpleNode {
+    private HashMap<Integer, Integer> requiredPops = new HashMap<>();
+
     public FlowControlNode(int i) {
         super(i);
     }
@@ -41,6 +48,24 @@ public class FlowControlNode extends SimpleNode {
         }
 
         return initializedVars;
+    }
+
+    public void write(PrintWriter writer) {
+        for(int i = 0; i< this.jjtGetNumChildren(); i++) {
+            SimpleNode node = (SimpleNode) this.jjtGetChild(i);
+            node.write(writer);
+            StackUsage.popStack(writer, requiredPops.get(i));
+        }
+    }
+
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        int stackUsageBefore = stackUsage.getStackUsage();
+        for (int i = 0; i < this.jjtGetNumChildren(); i++) {
+            SimpleNode child = (SimpleNode) this.jjtGetChild(i);
+            child.calculateStackUsage(stackUsage);
+            requiredPops.put(i, stackUsage.getStackUsage() - stackUsageBefore);
+            stackUsage.set(stackUsageBefore);
+        }
     }
 
     @Override

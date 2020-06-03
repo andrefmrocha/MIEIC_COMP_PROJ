@@ -12,8 +12,6 @@ import java.util.*;
 public
 class ASTIf extends ConditionalNode {
     public static int labelCounter = 0; //if/else counter
-    private int requiredThenPops = 0;
-    private int requiredElsePops = 0;
 
     public TreeSet<String> initializedVars = new TreeSet<>();
 
@@ -44,11 +42,10 @@ class ASTIf extends ConditionalNode {
             boolean inThen = thenInitializedVars.contains(identifier);
             boolean inElse = elseInitializedVars.contains(identifier);
 
-            if(inThen && inElse) {
+            if (inThen && inElse) {
                 this.table.getSymbol(identifier).setInitialized();
                 this.initializedVars.add(identifier);
-            }
-            else if (inThen && !inElse)
+            } else if (inThen && !inElse)
                 parser.semanticWarnings.add(new SemanticsException(identifier + " is not initialized in else", elseNode));
             else if (!inThen && inElse)
                 parser.semanticWarnings.add(new SemanticsException(identifier + " is not initialized in then", elseNode));
@@ -81,11 +78,9 @@ class ASTIf extends ConditionalNode {
 
         labelCounter++;
         thenNode.write(writer);
-        StackUsage.popStack(writer, requiredThenPops);
         writer.println("  goto endif_" + currCounter);
         writer.println("else_" + currCounter + ":");
         elseNode.write(writer);
-        StackUsage.popStack(writer, requiredElsePops);
         writer.println("endif_" + currCounter + ":");
     }
 
@@ -112,17 +107,8 @@ class ASTIf extends ConditionalNode {
         ASTThen thenNode = (ASTThen) this.jjtGetChild(1);
         ASTElse elseNode = (ASTElse) this.jjtGetChild(2);
 
-        int stackUsageBeforeThen = stackUsage.getStackUsage();
         thenNode.calculateStackUsage(stackUsage);
-        int stackUsageAfterThen = stackUsage.getStackUsage();
-
-        stackUsage.set(stackUsageBeforeThen);
         elseNode.calculateStackUsage(stackUsage);
-
-        this.requiredThenPops = stackUsageAfterThen - stackUsageBeforeThen;
-        this.requiredElsePops = stackUsage.getStackUsage() - stackUsageBeforeThen;
-
-        stackUsage.set(stackUsageBeforeThen);
     }
 
     @Override
@@ -133,12 +119,12 @@ class ASTIf extends ConditionalNode {
         List<CFGNode> thenNodes = ((SimpleNode) this.jjtGetChild(1)).getNodes();
         List<CFGNode> elseNodes = ((SimpleNode) this.jjtGetChild(2)).getNodes();
 
-        if(thenNodes.size() != 0){
+        if (thenNodes.size() != 0) {
             ifNode.addEdge(thenNodes.get(0));
             thenNodes.get(thenNodes.size() - 1).addEdge(endNode);
         }
 
-        if(elseNodes.size() != 0){
+        if (elseNodes.size() != 0) {
             ifNode.addEdge(elseNodes.get(0));
             elseNodes.get(elseNodes.size() - 1).addEdge(endNode);
         }
