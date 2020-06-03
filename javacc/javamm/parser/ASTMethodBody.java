@@ -17,6 +17,7 @@ public
 class ASTMethodBody extends SimpleNode {
     public Symbol.Type returnType = null;
     public int localsCount = 0;
+    public int numParams;
     private HashMap<Integer, Integer> requiredPops = new HashMap<>();
     public Graph graph = null;
 
@@ -75,6 +76,7 @@ class ASTMethodBody extends SimpleNode {
     }
 
     public void write(PrintWriter writer) {
+        this.graph.generateStackPos(256, numParams);
         for(int i = 0; i< this.jjtGetNumChildren(); i++) {
             SimpleNode node = (SimpleNode) this.jjtGetChild(i);
             node.write(writer);
