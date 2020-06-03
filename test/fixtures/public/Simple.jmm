@@ -1,6 +1,5 @@
 import static io.println(int) void;
 class Simple {
-    int x;
 
     public int add(int a, int b){
         int c;
@@ -20,7 +19,7 @@ class Simple {
         io.println(c);
     }
 
-    public int constInstr(int a, boolean b){
+    public int constInstr(){
         int c;
         c = 0;
         c = 4;
@@ -32,32 +31,4 @@ class Simple {
         c = 100474650;
         return 0;
     }
-
-    public int test(int c, int[] g, boolean l) {
-        this.constInstr(1, true);
-        return 0;
-    }
-
-    public void t() {
-        int a;
-        (new Simple()).add(1,1);
-
-        while(true) {
-            (new Simple()).add(1,1);
-        }
-
-        a = 1;
-
-        if (true) {
-            (new Simple()).add(1,1);
-            (new Simple()).add(1,1);
-            (new Simple()).add(1,1);
-        }
-        else {
-            (new Simple()).add(1,1);
-        }
-
-        a = 2;
-    }
-
 }

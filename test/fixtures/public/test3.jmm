@@ -80,6 +80,7 @@ class test3 {
         int i1;
         int i2;
 
+        i2 = 5;
         i1 = 4;
         i2 = i2 * 2;
         if (i1 < i2) {

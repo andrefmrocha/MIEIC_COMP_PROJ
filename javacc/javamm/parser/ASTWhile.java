@@ -136,6 +136,5 @@ class ASTWhile extends ConditionalNode {
 
     return nodes;
   }
-
 }
 /* JavaCC - OriginalChecksum=5f4455af0142b2fe9a424f1a313045fd (do not edit this line) */

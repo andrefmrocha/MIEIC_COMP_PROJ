@@ -19,6 +19,14 @@ class test1 {
     boolean atr2;
     classA atr3;
 
+     public boolean init() {
+         atr1 = 2;
+         atr2 = true;
+         atr3 = new classA();
+
+         return true;
+     }
+
     public int f1() {
 
         int a;
@@ -125,6 +133,7 @@ class test1 {
     public static void main(String[] args) {
         test1 x;
         x = new test1();
+        x.init();
         x.foo();
     }
 

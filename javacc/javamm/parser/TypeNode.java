@@ -37,7 +37,7 @@ public abstract class TypeNode extends SimpleNode {
             }
 
             if (!sym.isInitialized()) {
-                parser.semanticWarnings.add(new SemanticsException("Variable " + name + " may not be initialized", child));
+                parser.semanticErrors.add(new SemanticsException("Variable " + name + " may not be initialized", child));
             }
         } else if (child instanceof TypeNode) {
             child.setTables(table, methodTable);

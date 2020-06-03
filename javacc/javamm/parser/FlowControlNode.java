@@ -1,11 +1,12 @@
 package javamm.parser;
 
 import javamm.SemanticsException;
+import javamm.cfg.CFGNode;
+
 import javamm.semantics.StackUsage;
 
 import java.io.PrintWriter;
 import java.util.HashMap;
-import javamm.cfg.CFGNode;
 
 import java.util.ArrayList;
 import java.util.List;
