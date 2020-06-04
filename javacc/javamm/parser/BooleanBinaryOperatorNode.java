@@ -15,9 +15,11 @@ public abstract class BooleanBinaryOperatorNode extends BinaryOperatorNode{
     super(p, i, type, op);
   }
 
-  public abstract void write(PrintWriter writer, String labelFalse, boolean revert);
+  public abstract void write(PrintWriter writer, String labelFalse);
 
   public abstract void writeConditionOpt(PrintWriter writer, String labelFalse);
 
   public abstract void calculateParamsStackUsage(StackUsage stackUsage);
+
+
 }

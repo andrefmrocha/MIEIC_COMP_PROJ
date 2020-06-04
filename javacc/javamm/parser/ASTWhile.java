@@ -1,6 +1,5 @@
 package javamm.parser;
 
-import com.sun.jdi.BooleanValue;
 import javamm.SemanticsException;
 import javamm.cfg.CFGNode;
 import javamm.semantics.StackUsage;
@@ -56,11 +55,11 @@ class ASTWhile extends ConditionalNode {
             case JavammTreeConstants.JJTLESSTHAN:
                 BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
                 if (ASTProgram.optimize) {
-                    node.write(writer, "endwhile_" + localCounter, false);
+                    node.write(writer, "endwhile_" + localCounter);
                     writer.println("while_" + localCounter + ":");
                     b = node;
                 } else {
-                    node.write(writer, "endwhile_" + localCounter, false);
+                    node.write(writer, "endwhile_" + localCounter);
                 }
                 break;
             case JavammTreeConstants.JJTBOOLEANVALUE:
@@ -89,12 +88,11 @@ class ASTWhile extends ConditionalNode {
 
         if (!ASTProgram.optimize)
             writer.println("  goto while_" + localCounter);
-        else
-        {
-            if(b != null)
-                b.writeConditionOpt(writer, "while_" + localCounter);
-            else
-                writer.println("  ifneq while_" + localCounter);
+        else if (b != null)
+            b.writeConditionOpt(writer, "while_" + localCounter);
+        else {
+            expression.write(writer);
+            writer.println("  ifne while_" + localCounter);
         }
 
 
@@ -102,9 +100,7 @@ class ASTWhile extends ConditionalNode {
         labelCounter++;
     }
 
-    @Override
-    protected void calculateStackUsage(StackUsage stackUsage) {
-        SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
+    public void calculateStackCondition(StackUsage stackUsage, SimpleNode expression) {
         switch (expression.id) {
             case JavammTreeConstants.JJTIDENTIFIER:
             case JavammTreeConstants.JJTBOOLEANVALUE:
@@ -121,6 +117,12 @@ class ASTWhile extends ConditionalNode {
             default:
                 return;
         }
+    }
+
+    @Override
+    protected void calculateStackUsage(StackUsage stackUsage) {
+        SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
+        calculateStackCondition(stackUsage, expression);
 
         int stackUsageBefore = stackUsage.getStackUsage();
         for (int i = 1; i < this.jjtGetNumChildren(); i++) {
@@ -129,35 +131,39 @@ class ASTWhile extends ConditionalNode {
             this.requiredPops.put(i, stackUsage.getStackUsage() - stackUsageBefore);
             stackUsage.set(stackUsageBefore);
         }
+
+        if (ASTProgram.optimize)
+            calculateStackCondition(stackUsage, expression);
     }
 
-  @Override
-  public List<CFGNode> getNodes() {
-    CFGNode conditionNode = new CFGNode(((SimpleNode) this.jjtGetChild(0)).getSymbols());
-    CFGNode endNode = new CFGNode(new ArrayList<>());
+    @Override
+    public List<CFGNode> getNodes() {
+        CFGNode conditionNode = new CFGNode(((SimpleNode) this.jjtGetChild(0)).getSymbols());
+        CFGNode endNode = new CFGNode(new ArrayList<>());
 
-    conditionNode.addEdge(endNode); // connect condition to end
+        conditionNode.addEdge(endNode); // connect condition to end
 
-    List<CFGNode> whileNodes = new ArrayList<>(); // all nodes inside while after condition
-    for (int i = 1; i < this.jjtGetNumChildren(); i++) {
-      List<CFGNode> nodes = ((SimpleNode) this.jjtGetChild(i)).getNodes();
+        List<CFGNode> whileNodes = new ArrayList<>(); // all nodes inside while after condition
+        for (int i = 1; i < this.jjtGetNumChildren(); i++) {
+            List<CFGNode> nodes = ((SimpleNode) this.jjtGetChild(i)).getNodes();
 
-      if (whileNodes.size() != 0)
-        whileNodes.get(whileNodes.size() - 1).addEdge(nodes.get(0));
+            if (whileNodes.size() != 0)
+                whileNodes.get(whileNodes.size() - 1).addEdge(nodes.get(0));
 
-      whileNodes.addAll(nodes);
+            whileNodes.addAll(nodes);
+        }
+
+        if (whileNodes.size() != 0) {
+            conditionNode.addEdge(whileNodes.get(0)); // connect condition to while's inner nodes
+            whileNodes.get(whileNodes.size() - 1).addEdge(conditionNode); // connect last node to condition
+        }
+
+        List<CFGNode> nodes = new ArrayList<>();
+        nodes.add(conditionNode);
+        nodes.addAll(whileNodes);
+        nodes.add(endNode);
+
+        return nodes;
     }
-
-    if (whileNodes.size() != 0) {
-      conditionNode.addEdge(whileNodes.get(0)); // connect condition to while's inner nodes
-    }
-
-    List<CFGNode> nodes = new ArrayList<>();
-    nodes.add(conditionNode);
-    nodes.addAll(whileNodes);
-    nodes.add(endNode);
-
-    return nodes;
-  }
 }
 /* JavaCC - OriginalChecksum=5f4455af0142b2fe9a424f1a313045fd (do not edit this line) */

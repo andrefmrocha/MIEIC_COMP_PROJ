@@ -34,20 +34,28 @@ class ASTAnd extends BooleanBinaryOperatorNode {
         writer.println("endEval_" + currCounter + ":");
     }
 
+    public void writeOperands(PrintWriter writer, SimpleNode node, String cond, String label) {
+        node.write(writer);
+        writer.println(cond + label);
+    }
+
     @Override
-    public void write(PrintWriter writer, String labelFalse, boolean revert) {
+    public void write(PrintWriter writer, String labelFalse) {
         SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
         SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
 
-        leftOperand.write(writer);
-        writer.println("  ifeq " + labelFalse);
-        rightOperand.write(writer);
-        writer.println("  ifeq " + labelFalse);
+        writeOperands(writer, leftOperand, "  ifeq ", labelFalse);
+        writeOperands(writer, rightOperand, "  ifeq ", labelFalse);
     }
 
     @Override
     public void writeConditionOpt(PrintWriter writer, String labelFalse) {
-        writer.println("  ifneq " + labelFalse);
+
+        SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
+        SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
+
+        writeOperands(writer, leftOperand, "  ifeq end", labelFalse);
+        writeOperands(writer, rightOperand, "  ifne ", labelFalse);
     }
 
     @Override
@@ -65,6 +73,7 @@ class ASTAnd extends BooleanBinaryOperatorNode {
         stackUsage.dec(1); //ifeq
         rightOperand.calculateStackUsage(stackUsage);
         stackUsage.dec(1); //ifeq
+
     }
 }
 /* JavaCC - OriginalChecksum=1766d5431be81e19119cf5feee80cd49 (do not edit this line) */
