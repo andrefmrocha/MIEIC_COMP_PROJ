@@ -23,4 +23,22 @@ class Simple extends Parent {
         io.func(a);
         return a;
     }
+    public int test() {
+        int sum;
+        int i;
+        int N;
+        int[] A;
+        int t1;
+
+        N = 1;
+        A = new int[1];
+        sum = 0;
+        i = 0;
+        while(i < N) {
+            t1 = A[1];
+            sum = sum + t1;
+            i = i + 1;
+        }
+        return sum;
+    }
 }
