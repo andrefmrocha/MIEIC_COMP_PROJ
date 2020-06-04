@@ -64,7 +64,7 @@ class ASTIdentifier extends TypeNode {
     final List<CFGSymbol> symbol = new ArrayList<>();
     if(table.checkSymbol(identifierName)){
       Symbol s = table.getSymbol(identifierName);
-      if(s.getType() != Symbol.Type.CLASS && s.getStackPos() != -1){
+      if(s.getStackPos() != -1){
         symbol.add(new CFGSymbol(identifierName, s));
       } else {
         System.out.println("Won't add variable with name " + identifierName + " with type " + s.getType() + " and pos " + s.getStackPos() + " in line " + getLine());

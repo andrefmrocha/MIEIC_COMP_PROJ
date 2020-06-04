@@ -44,7 +44,6 @@ class ASTAssignVar extends TypeNode {
             parser.semanticErrors.add(new SemanticsException("Variable has not a valid identifier", identifier));
             return;
         }
-<<<<<<< HEAD
 
         ASTIdentifier temp = (ASTIdentifier) identifier;
         varIdentifier = temp.identifierName;
@@ -67,29 +66,11 @@ class ASTAssignVar extends TypeNode {
         if(!symbol.hasChanged() && !checkConstant(expression,symbol)) {
             symbol.didChange();
         }
-=======
-
-        ASTIdentifier temp = (ASTIdentifier) identifier;
-        varIdentifier = temp.identifierName;
-
-        if (!this.table.checkSymbol(varIdentifier)) {
-            parser.semanticErrors.add(new SemanticsException("Variable " + varIdentifier + " does not exist", identifier));
-            return;
-        }
-
-        Symbol symbol = this.table.getSymbol(varIdentifier);
-
-        SimpleNode expression = (SimpleNode) this.jjtGetChild(1);
-        this.evaluateChild(expression, symbol, parser);
-
-        symbol.setInitialized();
->>>>>>> bd7ddcf... Generating CFG without placeholders
 
         if (expression.id == JavammTreeConstants.JJTSUM && symbol.getStackPos() != -1)
             this.optimizeMathOperation(expression);
     }
 
-<<<<<<< HEAD
     public boolean checkConstant(SimpleNode node, Symbol symbol) {
         switch(node.id) {
             case JavammTreeConstants.JJTNUMERIC:
@@ -104,8 +85,6 @@ class ASTAssignVar extends TypeNode {
         }
     }
 
-=======
->>>>>>> bd7ddcf... Generating CFG without placeholders
     public void optimizeMathOperation(SimpleNode expression) {
         List<SimpleNode> nodes = getSumNodes((ASTSum) expression);
         boolean hasOnlyConstants = true;

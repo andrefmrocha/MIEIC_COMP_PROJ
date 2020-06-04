@@ -121,9 +121,10 @@ class ASTIf extends ConditionalNode {
         if (thenNodes.size() != 0 && elseNodes.size() != 0) {
             ifNode.addEdge(thenNodes.get(0));
             thenNodes.get(thenNodes.size() - 1).addEdge(elseNodes.get(0));
-        } else if(thenNodes.size() == 0 && elseNodes.size() != 0){
+        } else if(thenNodes.size() == 0 && elseNodes.size() != 0)
             ifNode.addEdge(elseNodes.get(0));
-        }
+        else
+            ifNode.addEdge(thenNodes.get(0));
 
         List<CFGNode> nodes = new ArrayList<>();
         nodes.add(ifNode);
