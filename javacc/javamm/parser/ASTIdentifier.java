@@ -31,7 +31,10 @@ class ASTIdentifier extends TypeNode {
   public void eval(Javamm parser) {
     if(this.table != null) {
       Symbol s = this.table.getSymbol(identifierName);
-      if (s != null) value = s.getValue();
+      if (s != null) {
+        value = s.getValue();
+        s.setUsed();
+      }
     }
   }
 

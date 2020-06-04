@@ -2,8 +2,15 @@ import static io.println(int) void;
 import Parent;
 import static io.func(int) void;
 class Simple extends Parent {
-
-    public int test() {
+    public Simple t() {
+        return new Simple();
+    }
+    public void coisa(Parent p) {}
+    public void nothing(int a) {
+        int c;
+        c = a;
+    }
+    public int t2() {
         int a;
         int b;
         int c;
@@ -17,6 +24,6 @@ class Simple extends Parent {
         a = 1 + d + e;
         b = 2;
         c = 3 + b + e + d;
-        return 0;
+        return a;
     }
 }

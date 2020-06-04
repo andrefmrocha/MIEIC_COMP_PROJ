@@ -18,6 +18,7 @@ class ASTAssignVar extends TypeNode {
     public String varIdentifier;
     private int iinc = Integer.MAX_VALUE;
     public boolean optimized;
+    private CFGNode assignNode = null;
 
     public ASTAssignVar(int id) {
         super(id);
@@ -63,7 +64,7 @@ class ASTAssignVar extends TypeNode {
         if (!symbol.isInitialized())
             symbol.setInitialized();
 
-        if(!symbol.hasChanged() && !checkConstant(expression,symbol)) {
+        if (!symbol.hasChanged() && !checkConstant(expression, symbol)) {
             symbol.didChange();
         }
 
@@ -72,12 +73,12 @@ class ASTAssignVar extends TypeNode {
     }
 
     public boolean checkConstant(SimpleNode node, Symbol symbol) {
-        switch(node.id) {
+        switch (node.id) {
             case JavammTreeConstants.JJTNUMERIC:
-                symbol.setValue(((ASTNumeric)node).number);
+                symbol.setValue(((ASTNumeric) node).number);
                 return true;
             case JavammTreeConstants.JJTBOOLEANVALUE:
-                symbol.setValue(((ASTBooleanValue)node).bool?1:0);
+                symbol.setValue(((ASTBooleanValue) node).bool ? 1 : 0);
                 return true;
             default:
                 //the node is not a constant value
@@ -141,7 +142,9 @@ class ASTAssignVar extends TypeNode {
         if (iinc != Integer.MAX_VALUE && iinc >= -32768 && iinc <= 32767) {
             final String iincInstruction = (iinc > 127 || iinc < -128) ? "iinc_w" : "iinc";
             writer.println("  " + iincInstruction + " " + varNum + " " + iinc);
-        } else if(!optimized || leftSymbol.hasChanged() || leftSymbol.getValue() == -1) { //the optimization is off or the variable isn't a constant
+        }
+        //if optimizing, check if the value of the assignment is used before another assignment or the variable is constant
+        else if (!ASTProgram.optimize || (findSymbolUse(assignNode.getEdges(), leftSymbol, varName) && (leftSymbol.hasChanged() || leftSymbol.getValue() == -1))) {
             if (varNum == -1)
                 writer.println("  aload_0");
             // result will be on stack
@@ -157,6 +160,26 @@ class ASTAssignVar extends TypeNode {
                 writer.println("  " + storeInstr + separator + Integer.toString(varNum) + "\n");
             }
         }
+    }
+
+    protected boolean findSymbolUse(List<CFGNode> edges, Symbol symbol, String varName) {
+        for (CFGNode edge : edges) {
+            for (CFGSymbol cfgSymbol : edge.getDefinedVars())
+                if (cfgSymbol.getSymbol().equals(symbol))
+                    return false;
+            for (CFGSymbol cfgSymbol : edge.getUsedVars())
+                if (cfgSymbol.getSymbol().equals(symbol)) {
+                    System.out.println("Found use of variable: " + symbol.getValue() + " Symbol name: " + varName);
+
+                    return true;
+                }
+            if (findSymbolUse(edge.getEdges(), symbol, varName)) {
+                System.out.println("Found use of variable: " + symbol.getValue() + " Symbol name: " + varName);
+                return true;
+            }
+
+        }
+        return false;
     }
 
     @Override
@@ -183,13 +206,13 @@ class ASTAssignVar extends TypeNode {
         List<CFGSymbol> used = ((SimpleNode) this.jjtGetChild(1)).getSymbols();
         if (table.checkSymbol(identifier.identifierName)) {
             final Symbol symbol = table.getSymbol(identifier.identifierName);
-            if (symbol.getStackPos() == -1){
+            if (symbol.getStackPos() == -1) {
                 System.out.println("Defined variable" + identifier.identifierName + " is defined in top level");
                 return Collections.singletonList(new CFGNode(used));
             }
-
-            nodes.add(new CFGNode(used,
-                    Collections.singletonList(new CFGSymbol(identifier.identifierName, symbol))));
+            this.assignNode = new CFGNode(used,
+                Collections.singletonList(new CFGSymbol(identifier.identifierName, symbol)));
+            nodes.add(this.assignNode);
         } else {
             System.out.println("Var " + identifier.identifierName + " not found");
         }
