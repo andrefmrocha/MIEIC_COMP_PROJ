@@ -1,5 +1,6 @@
 package javamm.parser;
 
+import javamm.cfg.CFGSymbol;
 import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 
@@ -59,12 +60,15 @@ class ASTIdentifier extends TypeNode {
   }
 
   @Override
-  public List<Symbol> getSymbols() {
-    final List<Symbol> symbol = new ArrayList<>();
+  public List<CFGSymbol> getSymbols() {
+    final List<CFGSymbol> symbol = new ArrayList<>();
     if(table.checkSymbol(identifierName)){
       Symbol s = table.getSymbol(identifierName);
-      if(s.getType() != Symbol.Type.CLASS && !table.getParent().checkSymbol(identifierName))
-        symbol.add(s);
+      if(s.getType() != Symbol.Type.CLASS && s.getStackPos() != -1){
+        symbol.add(new CFGSymbol(identifierName, s));
+      } else {
+        System.out.println("Won't add variable with name " + identifierName + " with type " + s.getType() + " and pos " + s.getStackPos() + " in line " + getLine());
+      }
     }
 
     return symbol;

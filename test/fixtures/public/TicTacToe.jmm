@@ -175,7 +175,7 @@ class TicTacToe {
 
         player = mygame.getCurrentPlayer();
         move = BoardBase.playerTurn(player);
-	    
+
       		
         if (!mygame.inbounds(move[0],move[1])) 
           BoardBase.wrongMove();

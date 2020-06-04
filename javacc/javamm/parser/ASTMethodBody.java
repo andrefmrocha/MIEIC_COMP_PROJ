@@ -76,6 +76,8 @@ class ASTMethodBody extends SimpleNode {
     }
 
     public void write(PrintWriter writer) {
+        System.out.println("\n\n");
+        System.out.println("Generating new stack Pos");
         this.graph.generateStackPos(256, numParams);
         for(int i = 0; i< this.jjtGetNumChildren(); i++) {
             SimpleNode node = (SimpleNode) this.jjtGetChild(i);

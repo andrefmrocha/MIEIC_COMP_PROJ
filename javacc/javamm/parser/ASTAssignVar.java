@@ -2,6 +2,7 @@ package javamm.parser;
 
 import javamm.SemanticsException;
 import javamm.cfg.CFGNode;
+import javamm.cfg.CFGSymbol;
 import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 
@@ -43,6 +44,7 @@ class ASTAssignVar extends TypeNode {
             parser.semanticErrors.add(new SemanticsException("Variable has not a valid identifier", identifier));
             return;
         }
+<<<<<<< HEAD
 
         ASTIdentifier temp = (ASTIdentifier) identifier;
         varIdentifier = temp.identifierName;
@@ -65,11 +67,29 @@ class ASTAssignVar extends TypeNode {
         if(!symbol.hasChanged() && !checkConstant(expression,symbol)) {
             symbol.didChange();
         }
+=======
+
+        ASTIdentifier temp = (ASTIdentifier) identifier;
+        varIdentifier = temp.identifierName;
+
+        if (!this.table.checkSymbol(varIdentifier)) {
+            parser.semanticErrors.add(new SemanticsException("Variable " + varIdentifier + " does not exist", identifier));
+            return;
+        }
+
+        Symbol symbol = this.table.getSymbol(varIdentifier);
+
+        SimpleNode expression = (SimpleNode) this.jjtGetChild(1);
+        this.evaluateChild(expression, symbol, parser);
+
+        symbol.setInitialized();
+>>>>>>> bd7ddcf... Generating CFG without placeholders
 
         if (expression.id == JavammTreeConstants.JJTSUM && symbol.getStackPos() != -1)
             this.optimizeMathOperation(expression);
     }
 
+<<<<<<< HEAD
     public boolean checkConstant(SimpleNode node, Symbol symbol) {
         switch(node.id) {
             case JavammTreeConstants.JJTNUMERIC:
@@ -84,6 +104,8 @@ class ASTAssignVar extends TypeNode {
         }
     }
 
+=======
+>>>>>>> bd7ddcf... Generating CFG without placeholders
     public void optimizeMathOperation(SimpleNode expression) {
         List<SimpleNode> nodes = getSumNodes((ASTSum) expression);
         boolean hasOnlyConstants = true;
@@ -179,8 +201,19 @@ class ASTAssignVar extends TypeNode {
     public List<CFGNode> getNodes() {
         List<CFGNode> nodes = new ArrayList<>();
         ASTIdentifier identifier = (ASTIdentifier) this.jjtGetChild(0);
-        nodes.add(new CFGNode(((SimpleNode) this.jjtGetChild(1)).getSymbols(),
-                Collections.singletonList(table.getSymbol(identifier.identifierName))));
+        List<CFGSymbol> used = ((SimpleNode) this.jjtGetChild(1)).getSymbols();
+        if (table.checkSymbol(identifier.identifierName)) {
+            final Symbol symbol = table.getSymbol(identifier.identifierName);
+            if (symbol.getStackPos() == -1){
+                System.out.println("Defined variable" + identifier.identifierName + " is defined in top level");
+                return Collections.singletonList(new CFGNode(used));
+            }
+
+            nodes.add(new CFGNode(used,
+                    Collections.singletonList(new CFGSymbol(identifier.identifierName, symbol))));
+        } else {
+            System.out.println("Var " + identifier.identifierName + " not found");
+        }
         return nodes;
     }
 }

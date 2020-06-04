@@ -24,21 +24,13 @@ class Simple extends Parent {
         return a;
     }
     public int test() {
-        int sum;
-        int i;
-        int N;
-        int[] A;
-        int t1;
+        int a;
+        int b;
+        int c;
 
-        N = 1;
-        A = new int[1];
-        sum = 0;
-        i = 0;
-        while(i < N) {
-            t1 = A[1];
-            sum = sum + t1;
-            i = i + 1;
-        }
-        return sum;
+        a = 1;
+        b = 2 + a;
+        c = 3;
+        return c;
     }
 }

@@ -1,32 +1,27 @@
 package javamm.cfg;
 
-import javamm.semantics.Symbol;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class CFGNode {
     private final List<CFGNode> edges;
-    private final Set<Symbol> usedVars;
-    private final Set<Symbol> definedVars;
-    private final Set<Symbol> in = new HashSet<>();
-    private final Set<Symbol> out = new HashSet<>();
+    private final Set<CFGSymbol> usedVars;
+    private final Set<CFGSymbol> definedVars;
+    private final Set<CFGSymbol> in = new HashSet<>();
+    private final Set<CFGSymbol> out = new HashSet<>();
 
     public boolean visited = false;
 
-    public CFGNode(List<CFGNode> edges, List<Symbol> usedVars, List<Symbol> definedVars) {
+    public CFGNode(List<CFGNode> edges, List<CFGSymbol> usedVars, List<CFGSymbol> definedVars) {
         this.edges = edges;
         this.usedVars = new HashSet<>(usedVars);
         this.definedVars = new HashSet<>(definedVars);
     }
 
-    public CFGNode(List<Symbol> usedVars) {
+    public CFGNode(List<CFGSymbol> usedVars) {
         this(new ArrayList<>(), usedVars, new ArrayList<>());
     }
 
-    public CFGNode(List<Symbol> usedVars, List<Symbol> definedVars) {
+    public CFGNode(List<CFGSymbol> usedVars, List<CFGSymbol> definedVars) {
         this(new ArrayList<>(), usedVars, definedVars);
     }
 
@@ -38,19 +33,19 @@ public class CFGNode {
         this.edges.add(node);
     }
 
-    public Set<Symbol> getUsedVars() {
+    public Set<CFGSymbol> getUsedVars() {
         return usedVars;
     }
 
-    public Set<Symbol> getDefinedVars() {
+    public Set<CFGSymbol> getDefinedVars() {
         return definedVars;
     }
 
-    public Set<Symbol> getIn() {
+    public Set<CFGSymbol> getIn() {
         return in;
     }
 
-    public Set<Symbol> getOut() {
+    public Set<CFGSymbol> getOut() {
         return out;
     }
 
@@ -64,27 +59,13 @@ public class CFGNode {
         }
     }
 
-    public void resetVisitedDFS() {
-        this.visited = false;
-        for(CFGNode succ : edges) {
-            if(!succ.visited) continue; // already reseted
-            succ.resetVisitedDFS(); // dfs
-        }
-    }
-
     public boolean generateInAndOut() {
-        this.visited = true;
-        final Set<Symbol> prev_in = new HashSet<>(this.getIn());
-        final Set<Symbol> prev_out = new HashSet<>(this.getOut());
+        final Set<CFGSymbol> prev_in = new HashSet<>(this.getIn());
+        final Set<CFGSymbol> prev_out = new HashSet<>(this.getOut());
         this.updateOutStep();
         this.updateInStep();
 
-        boolean stabilized = this.getIn().equals(prev_in) && this.getOut().equals(prev_out);
-        for (CFGNode succ : edges) {
-            if (succ.visited) continue;
-            stabilized &= succ.generateInAndOut();
-        }
-        return stabilized;
+        return this.getIn().equals(prev_in) && this.getOut().equals(prev_out);
     }
 
     public void updateInStep() {
@@ -99,4 +80,61 @@ public class CFGNode {
         for (CFGNode succ : edges)
             this.out.addAll(succ.getIn());
     }
+
+    public boolean isPlaceholder(){
+        return this.definedVars.isEmpty() && this.usedVars.isEmpty();
+    }
+
+    public void generateStackPos(PriorityQueue<Integer> priorityQueue, Set<CFGSymbol> previousOut, int numParams) {
+        visited = true;
+        final Set<CFGSymbol> newVariablesSet = new HashSet<>(getOut());
+
+        System.out.println("In " + Arrays.toString(getIn().toArray()));
+        System.out.println("Out " + Arrays.toString(getOut().toArray()));
+        System.out.println("Used " + Arrays.toString(getUsedVars().toArray()));
+        System.out.println("Def " + Arrays.toString(getDefinedVars().toArray()));
+        System.out.println("Node " + this);
+        System.out.println("Edges " + Arrays.toString(getEdges().toArray()));
+        newVariablesSet.removeAll(getIn());
+        newVariablesSet.removeAll(previousOut);
+
+        final Set<CFGSymbol> unusedVariables = new HashSet<>(getIn());
+        unusedVariables.removeAll(getOut());
+        final Set<CFGSymbol> lostVars = new HashSet<>(previousOut);
+        lostVars.removeAll(getOut());
+        lostVars.removeAll(getIn());
+
+        for (CFGSymbol s : unusedVariables) {
+            pushBackPosition(priorityQueue, numParams, s);
+        }
+
+        for (CFGSymbol s : lostVars) {
+            pushBackPosition(priorityQueue, numParams, s);
+        }
+
+        final Set<CFGSymbol> outSymbols = new HashSet<>(getOut());
+
+        for (CFGSymbol s : newVariablesSet) {
+            int num = priorityQueue.remove();
+            System.out.println("Using num " + num);
+            s.getSymbol().setStackPos(num);
+            outSymbols.add(s);
+        }
+        System.out.println();
+
+        for(CFGNode edge: getEdges()){
+            if(!edge.visited)
+                edge.generateStackPos(priorityQueue, getOut(), numParams);
+        }
+    }
+
+    private void pushBackPosition(PriorityQueue<Integer> priorityQueue, int numParams, CFGSymbol s) {
+        int varNum = s.getSymbol().getStackPos();
+        if(varNum < numParams)
+            return;
+        System.out.println("Pushing back num " + s.getSymbol().getStackPos());
+        priorityQueue.offer(varNum);
+    }
+
+
 }

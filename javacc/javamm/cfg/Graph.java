@@ -6,20 +6,56 @@ import java.util.*;
 
 public class Graph {
     private final List<CFGNode> nodes;
-    private final CFGNode root;
+    private CFGNode root;
 
     public Graph(List<CFGNode> nodes) {
-        this.nodes = nodes;
-        this.root = nodes.size() > 0 ? nodes.get(0) : null;
+        this.nodes = this.removePlaceHolders(nodes);
         generateInAndOut();
+    }
+
+    private List<CFGNode> removePlaceHolders(List<CFGNode> nodes) {
+        for (CFGNode node : nodes) {
+            if (!node.isPlaceholder()) {
+                this.root = node;
+                break;
+            }
+        }
+
+        final List<CFGNode> finalNodes = new ArrayList<>();
+
+
+        for (CFGNode node : nodes) {
+            if (node.isPlaceholder())
+                continue;
+
+            finalNodes.add(node);
+            for (CFGNode edge : new ArrayList<>(node.getEdges())) {
+                if (edge.isPlaceholder()) {
+                    node.getEdges().remove(edge);
+                    while (!edge.getEdges().isEmpty()) {
+                        edge = edge.getEdges().get(0);
+                        if (!edge.isPlaceholder()) {
+                            node.getEdges().add(edge);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return finalNodes;
     }
 
     public void generateInAndOut() {
         if (root != null) {
             resetInAndOut();
-            while (!root.generateInAndOut()) {
-                resetVisited();
+            boolean stabilized = false;
+            while (!stabilized){
+                stabilized = true;
+                for(CFGNode node: nodes)
+                    stabilized &= node.generateInAndOut();
             }
+            
+            resetVisited();
         }
     }
 
@@ -29,28 +65,20 @@ public class Graph {
     }
 
     private void resetVisited() {
-        root.resetVisitedDFS();
+        for (CFGNode node: nodes)
+            node.visited = false;
     }
 
     public void generateStackPos(int maxSize, int numParams) throws NoSuchElementException {
+        if(root == null)
+            return;
         final PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(maxSize);
 
         for (int i = numParams; i < maxSize; i++) {
             priorityQueue.offer(i);
         }
 
-        for (CFGNode node : nodes) {
-            System.out.println("In: " + Arrays.toString(node.getIn().toArray()));
-            System.out.println("Out: " + Arrays.toString(node.getOut().toArray()));
-            System.out.println();
-            final Set<Symbol> newVariablesSet = new HashSet<>(node.getIn());
-            newVariablesSet.removeAll(node.getOut());
-
-            for(Symbol s: newVariablesSet){
-                int num = priorityQueue.remove();
-                System.out.println("Using num " + num);
-                s.setStackPos(num);
-            }
-        }
+        root.generateStackPos(priorityQueue, new HashSet<>(), numParams);
+        resetVisited();
     }
 }
