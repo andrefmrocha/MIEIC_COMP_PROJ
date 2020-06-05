@@ -16,15 +16,18 @@ public
 class ASTAssignVar extends TypeNode {
     public String varIdentifier;
     private int iinc = Integer.MAX_VALUE;
+    public boolean optimized;
 
     public ASTAssignVar(int id) {
         super(id);
         this.validStatement = true;
+        optimized = ASTProgram.optimize;
     }
 
     public ASTAssignVar(Javamm p, int id) {
         super(p, id);
         this.validStatement = true;
+        optimized = ASTProgram.optimize;
     }
 
     @Override
@@ -50,6 +53,8 @@ class ASTAssignVar extends TypeNode {
         }
 
         Symbol symbol = this.table.getSymbol(varIdentifier);
+        if(!optimized)
+            symbol.didChange();
 
         SimpleNode expression = (SimpleNode) this.jjtGetChild(1);
         this.evaluateChild(expression, symbol, parser);
@@ -135,7 +140,7 @@ class ASTAssignVar extends TypeNode {
         if (iinc != Integer.MAX_VALUE && iinc >= -32768 && iinc <= 32767) {
             final String iincInstruction = (iinc > 127 || iinc < -128) ? "iinc_w" : "iinc";
             writer.println("  " + iincInstruction + " " + varNum + " " + iinc);
-        } else if(!ASTProgram.optimize || leftSymbol.hasChanged() || leftSymbol.getValue() == -1) { //the optimization is off or the variable isn't a constant
+        } else if(!optimized || leftSymbol.hasChanged() || leftSymbol.getValue() == -1) { //the optimization is off or the variable isn't a constant
             if (varNum == -1)
                 writer.println("  aload_0");
             // result will be on stack
