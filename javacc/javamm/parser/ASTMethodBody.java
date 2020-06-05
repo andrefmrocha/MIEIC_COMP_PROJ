@@ -63,6 +63,26 @@ class ASTMethodBody extends SimpleNode {
         }
 
         this.graph = new Graph(nodes);
+
+        checkUsedSymbols(this);
+    }
+
+    private void checkUsedSymbols(SimpleNode node) {
+        for(int i = 0; i < node.jjtGetNumChildren(); i++){
+            SimpleNode methodNode = (SimpleNode) node.jjtGetChild(i);
+            switch (methodNode.id) {
+                case JavammTreeConstants.JJTASSIGNVAR:
+                    ((ASTAssignVar) methodNode).isUsedSymbol();
+                    break;
+                case JavammTreeConstants.JJTWHILE:
+                    checkUsedSymbols(methodNode);
+                    break;
+                case JavammTreeConstants.JJTIF:
+                    checkUsedSymbols((SimpleNode) methodNode.jjtGetChild(1));
+                    checkUsedSymbols((SimpleNode) methodNode.jjtGetChild(2));
+                    break;
+            }
+        }
     }
 
     private void addNodesToGraph(List<CFGNode> graph, SimpleNode methodNode) {

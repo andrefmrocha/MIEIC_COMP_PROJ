@@ -8,6 +8,7 @@ public class CFGNode {
     private final Set<CFGSymbol> definedVars;
     private final Set<CFGSymbol> in = new HashSet<>();
     private final Set<CFGSymbol> out = new HashSet<>();
+    private boolean isIf = false;
 
     public boolean visited = false;
 
@@ -25,11 +26,16 @@ public class CFGNode {
         this(new ArrayList<>(), usedVars, definedVars);
     }
 
+    public CFGNode(List<CFGSymbol> symbols, boolean isIf) {
+        this(symbols);
+        this.isIf = isIf;
+    }
+
     public List<CFGNode> getEdges() {
         return edges;
     }
 
-    public void addEdge(CFGNode node){
+    public void addEdge(CFGNode node) {
         this.edges.add(node);
     }
 
@@ -53,8 +59,8 @@ public class CFGNode {
         this.visited = true;
         this.in.clear();
         this.out.clear();
-        for(CFGNode succ : edges) {
-            if(succ.visited) continue; // already visited
+        for (CFGNode succ : edges) {
+            if (succ.visited) continue; // already visited
             succ.resetInAndOutDFS(); // dfs
         }
     }
@@ -81,8 +87,14 @@ public class CFGNode {
             this.out.addAll(succ.getIn());
     }
 
-    public boolean isPlaceholder(){
-        return this.definedVars.isEmpty() && this.usedVars.isEmpty();
+    public boolean isPlaceholder() {
+        return this.definedVars.isEmpty() && this.usedVars.isEmpty() && !this.isIf;
     }
 
+    public void resetVisited() {
+        if (this.visited) {
+            this.visited = false;
+            edges.forEach(CFGNode::resetVisited);
+        }
+    }
 }

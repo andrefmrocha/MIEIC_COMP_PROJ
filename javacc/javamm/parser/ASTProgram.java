@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public
 class ASTProgram extends SimpleNode {
-  public static boolean optimize = false;
+  public static boolean optimize = false; //default false
   public static int registerAllocated = -1;
 
   public ASTProgram(int id) {

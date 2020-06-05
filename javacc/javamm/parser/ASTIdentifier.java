@@ -34,6 +34,7 @@ class ASTIdentifier extends TypeNode {
       if (s != null) {
         value = s.getValue();
         s.setUsed();
+        //System.out.println("Evaluating variable: " + identifierName + " value " + value + " line " + this.getLine());
       }
     }
   }
@@ -67,10 +68,9 @@ class ASTIdentifier extends TypeNode {
     final List<CFGSymbol> symbol = new ArrayList<>();
     if(table.checkSymbol(identifierName)){
       Symbol s = table.getSymbol(identifierName);
+      s.setUsed();
       if(s.getStackPos() != -1){
         symbol.add(new CFGSymbol(identifierName, s));
-      } else {
-        System.out.println("Won't add variable with name " + identifierName + " with type " + s.getType() + " and pos " + s.getStackPos() + " in line " + getLine());
       }
     }
 
