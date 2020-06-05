@@ -3,7 +3,6 @@ package javamm.parser;
 import javamm.SemanticsException;
 import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
-import javamm.semantics.SymbolTable;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import java.util.Map;
 public
 class ASTMethod extends TypeNode {
     public List<Symbol> parameters = new ArrayList<>();
+    private int localsLimit;
 
     public ASTMethod(int id) {
         super(id);
@@ -62,13 +62,22 @@ class ASTMethod extends TypeNode {
         } else {
             methodBody = (ASTMethodBody) this.jjtGetChild(2);
         }
-        if(((SimpleNode)this.jjtGetChild(0)).id == JavammTreeConstants.JJTMAIN){
+        if (((SimpleNode) this.jjtGetChild(0)).id == JavammTreeConstants.JJTMAIN) {
             methodBody.setTables(table.getParent(), methodTable.getParent());
         } else {
             methodBody.setTables(table, methodTable);
         }
         methodBody.returnType = this.type;
         methodBody.eval(parser, stackPointer);
+        if (ASTProgram.registerAllocated != -1)
+            localsLimit = methodBody.graph.generateStackPos(ASTProgram.registerAllocated, parameters.size() + 1);
+        else
+            localsLimit = parameters.size() +
+                    methodBody.localsCount + 1;
+
+        if (localsLimit == -1) {
+            parser.semanticErrors.add(new SemanticsException("More local variables are needed for the method", this));
+        }
     }
 
     @Override
@@ -81,18 +90,16 @@ class ASTMethod extends TypeNode {
             writer.println(".method public static main([Ljava/lang/String;)V");
         }
 
-        int paramsCount = 0;
         ASTMethodBody methodBody;
         if (this.jjtGetNumChildren() == 2) {
             methodBody = (ASTMethodBody) this.jjtGetChild(1);
         } else {
-            paramsCount = ((ASTParameters) this.jjtGetChild(1)).nParams;
             methodBody = (ASTMethodBody) this.jjtGetChild(2);
         }
 
-        if(ASTProgram.optimize) {
+        if (ASTProgram.optimize) {
             int constVars = 0;
-            for(int i = 0; i< methodBody.jjtGetNumChildren(); i++) {
+            for (int i = 0; i < methodBody.jjtGetNumChildren(); i++) {
                 SimpleNode node = (SimpleNode) methodBody.jjtGetChild(i);
                 if(node.id == JavammTreeConstants.JJTVAR) {
                     ASTIdentifier identifier = ((ASTIdentifier)node.jjtGetChild(1));
@@ -101,7 +108,7 @@ class ASTMethod extends TypeNode {
                     if(!symbol.hasChanged() && symbol.getValue() != -1) {
                         //check if the variable can be replaced with a constant
                         constVars++;
-                        methodBody.localsCount--; //therefore reducing the number of locals needed
+                        localsLimit--; //therefore reducing the number of locals needed
                     } else {
                         ASTVar varNode = (ASTVar) node;
                         varNode.stackPos -= constVars;
@@ -110,8 +117,6 @@ class ASTMethod extends TypeNode {
                 }
             }
         }
-        int localsLimit = paramsCount +
-                methodBody.localsCount + 1;
 
         StackUsage stackUsage = new StackUsage();
         methodBody.calculateStackUsage(stackUsage);

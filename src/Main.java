@@ -100,7 +100,7 @@ public class Main {
         }
     }
 
-    private static String checkDebugMode(String[] args) throws ParseException {
+    private static String checkDebugMode(String[] args) throws IllegalArgumentException {
         if (args.length > 4 || args.length < 1)
             throw new IllegalArgumentException("At least one argument needed and at most four arguments allowed: java –jar comp2020-5f.jar [-r=<num>] [-o] [-d] <input_file.jmm>");
 
@@ -116,7 +116,11 @@ public class Main {
                     continue;
             }
             if(registerPatter.matcher(arg).matches()) {
-                ASTProgram.registerAllocated = Integer.parseInt(arg.split("-r=")[1]);
+                final int localsMax = Integer.parseInt(arg.split("-r=")[1]);
+                if(localsMax == 0)
+                    throw new IllegalArgumentException("-r number must be at least 1");
+
+                ASTProgram.registerAllocated = localsMax;
             } else if (filePattern.matcher(arg).find()) {
                 fileName = arg;
             }

@@ -2,25 +2,21 @@ import static io.println(int) void;
 import Parent;
 import static io.func(int) void;
 class Simple extends Parent {
-    public Simple t() {
-        return new Simple();
-    }
-    public void coisa(Parent p) {}
-    public void nothing(int a) {
-        int c;
-        c = a;
-        io.println(c);
-    }
-    public int t2() {
+
+    public int test() {
         int a;
         int b;
-        a = 2;
-        b = 2*3 + 4/a +1;
-        a = 4;
-        b = a +2;
-        this.nothing(a+8);
-        this.nothing(a);
-        io.func(a);
-        return a;
+        int c;
+        int d;
+        int e;
+        int f;
+        f = 1;
+        d = f;
+        f = 2;
+        e = 1;
+        a = 1 + d + e;
+        b = 2;
+        c = 3 + b + e + d;
+        return 0;
     }
 }

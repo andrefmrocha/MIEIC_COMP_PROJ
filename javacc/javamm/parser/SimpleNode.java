@@ -2,6 +2,7 @@ package javamm.parser;
 
 import javamm.SemanticsException;
 import javamm.cfg.CFGNode;
+import javamm.cfg.CFGSymbol;
 import javamm.semantics.MethodSymbolTable;
 import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
@@ -145,8 +146,8 @@ class SimpleNode implements Node {
     return Collections.singletonList(new CFGNode(getSymbols()));
   }
 
-  public List<Symbol> getSymbols() {
-    List<Symbol> nodes = new ArrayList<>();
+  public List<CFGSymbol> getSymbols() {
+    List<CFGSymbol> nodes = new ArrayList<>();
     for(int i = 0; i < this.jjtGetNumChildren(); i++){
       final SimpleNode node = ((SimpleNode) this.jjtGetChild(i));
       node.setTables(table, methodTable);

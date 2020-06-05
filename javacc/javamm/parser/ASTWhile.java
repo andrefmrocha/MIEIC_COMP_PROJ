@@ -126,7 +126,6 @@ class ASTWhile extends ConditionalNode {
 
     if (whileNodes.size() != 0) {
       conditionNode.addEdge(whileNodes.get(0)); // connect condition to while's inner nodes
-      whileNodes.get(whileNodes.size() - 1).addEdge(conditionNode); // connect last node to condition
     }
 
     List<CFGNode> nodes = new ArrayList<>();

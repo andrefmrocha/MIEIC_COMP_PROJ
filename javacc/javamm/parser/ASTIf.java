@@ -119,12 +119,12 @@ class ASTIf extends ConditionalNode {
         List<CFGNode> thenNodes = ((SimpleNode) this.jjtGetChild(1)).getNodes();
         List<CFGNode> elseNodes = ((SimpleNode) this.jjtGetChild(2)).getNodes();
 
-        if (thenNodes.size() != 0) {
+        if(thenNodes.size() != 0 && elseNodes.size() != 0) {
             ifNode.addEdge(thenNodes.get(0));
             thenNodes.get(thenNodes.size() - 1).addEdge(endNode);
         }
 
-        if (elseNodes.size() != 0) {
+        if(elseNodes.size() != 0) {
             ifNode.addEdge(elseNodes.get(0));
             elseNodes.get(elseNodes.size() - 1).addEdge(endNode);
         }
