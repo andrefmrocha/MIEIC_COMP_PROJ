@@ -173,7 +173,7 @@ class TicTacToe {
           mygame.getRow1(), 
           mygame.getRow2());
 
-        player = mygame.getCurrentPlayer();            
+        player = mygame.getCurrentPlayer();
         move = BoardBase.playerTurn(player);
 	    
       		

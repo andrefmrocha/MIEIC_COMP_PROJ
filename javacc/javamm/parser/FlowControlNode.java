@@ -29,6 +29,8 @@ public class FlowControlNode extends SimpleNode {
             SimpleNode child = (SimpleNode) this.jjtGetChild(i);
             child.setTables(table, methodTable);
             if (child.id == JavammTreeConstants.JJTASSIGNVAR) {
+                final ASTAssignVar assignVar = ((ASTAssignVar) child);
+                assignVar.optimized = false;
                 final String identifier = ((ASTIdentifier) child.jjtGetChild(0)).identifierName;
                 if (table.checkSymbol(identifier) && !table.getSymbol(identifier).isInitialized())
                     initializedVars.add(identifier);

@@ -95,9 +95,11 @@ class ASTMethod extends TypeNode {
             for(int i = 0; i< methodBody.jjtGetNumChildren(); i++) {
                 SimpleNode node = (SimpleNode) methodBody.jjtGetChild(i);
                 if(node.id == JavammTreeConstants.JJTVAR) {
-                    String symName = ((ASTIdentifier)node.jjtGetChild(1)).identifierName;
+                    ASTIdentifier identifier = ((ASTIdentifier)node.jjtGetChild(1));
+                    String symName = identifier.identifierName;
                     Symbol symbol = methodBody.table.getSymbol(symName);
-                    if(!symbol.hasChanged() && symbol.getValue() != -1) { //check if the variable can be replaced with a constant
+                    if(!symbol.hasChanged() && symbol.getValue() != -1) {
+                        //check if the variable can be replaced with a constant
                         constVars++;
                         methodBody.localsCount--; //therefore reducing the number of locals needed
                     } else {

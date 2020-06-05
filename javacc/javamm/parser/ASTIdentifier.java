@@ -1,11 +1,9 @@
 package javamm.parser;
 
-import javamm.cfg.CFGNode;
 import javamm.semantics.StackUsage;
 import javamm.semantics.Symbol;
 
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
