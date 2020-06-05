@@ -17,5 +17,9 @@ public abstract class BooleanBinaryOperatorNode extends BinaryOperatorNode{
 
   public abstract void write(PrintWriter writer, String labelFalse);
 
+  public abstract void writeConditionOpt(PrintWriter writer, String labelFalse);
+
   public abstract void calculateParamsStackUsage(StackUsage stackUsage);
+
+
 }

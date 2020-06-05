@@ -33,6 +33,7 @@ class ASTLessThan extends BooleanBinaryOperatorNode {
     writer.println("endCmp_" + currCount + ":");
   }
 
+
   @Override
   public void write(PrintWriter writer, String labelFalse) {
     SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
@@ -40,7 +41,20 @@ class ASTLessThan extends BooleanBinaryOperatorNode {
 
     leftOperand.write(writer);
     rightOperand.write(writer);
+
     writer.println("  if_icmpge " + labelFalse);
+  }
+
+  @Override
+  public void writeConditionOpt(PrintWriter writer, String labelFalse) {
+
+    SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
+    SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
+
+    leftOperand.write(writer);
+    rightOperand.write(writer);
+
+    writer.println("  if_icmplt " + labelFalse);
   }
 
   @Override
