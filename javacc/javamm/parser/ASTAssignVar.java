@@ -17,18 +17,18 @@ public
 class ASTAssignVar extends TypeNode {
     public String varIdentifier;
     private int iinc = Integer.MAX_VALUE;
-    public boolean optimized;
+    private CFGNode assignNode = null;
+    private boolean usedSymbol;
+    private Symbol leftSymbol;
 
     public ASTAssignVar(int id) {
         super(id);
         this.validStatement = true;
-        optimized = ASTProgram.optimize;
     }
 
     public ASTAssignVar(Javamm p, int id) {
         super(p, id);
         this.validStatement = true;
-        optimized = ASTProgram.optimize;
     }
 
     @Override
@@ -53,31 +53,29 @@ class ASTAssignVar extends TypeNode {
             return;
         }
 
-        Symbol symbol = this.table.getSymbol(varIdentifier);
-        if(!optimized)
-            symbol.didChange();
+        leftSymbol = this.table.getSymbol(varIdentifier);
 
         SimpleNode expression = (SimpleNode) this.jjtGetChild(1);
-        this.evaluateChild(expression, symbol, parser);
+        this.evaluateChild(expression, leftSymbol, parser);
 
-        if (!symbol.isInitialized())
-            symbol.setInitialized();
+        if (!leftSymbol.isInitialized())
+            leftSymbol.setInitialized();
 
-        if(!symbol.hasChanged() && !checkConstant(expression,symbol)) {
-            symbol.didChange();
+        if (!leftSymbol.hasChanged() && !checkConstant(expression, leftSymbol)) {
+            leftSymbol.didChange();
         }
 
-        if (expression.id == JavammTreeConstants.JJTSUM && symbol.getStackPos() != -1)
+        if (expression.id == JavammTreeConstants.JJTSUM && leftSymbol.getStackPos() != -1)
             this.optimizeMathOperation(expression);
     }
 
     public boolean checkConstant(SimpleNode node, Symbol symbol) {
-        switch(node.id) {
+        switch (node.id) {
             case JavammTreeConstants.JJTNUMERIC:
-                symbol.setValue(((ASTNumeric)node).number);
+                symbol.setValue(((ASTNumeric) node).number);
                 return true;
             case JavammTreeConstants.JJTBOOLEANVALUE:
-                symbol.setValue(((ASTBooleanValue)node).bool?1:0);
+                symbol.setValue(((ASTBooleanValue) node).bool ? 1 : 0);
                 return true;
             default:
                 //the node is not a constant value
@@ -138,10 +136,13 @@ class ASTAssignVar extends TypeNode {
         Symbol leftSymbol = this.table.getSymbol(varName);
         int varNum = leftSymbol.getStackPos();
         SimpleNode right = (SimpleNode) this.jjtGetChild(1);
+
         if (iinc != Integer.MAX_VALUE && iinc >= -32768 && iinc <= 32767) {
             final String iincInstruction = (iinc > 127 || iinc < -128) ? "iinc_w" : "iinc";
             writer.println("  " + iincInstruction + " " + varNum + " " + iinc);
-        } else if(!optimized || leftSymbol.hasChanged() || leftSymbol.getValue() == -1) { //the optimization is off or the variable isn't a constant
+        }
+        //if optimizing, check if the value of the assignment is used before another assignment or the variable is constant
+        else if (isStorable(leftSymbol, varNum, usedSymbol)) {
             if (varNum == -1)
                 writer.println("  aload_0");
             // result will be on stack
@@ -157,6 +158,35 @@ class ASTAssignVar extends TypeNode {
                 writer.println("  " + storeInstr + separator + Integer.toString(varNum) + "\n");
             }
         }
+    }
+
+    public void isUsedSymbol() {
+        usedSymbol = false;
+        if(leftSymbol.getStackPos() != -1) {
+            usedSymbol = findSymbolUse(assignNode.getEdges(),new CFGSymbol(varIdentifier, leftSymbol));
+            assignNode.resetVisited();
+        }
+
+        if(isStorable(leftSymbol, leftSymbol.getStackPos(), usedSymbol))
+            leftSymbol.didChange();
+    }
+
+    private boolean isStorable(Symbol leftSymbol, int varNum, boolean usedSymbol) {
+        return varNum == -1 || !ASTProgram.optimize || (usedSymbol && (leftSymbol.hasChanged() || leftSymbol.getValue() == -1));
+    }
+
+    protected boolean findSymbolUse(List<CFGNode> edges, CFGSymbol symbol) {
+        for(CFGNode cfgNode : edges) {
+            if(cfgNode.getEdges().size() > 1){
+                symbol.getSymbol().didChange();
+                return true;
+            }
+
+            if(cfgNode.visited || cfgNode.getDefinedVars().contains(symbol)) continue;
+            cfgNode.visited = true;
+            if (cfgNode.getOut().contains(symbol) || cfgNode.getUsedVars().contains(symbol) || findSymbolUse(cfgNode.getEdges(), symbol)) return true;
+        }
+        return assignNode.getOut().contains(symbol);
     }
 
     @Override
@@ -183,15 +213,12 @@ class ASTAssignVar extends TypeNode {
         List<CFGSymbol> used = ((SimpleNode) this.jjtGetChild(1)).getSymbols();
         if (table.checkSymbol(identifier.identifierName)) {
             final Symbol symbol = table.getSymbol(identifier.identifierName);
-            if (symbol.getStackPos() == -1){
-                System.out.println("Defined variable" + identifier.identifierName + " is defined in top level");
+            if (symbol.getStackPos() == -1) {
                 return Collections.singletonList(new CFGNode(used));
             }
-
-            nodes.add(new CFGNode(used,
-                    Collections.singletonList(new CFGSymbol(identifier.identifierName, symbol))));
-        } else {
-            System.out.println("Var " + identifier.identifierName + " not found");
+            this.assignNode = new CFGNode(used,
+                Collections.singletonList(new CFGSymbol(identifier.identifierName, symbol)));
+            nodes.add(this.assignNode);
         }
         return nodes;
     }

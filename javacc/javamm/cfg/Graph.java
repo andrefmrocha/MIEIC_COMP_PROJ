@@ -7,7 +7,7 @@ public class Graph {
     private CFGNode root;
 
     public Graph(List<CFGNode> nodes) {
-        this.nodes = this.removePlaceHolders(nodes);
+        this.nodes = removePlaceHolders(nodes);
         generateInAndOut();
     }
 

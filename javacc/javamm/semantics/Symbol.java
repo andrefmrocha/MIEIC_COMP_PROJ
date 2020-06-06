@@ -16,6 +16,7 @@ public class Symbol {
     final protected Type type;
     protected boolean isInitialized;
     protected boolean hasChanged = false;
+    protected boolean isUsed = false;
     protected int value = -1;
 
     public Type getType() {
@@ -91,6 +92,14 @@ public class Symbol {
     public boolean hasChanged() {return hasChanged;}
 
     public void didChange() {hasChanged = true;}
+
+    public boolean isUsed() {
+        return isUsed;
+    }
+
+    public void setUsed() {
+        isUsed = true;
+    }
 
     public int getValue() {return value;}
 

@@ -97,21 +97,20 @@ class ASTMethod extends TypeNode {
             methodBody = (ASTMethodBody) this.jjtGetChild(2);
         }
 
-        if (ASTProgram.optimize) {
-            int constVars = 0;
-            for (int i = 0; i < methodBody.jjtGetNumChildren(); i++) {
+        if(ASTProgram.optimize) {
+            int unusedVars = 0;
+            for(int i = 0; i< methodBody.jjtGetNumChildren(); i++) {
                 SimpleNode node = (SimpleNode) methodBody.jjtGetChild(i);
                 if(node.id == JavammTreeConstants.JJTVAR) {
                     ASTIdentifier identifier = ((ASTIdentifier)node.jjtGetChild(1));
                     String symName = identifier.identifierName;
                     Symbol symbol = methodBody.table.getSymbol(symName);
-                    if(!symbol.hasChanged() && symbol.getValue() != -1) {
-                        //check if the variable can be replaced with a constant
-                        constVars++;
+                    if(!symbol.isUsed() ||(!symbol.hasChanged() && symbol.getValue() != -1)) { //check if the variable store can be discarded
+                        unusedVars++;
                         localsLimit--; //therefore reducing the number of locals needed
                     } else {
                         ASTVar varNode = (ASTVar) node;
-                        varNode.stackPos -= constVars;
+                        varNode.stackPos -= unusedVars;
                         symbol.setStackPos(varNode.stackPos); //move up the non constant variables in the stack
                     }
                 }
