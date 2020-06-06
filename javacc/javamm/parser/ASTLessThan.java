@@ -39,10 +39,18 @@ class ASTLessThan extends BooleanBinaryOperatorNode {
     SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
     SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
 
-    leftOperand.write(writer);
-    rightOperand.write(writer);
+    if(leftOperand.id == JavammTreeConstants.JJTNUMERIC && ((ASTNumeric) leftOperand).number == 0) {
+      rightOperand.write(writer);
+      writer.println("  ifle " + labelFalse);
+    } else if(rightOperand.id == JavammTreeConstants.JJTNUMERIC && ((ASTNumeric) rightOperand).number == 0) {
+      leftOperand.write(writer);
+      writer.println("  ifge " + labelFalse);
+    } else {
+      leftOperand.write(writer);
+      rightOperand.write(writer);
+      writer.println("  if_icmpge " + labelFalse);
+    }
 
-    writer.println("  if_icmpge " + labelFalse);
   }
 
   @Override
@@ -51,10 +59,17 @@ class ASTLessThan extends BooleanBinaryOperatorNode {
     SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
     SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
 
-    leftOperand.write(writer);
-    rightOperand.write(writer);
-
-    writer.println("  if_icmplt " + labelFalse);
+    if(leftOperand.id == JavammTreeConstants.JJTNUMERIC && ((ASTNumeric) leftOperand).number == 0) {
+      rightOperand.write(writer);
+      writer.println("  ifgt " + labelFalse);
+    } else if(rightOperand.id == JavammTreeConstants.JJTNUMERIC && ((ASTNumeric) rightOperand).number == 0) {
+      leftOperand.write(writer);
+      writer.println("  iflt " + labelFalse);
+    } else {
+      leftOperand.write(writer);
+      rightOperand.write(writer);
+      writer.println("  if_icmplt " + labelFalse);
+    }
   }
 
   @Override
