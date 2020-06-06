@@ -1,7 +1,7 @@
 options {
     LOOKAHEAD =  1;
-    MULTI = true;
-    NODE_SCOPE_HOOK=true;
+    MULTI = true; // force the generation of a file for each AST node
+    NODE_SCOPE_HOOK = true; // generate a listener on each node's opening and closing
 }
 
 PARSER_BEGIN(Javamm)
@@ -13,12 +13,12 @@ import java.util.ArrayList;
 public class Javamm {
     public final List<SemanticsException> semanticErrors = new ArrayList();
     public final List<SemanticsException> semanticWarnings = new ArrayList();
-    public static final int NUM_ERRORS = 10;
-    int nErrors = 1;
+    public static final int NUM_ERRORS = 10; // syntactic errors
+    int nErrors = 1; // syntactic errors counter
 
     public static void main(String[] args) throws ParseException {
-            Javamm parser = new Javamm(System.in);
-            parser.Program();
+        Javamm parser = new Javamm(System.in);
+        parser.Program();
     }
 
     public int getNumErrors(){
@@ -40,6 +40,7 @@ SKIP :
     " " | "\t" | "\r" | "\n"
 }
 
+// skip comments, both one-line and multi-line
 SKIP :
 {
   < "//" (~["\r", "\n"])* >
@@ -253,7 +254,7 @@ JAVACODE
 void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #RecoverFromError {
 
     if(nErrors <= 0) throw new ParseException();
-    nErrors--;
+    nErrors--; // decrement remaining errors
 
     ParseException e = generateParseException();  // generate the exception object.
     System.out.println("Error in line " + e.currentToken.beginLine + ", column " + e.currentToken.beginColumn + ":");
@@ -263,19 +264,22 @@ void recoverFromError(int[] skipTo, String errorMsg, boolean advanceWhenFound) #
     String skipped = "";
     boolean found = false;
     while(!found) {
+        // check if current token matches any of the next expected nodes
         for (int i = 0; i < skipTo.length; i++) {
             if (skipTo[i] == getToken(1).kind) {
                 found = true;
                 break;
             }
         }
+
+        // if it does not match, skip it
         if(!found) {
             skipped += getToken(1).toString();
             t = getNextToken();
        }
     }
 
-    if (advanceWhenFound) {
+    if (advanceWhenFound) { // if should consume or not the stoppage token
         skipped += getToken(1).toString();
         getNextToken();
     }

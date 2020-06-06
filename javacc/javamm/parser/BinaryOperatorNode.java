@@ -35,6 +35,7 @@ public abstract class BinaryOperatorNode extends TypeNode {
         SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
         SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
 
+        // check types
         this.evaluateChild(leftOperand, new Symbol(operandType), parser);
         this.evaluateChild(rightOperand, new Symbol(operandType), parser);
     }
@@ -44,6 +45,7 @@ public abstract class BinaryOperatorNode extends TypeNode {
         SimpleNode leftOperand = (SimpleNode) this.jjtGetChild(0);
         SimpleNode rightOperand = (SimpleNode) this.jjtGetChild(1);
 
+        // write operands to stack
         leftOperand.write(writer);
         rightOperand.write(writer);
 
@@ -58,6 +60,6 @@ public abstract class BinaryOperatorNode extends TypeNode {
         leftOperand.calculateStackUsage(stackUsage);
         rightOperand.calculateStackUsage(stackUsage);
 
-        stackUsage.dec(1);
+        stackUsage.dec(1); // operation will pop the 2 operands and leave the result (-2+1 = -1)
     }
 }

@@ -30,6 +30,7 @@ public class ASTMethodCall extends TypeNode {
         final SimpleNode methodName = (SimpleNode) this.jjtGetChild(0);
         final ASTCall call = ((ASTCall) this.jjtGetChild(1));
         call.setTables(table, methodTable);
+        // handle different ways of calling a method
         switch (methodName.id) {
             case JavammTreeConstants.JJTIDENTIFIER:
                 final String methodIdentifier = ((ASTIdentifier) methodName).identifierName;

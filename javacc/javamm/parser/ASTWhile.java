@@ -14,7 +14,7 @@ import java.util.List;
 public
 class ASTWhile extends ConditionalNode {
 
-    public static int labelCounter = 0;
+    public static int labelCounter = 0; // count used labels to prevent repetition
     private HashMap<Integer, Integer> requiredPops = new HashMap<>();
 
     public ASTWhile(int id) {
@@ -28,16 +28,18 @@ class ASTWhile extends ConditionalNode {
     @Override
     public void eval(Javamm parser) {
         super.eval(parser);
+        // iterate all childs except the condition (child 0)
         for (int i = 1; i < this.jjtGetNumChildren(); i++) {
             SimpleNode child = (SimpleNode) this.jjtGetChild(i);
 
+            // invalid statement found, such as '1;'
             if (!child.validStatement) {
                 parser.semanticErrors.add(new SemanticsException("Not a statement: " + child.toString(), child));
                 return;
             }
 
             child.setTables(table, methodTable);
-            child.eval(parser);
+            child.eval(parser); // recursive call
         }
     }
 
@@ -51,6 +53,8 @@ class ASTWhile extends ConditionalNode {
             writer.println("while_" + localCounter + ":");
         SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
         switch (expression.id) {
+
+            // two values are pushed to stack
             case JavammTreeConstants.JJTAND:
             case JavammTreeConstants.JJTLESSTHAN:
                 BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
@@ -62,6 +66,8 @@ class ASTWhile extends ConditionalNode {
                     node.write(writer, "endwhile_" + localCounter);
                 }
                 break;
+
+            // one value is pushed to stack
             case JavammTreeConstants.JJTBOOLEANVALUE:
             case JavammTreeConstants.JJTNEGATION:
             case JavammTreeConstants.JJTIDENTIFIER:
@@ -79,12 +85,11 @@ class ASTWhile extends ConditionalNode {
 
         for (int i = 1; i < this.jjtGetNumChildren(); i++) {
             SimpleNode exp = (SimpleNode) this.jjtGetChild(i);
-            if (exp.id == JavammTreeConstants.JJTWHILE)
+            if (exp.id == JavammTreeConstants.JJTWHILE) // nested whiles
                 labelCounter++;
             exp.write(writer);
-            StackUsage.popStack(writer, this.requiredPops.get(i));
+            StackUsage.popStack(writer, this.requiredPops.get(i)); // pop any value left on the stack
         }
-
 
         if (!ASTProgram.optimize)
             writer.println("  goto while_" + localCounter);
@@ -95,13 +100,19 @@ class ASTWhile extends ConditionalNode {
             writer.println("  ifne while_" + localCounter);
         }
 
-
         writer.println("endwhile_" + localCounter + ":");
         labelCounter++;
     }
 
+    /**
+     * Calculate stack usage of the given node that represents a condition
+     * @param stackUsage StackUsage object that should be used as a starting point and updated
+     * @param expression Node to calculate stack usage
+     */
     public void calculateStackCondition(StackUsage stackUsage, SimpleNode expression) {
         switch (expression.id) {
+
+            // one value is pushed to stack
             case JavammTreeConstants.JJTIDENTIFIER:
             case JavammTreeConstants.JJTBOOLEANVALUE:
             case JavammTreeConstants.JJTNEGATION:
@@ -109,6 +120,8 @@ class ASTWhile extends ConditionalNode {
                 expression.calculateStackUsage(stackUsage);
                 stackUsage.dec(1); // ifeq
                 break;
+
+            // two values are pushed to stack
             case JavammTreeConstants.JJTAND:
             case JavammTreeConstants.JJTLESSTHAN:
                 BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
@@ -128,18 +141,18 @@ class ASTWhile extends ConditionalNode {
         for (int i = 1; i < this.jjtGetNumChildren(); i++) {
             SimpleNode exp = (SimpleNode) this.jjtGetChild(i);
             exp.calculateStackUsage(stackUsage);
-            this.requiredPops.put(i, stackUsage.getStackUsage() - stackUsageBefore);
-            stackUsage.set(stackUsageBefore);
+            this.requiredPops.put(i, stackUsage.getStackUsage() - stackUsageBefore); // check if any value was left in stack
+            stackUsage.set(stackUsageBefore); // reset stackUsage value to previous one
         }
 
-        if (ASTProgram.optimize)
+        if (ASTProgram.optimize) // condition will also be present in the end when optimized
             calculateStackCondition(stackUsage, expression);
     }
 
     @Override
     public List<CFGNode> getNodes() {
         CFGNode conditionNode = new CFGNode(((SimpleNode) this.jjtGetChild(0)).getSymbols());
-        CFGNode endNode = new CFGNode(new ArrayList<>());
+        CFGNode endNode = new CFGNode(new ArrayList<>()); // placeholder node that represents the end of the while
 
         conditionNode.addEdge(endNode); // connect condition to end
 
@@ -148,7 +161,7 @@ class ASTWhile extends ConditionalNode {
             List<CFGNode> nodes = ((SimpleNode) this.jjtGetChild(i)).getNodes();
 
             if (whileNodes.size() != 0)
-                whileNodes.get(whileNodes.size() - 1).addEdge(nodes.get(0));
+                whileNodes.get(whileNodes.size() - 1).addEdge(nodes.get(0)); // connected children nodes
 
             whileNodes.addAll(nodes);
         }
@@ -156,7 +169,7 @@ class ASTWhile extends ConditionalNode {
         if (whileNodes.size() != 0) {
             conditionNode.addEdge(whileNodes.get(0)); // connect condition to while's inner nodes
             for(CFGNode node: whileNodes){
-                node.addEdge(conditionNode);
+                node.addEdge(conditionNode); // connect all body nodes to the condition node
             }
         }
 

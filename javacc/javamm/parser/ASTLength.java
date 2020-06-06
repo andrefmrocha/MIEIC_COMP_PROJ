@@ -27,8 +27,10 @@ class ASTLength extends TypeNode {
 
 
         final SimpleNode var = (SimpleNode) this.jjtGetChild(0);
+        // handle different ways of calling .length
         switch (var.id) {
             case JavammTreeConstants.JJTIDENTIFIER:
+                // check identifier exists
                 final ASTIdentifier identifier = (ASTIdentifier) var;
                 if (!this.table.checkSymbol(identifier.identifierName)) {
                     parser.semanticErrors.add(new SemanticsException("No variable " + identifier.identifierName
@@ -36,6 +38,7 @@ class ASTLength extends TypeNode {
                     return;
                 }
 
+                // check symbol is an INT_ARRAY
                 final Symbol symbol = table.getSymbol(identifier.identifierName);
                 if (!this.checkType(Symbol.Type.INT_ARRAY, symbol)) {
                     parser.semanticErrors.add(new SemanticsException("Variable " + identifier.identifierName

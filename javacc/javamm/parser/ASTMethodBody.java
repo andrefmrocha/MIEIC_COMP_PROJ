@@ -16,7 +16,7 @@ import java.util.List;
 public
 class ASTMethodBody extends SimpleNode {
     public Symbol.Type returnType = null;
-    public int localsCount = 0;
+    public int localsCount = 0; // count locals in method body
     private HashMap<Integer, Integer> requiredPops = new HashMap<>();
     public Graph graph = null;
 
@@ -29,14 +29,14 @@ class ASTMethodBody extends SimpleNode {
     }
 
     public void eval(Javamm parser, int stackPointer) {
-        boolean foundReturn = false;
-        List<CFGNode> nodes = new ArrayList<>();
+        boolean foundReturn = false; // if found return node
+        List<CFGNode> nodes = new ArrayList<>(); // collect all CFGNodes inside this method
 
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {
             SimpleNode methodNode = (SimpleNode) this.jjtGetChild(i);
-            if (methodNode.id == JavammTreeConstants.JJTVAR){
+            if (methodNode.id == JavammTreeConstants.JJTVAR){ // var definition
                 ASTVar var = (ASTVar) methodNode;
-                var.stackPos = stackPointer++;
+                var.stackPos = stackPointer++; // assign initial register to each variable
                 localsCount++;
             }
             methodNode.setTables(table, methodTable);
@@ -47,9 +47,9 @@ class ASTMethodBody extends SimpleNode {
                 methodNode.eval(parser);
                 addNodesToGraph(nodes, methodNode);
                 break;
-
             }
 
+            // invalid statement found, such as '1;'
             if (!methodNode.validStatement) {
                 parser.semanticErrors.add(new SemanticsException("Not a statement: " + methodNode.toString(), methodNode));
                 return;
@@ -62,11 +62,15 @@ class ASTMethodBody extends SimpleNode {
             parser.semanticErrors.add(new SemanticsException("Return not found. Must return: " + returnType,this));
         }
 
-        this.graph = new Graph(nodes);
+        this.graph = new Graph(nodes); // build CFGNode graph, used for dataflow analysis
 
         checkUsedSymbols(this);
     }
 
+    /**
+     * Verify which assignments are effectively used or could be ignored
+     * @param node Node to start dfs
+     */
     private void checkUsedSymbols(SimpleNode node) {
         for(int i = 0; i < node.jjtGetNumChildren(); i++){
             SimpleNode methodNode = (SimpleNode) node.jjtGetChild(i);
@@ -98,7 +102,7 @@ class ASTMethodBody extends SimpleNode {
         for(int i = 0; i< this.jjtGetNumChildren(); i++) {
             SimpleNode node = (SimpleNode) this.jjtGetChild(i);
             node.write(writer);
-            StackUsage.popStack(writer, this.requiredPops.get(i));
+            StackUsage.popStack(writer, this.requiredPops.get(i)); // pop any value left on the stack
         }
     }
 
@@ -108,8 +112,8 @@ class ASTMethodBody extends SimpleNode {
         for(int i = 0; i < this.jjtGetNumChildren(); i++) {
             SimpleNode child = (SimpleNode) this.jjtGetChild(i);
             child.calculateStackUsage(stackUsage);
-            this.requiredPops.put(i, stackUsage.getStackUsage() - stackUsageBefore);
-            stackUsage.set(stackUsageBefore);
+            this.requiredPops.put(i, stackUsage.getStackUsage() - stackUsageBefore); // check if any value was left in stack
+            stackUsage.set(stackUsageBefore); // reset stackUsage value to previous one
         }
     }
 

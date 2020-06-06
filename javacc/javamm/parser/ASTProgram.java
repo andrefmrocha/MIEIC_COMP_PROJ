@@ -27,8 +27,9 @@ class ASTProgram extends SimpleNode {
   }
 
     public void eval(Javamm parser) {
-        super.eval(parser);
+        super.eval(parser); // call default eval
 
+        // extra behaviour for Import nodes
         for(int i = 0; i< this.jjtGetNumChildren(); i++) {
             SimpleNode node = (SimpleNode) this.jjtGetChild(i);
             if (!(node instanceof ASTImport)) continue;

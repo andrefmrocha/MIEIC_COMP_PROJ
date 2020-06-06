@@ -42,7 +42,7 @@ class ASTNew extends TypeNode {
 
         Symbol symbol = table.getSymbol(identifier.identifierName);
 
-        if (symbol.getType() != Type.CLASS) {
+        if (symbol.getType() != Type.CLASS) { // can only call new on a class
             parser.semanticErrors.add(new SemanticsException("Expected " + identifier.identifierName
                     + " to be a class, found " + symbol.getType(), identifier));
             return;
@@ -54,14 +54,14 @@ class ASTNew extends TypeNode {
         constructor = callParams.getMethodIdentifier(ClassSymbol.init, parser);
         this.identifier = identifier.identifierName;
 
-        if (!classSymbol.getConstructors().checkSymbol(constructor))
+        if (!classSymbol.getConstructors().checkSymbol(constructor)) // check constructor signature
             parser.semanticErrors.add(new SemanticsException("Can't find constructor with that signature", callParams));
     }
 
     @Override
     public void write(PrintWriter writer) {
         writer.println("  new " + identifier); // create new reference
-        writer.println("  dup"); //duplicate object on top of stack, need 2 references (1 constructor + 1 assign)
+        writer.println("  dup"); // duplicate object on top of stack, need 2 references (1 constructor + 1 assign)
         ((SimpleNode) this.jjtGetChild(1)).write(writer);
         writer.print("  invokespecial " + identifier + "/<init>("); // call constructor
         for (Symbol symbol : constructor.getParameters()) {
@@ -72,11 +72,11 @@ class ASTNew extends TypeNode {
 
     @Override
     protected void calculateStackUsage(StackUsage stackUsage) {
-        stackUsage.inc(2);
+        stackUsage.inc(2); // new + dup
 
         ASTCallParams params = (ASTCallParams) this.jjtGetChild(1);
         params.calculateStackUsage(stackUsage);
-        stackUsage.dec(params.nParams + 1);
+        stackUsage.dec(params.nParams + 1); // pops every param and a 'this' from stack
     }
 
 }

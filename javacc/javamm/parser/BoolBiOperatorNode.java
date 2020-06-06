@@ -4,6 +4,7 @@ import javamm.semantics.Symbol;
 
 import java.io.PrintWriter;
 
+
 public abstract class BoolBiOperatorNode extends BinaryOperatorNode{
 
   public BoolBiOperatorNode(int i, Symbol.Type type, Symbol.Type op) {

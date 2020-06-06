@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Live analysis node, used to build the interference graph
+ */
 public class LiveNode {
     private final CFGSymbol symbol;
     private final Set<LiveNode> edges = new HashSet<>();
@@ -41,6 +44,9 @@ public class LiveNode {
         visited = false;
     }
 
+    /**
+     * Visits the given node, removing the edge from the other nodes.
+     */
     public void visitNode(){
         visited = true;
         coloringEdges.forEach(node -> node.getColoringEdges().remove(this));

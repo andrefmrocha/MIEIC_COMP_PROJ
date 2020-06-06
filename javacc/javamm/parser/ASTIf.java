@@ -11,7 +11,7 @@ import java.util.*;
 /* JavaCCOptions:MULTI=true,NODE_USES_Javamm=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTIf extends ConditionalNode {
-    public static int labelCounter = 0; //if/else counter
+    public static int labelCounter = 0; // count used labels to prevent repetition
 
     public TreeSet<String> initializedVars = new TreeSet<>();
 
@@ -30,6 +30,8 @@ class ASTIf extends ConditionalNode {
         thenNode.setTables(table, methodTable);
         ASTElse elseNode = ((ASTElse) this.jjtGetChild(2));
         elseNode.setTables(table, methodTable);
+
+        // collect variables initilialized in each FlowControlNode child
         final TreeSet<String> thenInitializedVars = thenNode.evaluate(parser);
         final TreeSet<String> elseInitializedVars = elseNode.evaluate(parser);
 
@@ -38,6 +40,7 @@ class ASTIf extends ConditionalNode {
             addAll(elseInitializedVars);
         }};
 
+        // check if variables are initialized in both branches
         for (String identifier : allInitializedVars) {
             boolean inThen = thenInitializedVars.contains(identifier);
             boolean inElse = elseInitializedVars.contains(identifier);
@@ -57,11 +60,14 @@ class ASTIf extends ConditionalNode {
         SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
         int currCounter = labelCounter;
         switch (expression.id) {
+            // two values are pushed to stack
             case JavammTreeConstants.JJTAND:
             case JavammTreeConstants.JJTLESSTHAN:
                 BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
                 node.write(writer, "else_" + currCounter);
                 break;
+
+            // one value is pushed to stack
             case JavammTreeConstants.JJTIDENTIFIER:
             case JavammTreeConstants.JJTBOOLEANVALUE:
             case JavammTreeConstants.JJTNEGATION:
@@ -88,6 +94,7 @@ class ASTIf extends ConditionalNode {
     protected void calculateStackUsage(StackUsage stackUsage) {
         SimpleNode expression = (SimpleNode) this.jjtGetChild(0);
         switch (expression.id) {
+            // one value is pushed to stack
             case JavammTreeConstants.JJTIDENTIFIER:
             case JavammTreeConstants.JJTBOOLEANVALUE:
             case JavammTreeConstants.JJTNEGATION:
@@ -95,6 +102,8 @@ class ASTIf extends ConditionalNode {
                 expression.calculateStackUsage(stackUsage);
                 stackUsage.dec(1); // ifeq
                 break;
+
+            // two values are pushed to stack
             case JavammTreeConstants.JJTAND:
             case JavammTreeConstants.JJTLESSTHAN:
                 BooleanBinaryOperatorNode node = (BooleanBinaryOperatorNode) expression;
@@ -120,13 +129,13 @@ class ASTIf extends ConditionalNode {
         List<CFGNode> elseNodes = ((SimpleNode) this.jjtGetChild(2)).getNodes();
 
         if(thenNodes.size() != 0) {
-            ifNode.addEdge(thenNodes.get(0));
-            thenNodes.get(thenNodes.size() - 1).addEdge(endNode);
+            ifNode.addEdge(thenNodes.get(0)); // connect condition to 'then' branch
+            thenNodes.get(thenNodes.size() - 1).addEdge(endNode); // connect end of 'then' to the endNode
         }
 
         if(elseNodes.size() != 0) {
-            ifNode.addEdge(elseNodes.get(0));
-            elseNodes.get(elseNodes.size() - 1).addEdge(endNode);
+            ifNode.addEdge(elseNodes.get(0)); // connect condition to 'else' branch
+            elseNodes.get(elseNodes.size() - 1).addEdge(endNode); // connect end of 'else' to the endNode
         }
 
         List<CFGNode> nodes = new ArrayList<>();

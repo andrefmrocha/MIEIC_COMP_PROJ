@@ -31,7 +31,8 @@ class ASTClass extends SimpleNode {
         String className = null;
         ClassSymbol extendedClass = null;
 
-        for (int i = 0; i < this.jjtGetNumChildren(); i++) {
+        for (int i = 0; i < this.jjtGetNumChildren(); i++) { // Obtains all fields of the class, the name of the class,
+                                                            // if it extends any class and all its methods
             SimpleNode child = (SimpleNode) this.jjtGetChild(i);
 
             switch (child.id) {
@@ -63,7 +64,7 @@ class ASTClass extends SimpleNode {
             }
         }
 
-        for (int i = 0; i < this.jjtGetNumChildren(); i++) {
+        for (int i = 0; i < this.jjtGetNumChildren(); i++) { // After processing the whole class, it traverses the bodies of the methods
             SimpleNode child = (SimpleNode) this.jjtGetChild(i);
             if (child.id == JavammTreeConstants.JJTMETHOD) {
                 ASTMethod method = (ASTMethod) child;
