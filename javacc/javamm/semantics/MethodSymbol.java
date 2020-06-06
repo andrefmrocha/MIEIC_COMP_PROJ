@@ -3,6 +3,9 @@ package javamm.semantics;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Symbol of a given method. Stores its parameters's symbols and the return symbol
+ */
 public class MethodSymbol extends Symbol {
     final private List<Symbol> parameters;
     final private Symbol returnType;

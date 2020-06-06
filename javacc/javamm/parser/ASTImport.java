@@ -28,10 +28,11 @@ class ASTImport extends SimpleNode {
 
     public void eval(Javamm parser) {
 
-        Type returnValue = Type.VOID;
-        List<String> identifiers = new ArrayList<>();
-        List<Symbol> params = new ArrayList<>();
+        Type returnValue = Type.VOID; // default return is void
+        List<String> identifiers = new ArrayList<>(); // collect all used identifiers
+        List<Symbol> params = new ArrayList<>(); // collect the parameters types from ImportParams child
         ASTReturn returnNode = null;
+
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {
             SimpleNode currNode = (SimpleNode) this.jjtGetChild(i);
             currNode.setTables(table, methodTable);
@@ -50,15 +51,16 @@ class ASTImport extends SimpleNode {
         String fullImportName = String.join(".", identifiers);
         if (identifiers.size() == 1) {
 
-            if (table.checkSymbol(fullImportName)) {
+            if (table.checkSymbol(fullImportName)) { // new constructor for existing class
                 Symbol symbol = table.getSymbol(fullImportName);
                 if (symbol.getType() != Type.CLASS) {
                     parser.semanticErrors.add(new SemanticsException("Expected to find class, found " + symbol.getType(), this));
                     return;
                 }
+                // add constructor to class
                 ((ClassSymbol) symbol).getConstructors().putSymbol(
                         new MethodIdentifier(ClassSymbol.init, params), new MethodSymbol(symbol, params));
-            } else
+            } else // new class
                 table.putSymbol(fullImportName, new ClassSymbol(fullImportName, params));
 
 
@@ -67,23 +69,28 @@ class ASTImport extends SimpleNode {
         else {
             String methodName = identifiers.get(1);
             String className = identifiers.get(0);
-            if (!table.checkSymbol(className)) {
+            if (!table.checkSymbol(className)) { // check that class has been imported
                 parser.semanticErrors.add(new SemanticsException("Class " + className + " has not been imported", this));
                 return;
             }
 
+            // check that first identifier corresponds to a class
             Symbol symbol = table.getSymbol(className);
             if (symbol.getType() != Type.CLASS) {
                 parser.semanticErrors.add(new SemanticsException(className + " is not a class", this));
                 return;
             }
 
+            // add method to class
             ClassSymbol classSymbol = (ClassSymbol) symbol;
             classSymbol.getMethods().putSymbol(new MethodIdentifier(methodName, params), new MethodSymbol(
                     returnValue == Type.CLASS ? returnNode.returnSymbol : new Symbol(returnValue), params));
         }
     }
-
+    /**
+     * Check if all used identifiers exist
+     * @param parser Javamm object for Warnings and errors
+     */
     public void evalIdentifiers(Javamm parser) {
 
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {

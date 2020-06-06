@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Symbol used to store a given class. It stores information regarding its methods as well
+ * as its constructors
+ */
 public class ClassSymbol extends Symbol {
     public static final String init = "<init>";
     MethodSymbolTable methods = new MethodSymbolTable();
@@ -66,6 +70,11 @@ public class ClassSymbol extends Symbol {
         return className;
     }
 
+    /**
+     * Checks if a class symbol derives from the target parent
+     * @param targetParent - the target parent's class symbol
+     * @return if it is derives from the given symbol
+     */
     public boolean derivesFrom(ClassSymbol targetParent) {
         if (className.equals(targetParent.getClassName())) return true;
 

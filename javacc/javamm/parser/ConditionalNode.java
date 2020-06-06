@@ -24,11 +24,10 @@ public abstract class ConditionalNode extends TypeNode {
         }
 
         SimpleNode condition = (SimpleNode) this.jjtGetChild(0);
-        this.evaluateChild(condition, new Symbol(Symbol.Type.BOOL), parser);
+        this.evaluateChild(condition, new Symbol(Symbol.Type.BOOL), parser); // condition must return BOOL type
     }
 
     @Override
     public void write(PrintWriter writer) {
-        //TODO implement this or leave blank to not call the default one
     }
 }

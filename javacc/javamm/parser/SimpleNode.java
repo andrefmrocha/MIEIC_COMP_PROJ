@@ -25,7 +25,7 @@ class SimpleNode implements Node {
   protected Javamm parser;
   protected SymbolTable table;
   protected MethodSymbolTable methodTable;
-  protected boolean validStatement = false;
+  protected boolean validStatement = false; // boolean that indicates whether this node represents a valid statement by itself
   private int line = 0;
 
   public void setLine( int line ) { this.line = line ; }
@@ -48,14 +48,22 @@ class SimpleNode implements Node {
   public void jjtOpen() {
   }
 
+  /**
+   * Recursive method that performs the semantic analysis on every node of the tree
+   * @param parser Javamm object used for storing Warnings and Errors
+   */
   public void eval(Javamm parser)  {
     for(int i = 0; i< this.jjtGetNumChildren(); i++) {
       SimpleNode node = (SimpleNode) this.jjtGetChild(i);
-      node.setTables(this.table, this.methodTable);
-      node.eval(parser);
+      node.setTables(this.table, this.methodTable); // set child tables to the current ones
+      node.eval(parser); // recursive call
     }
   }
 
+  /**
+   * Recursive method that performs the code generation on every node of the tree
+   * @param writer PrintWriter object to use for writing the instructions
+   */
   public void write(PrintWriter writer) {
     for(int i = 0; i< this.jjtGetNumChildren(); i++) {
       SimpleNode node = (SimpleNode) this.jjtGetChild(i);
@@ -63,6 +71,9 @@ class SimpleNode implements Node {
     }
   }
 
+  /**
+   * Print class and method tables in a readable format
+   */
   public void printTable()  {
     for(int i = 0; i< this.jjtGetNumChildren(); i++) {
       SimpleNode node = (SimpleNode) this.jjtGetChild(i);
@@ -135,6 +146,12 @@ class SimpleNode implements Node {
     return id;
   }
 
+  /**
+   * Determine the maximum stack usage that this node will require
+   * By default iterates over all children and finds the maximum usage among them
+   * Should be overwritten in extended nodes when applicable
+   * @param stackUsage StackUsage object that should be used as a starting point and updated
+   */
   protected void calculateStackUsage(StackUsage stackUsage) {
     for(int i = 0; i < this.jjtGetNumChildren(); i++) {
       SimpleNode child = (SimpleNode) this.jjtGetChild(i);
@@ -146,6 +163,11 @@ class SimpleNode implements Node {
     return Collections.singletonList(new CFGNode(getSymbols()));
   }
 
+  /**
+   * Collect all the Symbols that are used inside this node, as CFGSymbol objects
+   * By default collects all the symbols from children elements
+   * @return List of the collected symbols
+   */
   public List<CFGSymbol> getSymbols() {
     List<CFGSymbol> nodes = new ArrayList<>();
     for(int i = 0; i < this.jjtGetNumChildren(); i++){

@@ -2,6 +2,10 @@ package javamm.semantics;
 
 import java.util.HashMap;
 
+/**
+ * Symbol table implementation. It may contain a parent symbol table,
+ * method use to define different scopes for the variables.
+ */
 public class SymbolTable {
     final private HashMap<String, Symbol> table = new HashMap<>();
     private SymbolTable parent = null;

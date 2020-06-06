@@ -69,6 +69,12 @@ class ASTAssignVar extends TypeNode {
             this.optimizeMathOperation(expression);
     }
 
+    /**
+     * Check if the given assign is of a constant value
+     * @param node - the node to be checked
+     * @param symbol - the symbol to be associated with the value
+     * @return if it found a constant
+     */
     public boolean checkConstant(SimpleNode node, Symbol symbol) {
         switch (node.id) {
             case JavammTreeConstants.JJTNUMERIC:
@@ -83,6 +89,11 @@ class ASTAssignVar extends TypeNode {
         }
     }
 
+    /**
+     * Checks if a given node is only a sum of constants on the same node that it is
+     * assigning. This opens up the ability to use the JVM instruction iinc and iinc_w
+     * @param expression - the expression node
+     */
     public void optimizeMathOperation(SimpleNode expression) {
         List<SimpleNode> nodes = getSumNodes((ASTSum) expression);
         boolean hasOnlyConstants = true;
@@ -115,6 +126,11 @@ class ASTAssignVar extends TypeNode {
 
     }
 
+    /**
+     * Get the sum nodes from expression
+     * @param sum - the sum node
+     * @return list of the all the sum nodes
+     */
     public List<SimpleNode> getSumNodes(ASTSum sum) {
         final List<SimpleNode> nodes = new ArrayList<>();
         for (int i = 0; i < sum.jjtGetNumChildren(); i++) {
@@ -160,6 +176,9 @@ class ASTAssignVar extends TypeNode {
         }
     }
 
+    /**
+     * Checks if a given symbol is ever used during the livelihood of the variable
+     */
     public void isUsedSymbol() {
         usedSymbol = false;
         if(leftSymbol.getStackPos() != -1) {
@@ -167,14 +186,28 @@ class ASTAssignVar extends TypeNode {
             assignNode.resetVisited();
         }
 
-        if(isStorable(leftSymbol, leftSymbol.getStackPos(), usedSymbol))
+        if(isStorable(leftSymbol, leftSymbol.getStackPos(), usedSymbol)) //If it is not a constant to be propagated, marks the node as storable
             leftSymbol.didChange();
     }
 
+    /**
+     * Checks if a given symbol is going to be stored, thus if it cannot be propagated as a constant.
+     * @param leftSymbol - the symbol of the variable
+     * @param varNum - the current register allocated to it
+     * @param usedSymbol - if the symbol is ever used during the livelihood of the variable
+     * @return if it is storable
+     */
     private boolean isStorable(Symbol leftSymbol, int varNum, boolean usedSymbol) {
         return varNum == -1 || !ASTProgram.optimize || (usedSymbol && (leftSymbol.hasChanged() || leftSymbol.getValue() == -1));
     }
 
+    /**
+     * Traverses the graph of the method in order to check if a variable is ever used.
+     * It resorts to the the Live-Out set as well as the Used variables set.
+     * @param edges - the edges of the current node
+     * @param symbol - the symbol to check for
+     * @return if it is ever used
+     */
     protected boolean findSymbolUse(List<CFGNode> edges, CFGSymbol symbol) {
         for(CFGNode cfgNode : edges) {
             if(cfgNode.getEdges().size() > 1){

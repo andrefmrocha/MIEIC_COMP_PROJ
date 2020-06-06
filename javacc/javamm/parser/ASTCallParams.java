@@ -23,9 +23,15 @@ class ASTCallParams extends SimpleNode {
         super(p, id);
     }
 
+    /**
+     * Generate the identifier of the method with the given parameters
+     * @param identifier - the identifier of the method itself
+     * @param parser - the Javamm syntactical parser
+     * @return the method identifier
+     */
     public MethodIdentifier getMethodIdentifier(String identifier, Javamm parser) {
         final List<Symbol> params = new ArrayList<>();
-        for (int i = 0; i < this.jjtGetNumChildren(); i++) {
+        for (int i = 0; i < this.jjtGetNumChildren(); i++) { // Goes through all nodes and generates the list of parameters
             SimpleNode node = (SimpleNode) this.jjtGetChild(i);
             node.setTables(table, methodTable);
             if (node.id == JavammTreeConstants.JJTIDENTIFIER) {

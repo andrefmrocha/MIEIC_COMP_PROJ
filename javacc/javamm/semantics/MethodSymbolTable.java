@@ -3,6 +3,9 @@ package javamm.semantics;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Symbol table specialized to store methods
+ */
 public class MethodSymbolTable {
     final private HashMap<MethodIdentifier, MethodSymbol> table = new HashMap<>();
     private MethodSymbolTable parent = null;

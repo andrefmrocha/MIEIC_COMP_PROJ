@@ -79,6 +79,13 @@ public class VarNode extends SimpleNode {
         this.name = name;
     }
 
+    /**
+     * Get a node's type
+     * @param node - the given node
+     * @param table - the symbol table
+     * @param parser - the Javamm syntactical parser
+     * @return the type of the node
+     */
     public static Type getType(SimpleNode node, SymbolTable table, Javamm parser) {
         switch (node.id) {
             case JavammTreeConstants.JJTINTARRAY:
@@ -102,6 +109,14 @@ public class VarNode extends SimpleNode {
         }
     }
 
+    /**
+     * Get the symbol regarding the given node
+     * @param node - the given node
+     * @param table - the symbol table
+     * @param parser - the Javamm syntactical parser
+     * @return the type of the node
+     * @return the symbol of the node
+     */
     public static Symbol getSymbol(SimpleNode node, SymbolTable table, Javamm parser) {
         switch (node.id) {
             case JavammTreeConstants.JJTINTARRAY:

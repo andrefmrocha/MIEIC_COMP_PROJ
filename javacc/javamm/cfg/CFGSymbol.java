@@ -4,6 +4,10 @@ import javamm.semantics.Symbol;
 
 import java.util.Objects;
 
+/**
+ * Wrapper around the Symbol Table's Symbol implementation
+ * that also stores its identifying String
+ */
 public class CFGSymbol {
     private final String identifier;
     private final Symbol symbol;
