@@ -1,14 +1,12 @@
-# PROJECT TITLE : Title
+# Javamm Compiler
 ### GROUP:  g5f
 
-* Ana Margarida Ruivo Loureiro, 201705749, GRADE1: <0 to 20 value>, CONTRIBUTION1: <0 to 100 %>
-* André Rocha, 201706462, GRADE2: <0 to 20 value>, CONTRIBUTION2: <0 to 100 %>
-* João Miguel Ribeiro de Castro Silva Martins , 201707311   ,GRADE2: <0 to 20 value>, CONTRIBUTION2: <0 to 100 %>
-* Mário Gil , 201705723, GRADE2: <0 to 20 value>, CONTRIBUTION2: <0 to 100 %>
+* Ana Margarida Ruivo Loureiro, 201705749, GRADE: 20, CONTRIBUTION: 25%
+* André Rocha, 201706462, GRADE: 20, CONTRIBUTION: 25%
+* João Miguel Ribeiro de Castro Silva Martins , 201707311, GRADE: 20, CONTRIBUTION: 25%
+* Mário Gil , 201705723, GRADE: 20, CONTRIBUTION: 25%
 
-(Note that the sum of the CONTRIBUTION? values must be 100 %)
-
-**GLOBAL GRADE OF THE PROJECT**: <0 to 20>
+**GLOBAL GRADE OF THE PROJECT**: 20
 
 ## SUMMARY
 
