@@ -38,15 +38,13 @@ java -cp "./build/classes/java/main/" <class_name> <arguments>
 
 Where ``<class_name>`` is the name of the class you want to run and ``<arguments>`` are the arguments to be passed to ``main()``.
 
-#### Run ``.jar``
-
 To run the JAR, do the following command:
 
 ```cmd
-java -jar <jar filename> [-d] [-o] [-r] <arguments>
+java -jar <jar filename> [-d] [-o] [-r=num] <arguments>
 ```
 
-Where ``<jar filename>`` is the name of the JAR file that has been copied to the root folder, `` -d `` is the debug mode flag, `` -o `` is the optmization mode flag related to loops and variables,  `` -r `` is the register allocation optimization mode flag and ``<arguments>`` are the arguments to be passed to ``main()``.
+Where ``<jar filename>`` is the name of the JAR file that has been copied to the root folder, `` -d `` is the debug mode flag, `` -o `` is the optmization mode flag related to loops and variables,  `` -r `` is the register allocation optimization mode flag and ``num`` is number of registers to consider and ``<arguments>`` are the arguments to be passed to ``main()``.
 
 #### Test
 
