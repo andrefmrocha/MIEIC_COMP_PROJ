@@ -19,7 +19,7 @@ class ASTParameters extends SimpleNode {
 
     @Override
     public void eval(Javamm parser) {
-        this.nParams = this.jjtGetNumChildren()/2;
+        this.nParams = this.jjtGetNumChildren()/2; // each parameter has type and identifier
         for (int i = 0; i < this.jjtGetNumChildren(); i+=2) {
             SimpleNode paramType = (SimpleNode) this.jjtGetChild(i);
             if(!(paramType instanceof ASTIdentifier)) continue;

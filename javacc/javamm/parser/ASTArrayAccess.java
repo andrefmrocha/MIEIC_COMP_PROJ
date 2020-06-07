@@ -17,12 +17,12 @@ class ASTArrayAccess extends TypeNode {
 
     public ASTArrayAccess(int id) {
         super(id);
-        type = Type.INT;  //TODO: Adapt if String[] is to be used
+        type = Type.INT;
     }
 
     public ASTArrayAccess(Javamm p, int id) {
         super(p, id);
-        type = Type.INT;  //TODO: Adapt if String[] is to be used
+        type = Type.INT;
     }
 
     @Override

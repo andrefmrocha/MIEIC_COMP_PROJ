@@ -2,6 +2,9 @@ package javamm.cfg;
 
 import java.util.*;
 
+/**
+ * CFG graph container. Contains all algorithms necessary by it
+ */
 public class Graph {
     private final List<CFGNode> nodes;
     private CFGNode root;
@@ -11,6 +14,13 @@ public class Graph {
         generateInAndOut();
     }
 
+    /**
+     * Removes placeholder nodes. The definition of a placeholder can be found
+     * in @link CFGNode.isPlaceholder. Placeholder edges will then point towards the nodes that
+     * point towards it
+     * @param nodes - list of the current graph nodes
+     * @return list of nodes with placeholders parse out.
+     */
     private List<CFGNode> removePlaceHolders(List<CFGNode> nodes) {
         for (CFGNode node : nodes) {
             if (!node.isPlaceholder()) {
@@ -28,7 +38,7 @@ public class Graph {
 
             finalNodes.add(node);
             for (CFGNode edge : new ArrayList<>(node.getEdges())) {
-                if (edge.isPlaceholder()) {
+                if (edge.isPlaceholder()) { // If an edge is placeholder, finds the next one that isn't
                     node.getEdges().remove(edge);
                     while (!edge.getEdges().isEmpty()) {
                         edge = edge.getEdges().get(0);
@@ -43,6 +53,9 @@ public class Graph {
         return finalNodes;
     }
 
+    /**
+     * Generate Live-In and Live-out sets for all nodes of the graph
+     */
     public void generateInAndOut() {
         if (root != null) {
             resetInAndOut();
@@ -57,16 +70,30 @@ public class Graph {
         }
     }
 
+    /**
+     * Reset In and Out sets
+     */
     private void resetInAndOut() {
         root.resetInAndOutDFS();
         resetVisited();
     }
 
+    /**
+     * Reset visited flag for all nodes in the graph
+     */
     private void resetVisited() {
         for (CFGNode node: nodes)
             node.visited = false;
     }
 
+    /**
+     * Use the graph coloring algorithm along with dataflow analysis
+     * to minimize the number of registers used to store variables in
+     * a given method
+     * @param maxSize - maximum number of variables to be used
+     * @param numParams - number of parameters a function as, which will limit the starting point of the allocation
+     * @return number of variables used
+     */
     public int generateStackPos(int maxSize, int numParams){
         Map<String, LiveNode> graph = new HashMap<>();
         for(CFGNode node: nodes){
@@ -87,6 +114,14 @@ public class Graph {
         return graph.isEmpty() ? numParams : colorGraph(graph, maxSize, numParams);
     }
 
+    /**
+     * Graph coloring algorithm, which is used to attribute virtual JVM registers
+     * to the variables in a method
+     * @param graph - the interference graph
+     * @param maxSize - maximum number of variables to be used
+     * @param numParams - number of parameters a function as, which will limit the starting point of the allocation
+     * @return number of variables used
+     */
     private int colorGraph(Map<String, LiveNode> graph, int maxSize, int numParams) {
         Stack<LiveNode> stack = new Stack<>();
         graph.values().forEach(LiveNode::reset);
@@ -118,6 +153,11 @@ public class Graph {
         return maxPos + 1;
     }
 
+    /**
+     * Build the interference graph from the existing information from the dataflow analysis
+     * @param graph the given graph
+     * @param nodesToAdd nodes to be added as interferences
+     */
     private void addInterferences(Map<String, LiveNode> graph, List<CFGSymbol> nodesToAdd) {
         for(int i = 0; i < nodesToAdd.size(); i++){
             for(int j = i + 1; j < nodesToAdd.size(); j++){

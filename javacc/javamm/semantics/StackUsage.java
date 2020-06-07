@@ -2,6 +2,9 @@ package javamm.semantics;
 
 import java.io.PrintWriter;
 
+/**
+ * Wrapper around the stack usage, to be calculated for each method
+ */
 public class StackUsage {
 
     private int stackUsage;

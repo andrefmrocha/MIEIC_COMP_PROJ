@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Wrapper around the identifier of the method, storing the parameter's symbols
+ * and the identifier of the method
+ */
 public class MethodIdentifier {
     public String getIdentifier() {
         return identifier;

@@ -19,6 +19,13 @@ public abstract class TypeNode extends SimpleNode {
         super(p, i);
     }
 
+    /**
+     * Evaluates a child to check if if is of the necessary type. Asserts all cases
+     * possible for a variable to exist as
+     * @param child the child node
+     * @param symbol the symbol of the child
+     * @param parser - the Javamm syntactical parser
+     */
     public void evaluateChild(SimpleNode child, Symbol symbol, Javamm parser) {
         Type expectedType = symbol.getType();
         if (child.id == JavammTreeConstants.JJTIDENTIFIER) {  //Check if the node is a variable
@@ -40,11 +47,12 @@ public abstract class TypeNode extends SimpleNode {
             if (!sym.isInitialized()) {
                 parser.semanticErrors.add(new SemanticsException("Variable " + name + " may not be initialized", child));
             }
-        } else if (child instanceof TypeNode) {
+        } else if (child instanceof TypeNode) { // If it is a new type node
             child.setTables(table, methodTable);
             child.eval(parser);
             Type childType = ((TypeNode) child).type;
             if (!(childType == Type.CLASS && expectedType == Type.OBJ) && expectedType != childType)
+                // if it is a class node, it must check if it's a child class of the variable
                 parser.semanticErrors.add(new SemanticsException("Expression is not of type: " + expectedType.toString() + " got " + childType.toString(), child));
             else if (expectedType == Type.OBJ) {
                 // compare classes and check if extends
@@ -78,6 +86,12 @@ public abstract class TypeNode extends SimpleNode {
             parser.semanticErrors.add(new SemanticsException("Invalid expression", child));
     }
 
+    /**
+     * Checks type against the symbol
+     * @param type the type of the variable
+     * @param symbol the child symbol
+     * @return if it's the same type
+     */
     boolean checkType(Type type, Symbol symbol) {
         return symbol.getType() == type ||
                 (symbol.getType() == Type.METHOD && ((MethodSymbol) symbol).getReturnSymbol().getType() == type) ||

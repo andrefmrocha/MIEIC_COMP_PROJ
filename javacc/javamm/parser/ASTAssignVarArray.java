@@ -37,8 +37,6 @@ class ASTAssignVarArray extends TypeNode {
         this.evaluateChild(assign_arr, new Symbol(Type.INT), parser);
 
         this.arrayIdentifier = ((ASTArrayAccess) array_access).arrayIdentifier;
-
-        //TODO assign array Identifier
     }
 
     @Override

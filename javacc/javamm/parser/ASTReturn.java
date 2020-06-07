@@ -28,10 +28,14 @@ class ASTReturn extends TypeNode {
       ASTIdentifier identifier = ((ASTIdentifier) child);
       this.returnSymbol = this.table.getSymbol(identifier.identifierName);
     } else {
-      this.returnSymbol = new Symbol(Symbol.getNodeSymbolType(child)); //TODO does not support statements
+      this.returnSymbol = new Symbol(Symbol.getNodeSymbolType(child));
     }
   }
 
+  /**
+   * If child is identifier, check its type exists
+   * @param parser Javamm object for Warnings and errors
+   */
   public void evalIdentifiers(Javamm parser) {
     SimpleNode child = (SimpleNode) this.jjtGetChild(0);
     if (!(child instanceof ASTIdentifier)) return;
@@ -43,7 +47,6 @@ class ASTReturn extends TypeNode {
 
   @Override
   public void write(PrintWriter writer) {
-    //TODO implement this or leave blank to not call the default one
   }
 }
 /* JavaCC - OriginalChecksum=0d7badc8de429fd7f39c8b2723d9a136 (do not edit this line) */

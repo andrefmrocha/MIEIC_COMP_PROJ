@@ -24,7 +24,7 @@ class ASTMethodReturn extends SimpleNode {
     @Override
     public void eval(Javamm parser) {
         if(expectedType != Symbol.Type.VOID) {
-            if(this.jjtGetNumChildren() == 0) {
+            if(this.jjtGetNumChildren() == 0) { // non-void return must have children
                 parser.semanticErrors.add(new SemanticsException("Expected return type: " + expectedType,this));
                 return;
             }
@@ -37,7 +37,7 @@ class ASTMethodReturn extends SimpleNode {
             final TypeNode node = (TypeNode) this.jjtGetChild(0);
             node.setTables(table, methodTable);
             node.evaluateChild(node, new Symbol(expectedType), parser);
-        } else {
+        } else { // void return should not have children
             if(this.jjtGetNumChildren() >0) {
                 parser.semanticErrors.add(new SemanticsException("Expected return type: " + expectedType,this));
             }
@@ -58,7 +58,7 @@ class ASTMethodReturn extends SimpleNode {
         if(expectedType != Symbol.Type.VOID) {
             final SimpleNode node = (SimpleNode) this.jjtGetChild(0);
             node.calculateStackUsage(stackUsage);
-            stackUsage.dec(1);
+            stackUsage.dec(1); // pop value to return
         }
     }
 }

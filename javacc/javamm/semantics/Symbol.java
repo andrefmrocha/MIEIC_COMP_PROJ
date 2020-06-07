@@ -6,6 +6,9 @@ import javamm.parser.SimpleNode;
 
 import java.util.Objects;
 
+/**
+ * Container for the Symbol's used in a jmm file.
+ */
 public class Symbol {
     private int stackPos = -1;
 
@@ -37,6 +40,11 @@ public class Symbol {
         this.stackPos = stackPos;
     }
 
+    /**
+     * Gets the type of the node
+     * @param node - the given node
+     * @return the type of the node
+     */
     public static Type getNodeSymbolType(SimpleNode node) {
         switch (node.getId()) {
             case JavammTreeConstants.JJTVOID:
@@ -53,6 +61,11 @@ public class Symbol {
         return null;
     }
 
+    /**
+     * Gets the JVM prefix associated to a variable
+     * @param type - the type of the variable
+     * @return the JVM prefix
+     */
     public static String getJVMPrefix(Type type) {
         switch (type) {
             case INT:
@@ -69,6 +82,10 @@ public class Symbol {
         return null;
     }
 
+    /**
+     * Gets the JVM type associated to the symbol
+     * @return the symbol's string
+     */
     public String getJVMType() {
         switch (type) {
             case INT:

@@ -75,7 +75,7 @@ class ASTLessThan extends BooleanBinaryOperatorNode {
   @Override
   protected void calculateStackUsage(StackUsage stackUsage) {
     calculateParamsStackUsage(stackUsage);
-    stackUsage.inc(1); //iconst_x
+    stackUsage.inc(1); // iconst_x
   }
 
   @Override
@@ -85,7 +85,7 @@ class ASTLessThan extends BooleanBinaryOperatorNode {
 
     leftOperand.calculateStackUsage(stackUsage);
     rightOperand.calculateStackUsage(stackUsage);
-    stackUsage.dec(2); //if_icmpge
+    stackUsage.dec(2); // if_icmpge
   }
 }
 /* JavaCC - OriginalChecksum=c0d8a8972c0a4b4df64282733df15850 (do not edit this line) */

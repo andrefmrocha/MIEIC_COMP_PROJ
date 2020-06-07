@@ -25,6 +25,14 @@ class ASTCall extends TypeNode {
         super(p, id);
     }
 
+    /**
+     * Sets the invokation method type used by this call
+     * @param invokationIdent - the indentation given to the invocation
+     * @param classIdent - indentation of the class
+     * @param methodIdent - indentation of the method
+     * @param types - list of the symbols of the parameters
+     * @param returnSymbol - the return type of the function
+     */
     public void setMethodInvokation(String invokationIdent, String classIdent, String methodIdent, List<Symbol> types, Symbol returnSymbol) {
         methodInvokation = invokationIdent + classIdent + "/" + methodIdent + "(";
         for (Symbol symbol : types) {
@@ -33,6 +41,14 @@ class ASTCall extends TypeNode {
         methodInvokation += ")" + returnSymbol.getJVMType();
     }
 
+    /**
+     * Evaluate the given method call that starts with an identifier. It
+     * pertains to the use of static methods or a given object's
+     * methods
+     * @param identifier - identifier used
+     * @param newIdentifier - if it is a new class
+     * @param parser - the Javamm syntactical parser
+     */
     public void evalWithIdentifier(String identifier, boolean newIdentifier, Javamm parser) {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
         final ASTCallParams staticCallParams =  ((ASTCallParams) this.jjtGetChild(1));
@@ -79,6 +95,10 @@ class ASTCall extends TypeNode {
 
     }
 
+    /**
+     * Evaluate the method call that starts with a this
+     * @param parser - the Javamm syntactical parser
+     */
     public void evalWithThis(Javamm parser) {
         final ASTIdentifier methodIdentifier = (ASTIdentifier) this.jjtGetChild(0);
         final ASTCallParams callParams =  ((ASTCallParams) this.jjtGetChild(1));
