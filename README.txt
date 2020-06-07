@@ -2,9 +2,9 @@
 ### GROUP:  g5f
 
 * Ana Margarida Ruivo Loureiro, 201705749, GRADE: 20, CONTRIBUTION: 25%
-* André Rocha, 201706462, GRADE: 20, CONTRIBUTION: 25%
+* André Filipe Magalhães Rocha, 201706462, GRADE: 20, CONTRIBUTION: 25%
 * João Miguel Ribeiro de Castro Silva Martins , 201707311, GRADE: 20, CONTRIBUTION: 25%
-* Mário Gil , 201705723, GRADE: 20, CONTRIBUTION: 25%
+* Mário Gil Marinho Mesquita, 201705723, GRADE: 20, CONTRIBUTION: 25%
 
 **GLOBAL GRADE OF THE PROJECT**: 20
 
