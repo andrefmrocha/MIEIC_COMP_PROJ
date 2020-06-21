@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 
 public class JmmCompiler {
 	
-    private static String CLASS_WITH_MAIN = "JMMCompiler";
+    private static String CLASS_WITH_MAIN = "Main";
 
 
     /**
