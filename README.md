@@ -39,3 +39,9 @@ Where ``<jar filename>`` is the name of the JAR file that has been copied to the
 ## Test
 
 To test the program, run ``gradle test``. This will execute the build, and run the JUnit tests in the ``test`` folder. If you want to see output printed during the tests, use the flag ``-i`` (i.e., ``gradle test -i``).
+
+## Contributors:
+ - [Ana Margarida](https://github.com/anamargaridarl)
+ - [André Rocha](https://github.com/andrefmrocha)
+ - [João Martins](https://github.com/joaomrcsmartins)
+ - [Mário Mesquite](https://github.com/gambuzx)
